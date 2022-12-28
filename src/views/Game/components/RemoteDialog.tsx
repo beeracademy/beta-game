@@ -23,7 +23,9 @@ const RemoteDialog: FunctionComponent<RemoteDialogProps> = (props) => {
         SetRemoteControl: state.SetRemoteControl,
     }));
 
-    const [url, setUrl] = useState("https://game.academy.beer/remote?token=1234567890");
+    const [url, _] = useState(`
+        ${window.location.origin}/remote?token=${generateRemoteToken()}
+    `);
 
     return (
         <Dialog {...props}>
@@ -93,23 +95,27 @@ const RemoteDialog: FunctionComponent<RemoteDialogProps> = (props) => {
                         </Typography>
 
                         <Stack direction="row" spacing={2} alignItems="center" justifyContent="space-between">
-                            <Button variant="contained" color="primary" onClick={
-                                () => {
+                            <Button
+                                variant="contained"
+                                color="primary"
+                                onClick={() => {
                                     navigator.clipboard.writeText(url);
-                                }
-                            }>
+                                }}
+                            >
                                 copy link
                             </Button>
 
-                            <Button variant="contained" color="primary" onClick={
-                                () => {
+                            <Button
+                                variant="contained"
+                                color="primary"
+                                onClick={() => {
                                     navigator.share({
                                         title: "Academy Remote Control",
                                         text: "Game 420 with player1, player2, player3",
-                                        url,
+                                        url: url,
                                     });
-                                }
-                            }>
+                                }}
+                            >
                                 share link
                             </Button>
                         </Stack>
@@ -119,5 +125,9 @@ const RemoteDialog: FunctionComponent<RemoteDialogProps> = (props) => {
         </Dialog>
     );
 };
+
+export function generateRemoteToken(): string {
+    return window.crypto.randomUUID();
+}
 
 export default RemoteDialog;

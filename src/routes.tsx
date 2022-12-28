@@ -4,6 +4,7 @@ import GameView from "./views/Game";
 import LoginView from "./views/Login";
 import ContinueGameView from "./views/Login/Continue";
 import NewGameView from "./views/Login/New";
+import RemoteView from "./views/Remote";
 
 const Routes: FunctionComponent = () => {
     return (
@@ -15,6 +16,8 @@ const Routes: FunctionComponent = () => {
                     <Route path="" element={<NewGameView />} />
                     <Route path="continue" element={<ContinueGameView />} />
                 </Route>
+
+                <Route path="remote" element={<RemoteView />} />
 
                 <Route path="*" element={<Navigate to="/login" />} />
             </RouterRoutes>

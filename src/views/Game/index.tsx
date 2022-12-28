@@ -1,6 +1,7 @@
 import { Box, Card, CardContent } from "@mui/material";
 import { FunctionComponent, useEffect, useState } from "react";
 import { Helmet } from "react-helmet";
+import useWebSocket from "../../api/websocket";
 import { useCardFlash } from "../../components/CardFlash";
 import Terminal from "../../components/Terminal";
 import useGame from "../../stores/game";
@@ -22,12 +23,26 @@ const GameView: FunctionComponent = () => {
 
     const game = useGame((state) => ({
         DrawCard: state.Draw,
-        cards: state.cards,
+        cards: state.draws,
     }));
 
     const gameMetrics = useGameMetrics();
 
     let spacePressed = false;
+
+    const ws = useWebSocket(`wss://academy.beer/ws/remote/31540691-784f-41ae-bf82-093edc84fac3/`);
+
+    useGame.subscribe((state) => {
+        if (ws.ready) {
+            ws.send(state);
+        }
+    });
+
+    ws.receive((message) => {
+        if (message.type === "draw") {
+            game.DrawCard();
+        }
+    });
 
     useEffect(() => {
         console.log(

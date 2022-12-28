@@ -1,0 +1,29 @@
+name: Build and Deploy
+
+on:
+  push:
+    branches:
+      - master
+
+env:
+  DOCKER_IMAGE_NAME: ghcr.io/beeracademy/beta-game
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Build image
+        run: ./build
+
+      - name: Publish image to ghcr.io
+        run: |
+          echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io --username "${{ github.actor }}" --password-stdin
+          docker push "$DOCKER_IMAGE_NAME"
+      - name: Deploy image to production
+        run: curl --fail -X POST "$WEBHOOK_URL"
+        env:
+          WEBHOOK_URL: ${{ secrets.WEBHOOK_URL }}
