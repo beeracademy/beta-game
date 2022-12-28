@@ -30,20 +30,6 @@ const GameView: FunctionComponent = () => {
 
     let spacePressed = false;
 
-    const ws = useWebSocket(`wss://academy.beer/ws/remote/31540691-784f-41ae-bf82-093edc84fac3/`);
-
-    useGame.subscribe((state) => {
-        if (ws.ready) {
-            ws.send(state);
-        }
-    });
-
-    ws.receive((message) => {
-        if (message.type === "draw") {
-            game.DrawCard();
-        }
-    });
-
     useEffect(() => {
         console.log(
             "To open the game terminal, press the ` key. (top left of keyboard, no not escape... the one below escape)"
