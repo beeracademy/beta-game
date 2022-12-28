@@ -5,7 +5,7 @@ import { Player } from "../../../models/player";
 import useSettings from "../../../stores/settings";
 import { toBase14 } from "../../../utilities/base14";
 import { secondsToHHMMSS } from "../../../utilities/time";
-import { usePlayerMetrics } from "../../../stores/metrics";
+import { usePlayerMetricsByIndex } from "../../../stores/metrics";
 import Bubbles from "../../../components/Bubbles";
 import useGame from "../../../stores/game";
 import { Crown, Jester } from "../../../components/Hats";
@@ -20,7 +20,9 @@ const PlayerItem: FunctionComponent<PlayerItemProps> = (props) => {
     const theme = useTheme();
 
     const sipsInABeer = useGame((state) => state.sipsInABeer);
-    const metrics = usePlayerMetrics(props.index);
+
+    const metrics = usePlayerMetricsByIndex(props.index);
+    
     const settings = useSettings((state) => ({
         simpleCardsMode: state.simpleCardsMode,
         SetSimpleCardsMode: state.SetSimpleCardsMode,

@@ -1,10 +1,10 @@
 import { FunctionComponent, useCallback } from "react";
 import useGame from "../../../stores/game";
 import { Line } from "react-chartjs-2";
-import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Legend } from "chart.js";
-import { Box, Card, useTheme } from "@mui/material";
+import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement } from "chart.js";
+import { Box, useTheme } from "@mui/material";
 import useSettings from "../../../stores/settings";
-import { useMetrics } from "../../../stores/metrics";
+import { usePlayerMetrics } from "../../../stores/metrics";
 
 ChartJS.register(LinearScale, PointElement, LineElement, CategoryScale);
 
@@ -15,17 +15,17 @@ const Chart: FunctionComponent<ChartProps> = () => {
 
     const game = useGame((state) => ({
         players: state.players,
-        totalRoundCount: state.totalRoundCount,
+        numberOfRounds: state.numberOfRounds,
     }));
 
-    const metrics = useMetrics();
+    const playerMetrics = usePlayerMetrics();
 
     const settings = useSettings((state) => ({
         themeMode: state.themeMode,
     }));
 
     const datasets = useCallback(() => {
-        const data = metrics.playerMetrics.map((pm, i) => {
+        const data = playerMetrics.map((pm, i) => {
             return {
                 label: game.players[i].username,
                 data: pm.cumulativeSips,
@@ -36,7 +36,7 @@ const Chart: FunctionComponent<ChartProps> = () => {
         });
 
         return data;
-    }, [metrics.playerMetrics, settings.themeMode]);
+    }, [playerMetrics, settings.themeMode]);
 
     return (
         <Box
@@ -50,7 +50,7 @@ const Chart: FunctionComponent<ChartProps> = () => {
         >
             <Line
                 data={{
-                    labels: Array.from(Array(game.totalRoundCount + 1).keys()),
+                    labels: Array.from(Array(game.numberOfRounds + 1).keys()),
                     datasets: [...datasets()],
                 }}
                 options={{

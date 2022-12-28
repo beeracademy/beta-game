@@ -1,21 +1,39 @@
 import create from "zustand";
+import { Card } from "../models/card";
+import { GenerateDeck } from "../utilities/deck";
 import useGame from "./game";
 
 interface PlayerMetrics {
+    totalTime: number;
+
     totalSips: number;
     maxSips: number;
     minSips: number;
-    totalTime: number;
     cumulativeSips: number[];
+
     numberOfBeers: number;
 
-    // Only updated in the beginning of a new round
     isLeading: boolean;
     isLast: boolean;
 }
 
+interface GameMetrics {
+    numberOfCards: number;
+    numberOfCardsDrawn: number;
+    numberOfCardsRemaining: number;
+
+    currentRound: number;
+    roundsRemaining: number;
+
+    numberOfPlayers: number;
+    activePlayerIndex: number;
+
+    done: boolean;
+}
+
 interface MetricsState {
-    playerMetrics: PlayerMetrics[];
+    players: PlayerMetrics[];
+    game: GameMetrics;
 }
 
 interface MetricsActions {
@@ -23,21 +41,62 @@ interface MetricsActions {
 }
 
 const initialState: MetricsState = {
-    playerMetrics: [],
+    players: [],
+    game: {
+        numberOfCards: 0,
+        numberOfCardsDrawn: 0,
+        numberOfCardsRemaining: 0,
+
+        currentRound: 1,
+        roundsRemaining: 0,
+
+        numberOfPlayers: 0,
+        activePlayerIndex: 0,
+
+        done: false,
+    },
 };
 
-const useMetrics = create<MetricsState & MetricsActions>()((set, get) => ({
+const MetricsStore = create<MetricsState & MetricsActions>()((set, get) => ({
     ...initialState,
 
     Update: () => {
         console.debug("[Metrics]", "updating");
 
         const game = useGame.getState();
-        const currentPlayerMetrics = get().playerMetrics;
-        const currentPlayerIndex = game.cards.length % game.players.length;
 
-        // Find the cumulative sips for each player
-        const cumulativeSips = game.cards.reduce<number[][]>(
+        if (game.players.length === 0) {
+            return;
+        }
+
+        const draws = game.draws;
+
+        /*
+            Calculate game metrics
+        */
+
+        const numberOfCards = game.players.length * game.numberOfRounds;
+
+
+        const numberOfCardsDrawn = draws.length;
+        const numberOfCardsRemaining = numberOfCards - numberOfCardsDrawn;
+
+        const currentRound = Math.floor(numberOfCardsDrawn / game.players.length) + 1;
+        const roundsRemaining = game.numberOfRounds - currentRound;
+
+        const numberOfPlayers = game.players.length;
+        const activePlayerIndex = numberOfCardsDrawn % numberOfPlayers;
+
+        const done = numberOfCardsDrawn === numberOfCards;
+
+        /*
+            Calculate player metrics
+        */
+
+        const currentPlayerMetrics = get().players;
+        const currentPlayerIndex = draws.length % game.players.length;
+
+        const cumulativeSips = draws.reduce<number[][]>(
             (acc, card, index) => {
                 const playerIndex = index % game.players.length;
 
@@ -48,19 +107,15 @@ const useMetrics = create<MetricsState & MetricsActions>()((set, get) => ({
             Array.from({ length: game.players.length }, () => [0])
         );
 
-        // Find the total sips for each player
         const totalSips = cumulativeSips.map((cumulativeSips) => cumulativeSips[cumulativeSips.length - 1]);
 
-        // Find number of beers for each player
         const numberOfBeers = totalSips.map((totalSips) => Math.floor(totalSips / game.sipsInABeer));
 
-        // Find the leading player
         const leadingPlayerIndex = totalSips.indexOf(Math.max(...totalSips));
-
-        // Find the last player
         const lastPlayerIndex = totalSips.indexOf(Math.min(...totalSips));
 
-        // Update the state
+        // Get the current metrics for each player
+
         const playerMetrics: PlayerMetrics[] = game.players.map((_, index) => ({
             ...currentPlayerMetrics[index],
 
@@ -73,26 +128,47 @@ const useMetrics = create<MetricsState & MetricsActions>()((set, get) => ({
 
             // Only updated in the beginning of a new round, or first time calculating metrics
             ...((currentPlayerIndex === 0 || currentPlayerMetrics.length === 0) &&
-                game.cardCount !== 0 && {
+                numberOfCardsDrawn !== 0 && {
                     isLeading: index === leadingPlayerIndex,
                     isLast: index === lastPlayerIndex,
                 }),
         }));
 
+        /*
+            Update the metrics store state
+        */
+
         set({
-            playerMetrics: playerMetrics,
+            players: playerMetrics,
+            game: {
+                numberOfCards: numberOfCards,
+                numberOfCardsDrawn: numberOfCardsDrawn,
+                numberOfCardsRemaining: numberOfCardsRemaining,
+
+                currentRound: currentRound,
+                roundsRemaining: roundsRemaining,
+
+                numberOfPlayers: numberOfPlayers,
+                activePlayerIndex: activePlayerIndex,
+
+                done: done,
+            },
         });
     },
 }));
 
 useGame.subscribe(() => {
-    useMetrics.getState().Update();
+    MetricsStore.getState().Update();
 });
-useMetrics.getState().Update();
+MetricsStore.getState().Update();
 
-const usePlayerMetrics = (playerIndex: number) => {
+const usePlayerMetrics = () => {
+    return MetricsStore((state) => state.players);
+};
+
+const usePlayerMetricsByIndex = (playerIndex: number) => {
     return (
-        useMetrics((state) => state.playerMetrics[playerIndex]) || {
+        MetricsStore((state) => state.players[playerIndex]) || {
             totalSips: 0,
             maxSips: 0,
             minSips: 0,
@@ -104,5 +180,9 @@ const usePlayerMetrics = (playerIndex: number) => {
     );
 };
 
-export { useMetrics, usePlayerMetrics };
-export type { MetricsState, MetricsActions };
+const useGameMetrics = () => {
+    return MetricsStore((state) => state.game);
+};
+
+export { MetricsStore, usePlayerMetricsByIndex, useGameMetrics, usePlayerMetrics };
+export type { PlayerMetrics, GameMetrics, MetricsState, MetricsActions };

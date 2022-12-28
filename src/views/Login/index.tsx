@@ -5,7 +5,7 @@ import SoundMuteFab from "./components/SoundMuteFab";
 import useWindowSize from "react-use/lib/useWindowSize";
 import Confetti from "react-confetti";
 import BottomGamesCount from "./components/BottomGamesCount";
-import { useSounds  }from "../../hooks/sounds";
+import { useSounds } from "../../hooks/sounds";
 import ConfirmDialog from "../../components/ConfirmDialog";
 import ThemeModeFab from "./components/ThemeModeFab";
 

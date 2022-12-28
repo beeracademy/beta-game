@@ -17,7 +17,7 @@ export const customCommands: Command[] = [
 
             switch (args[0]) {
                 case "draw":
-                    const card = useGame.getState().DrawCard();
+                    const card = useGame.getState().Draw();
                     buffer.write(`You drew ${card.value} of ${getCardSuitName(card)}!`);
                 default:
             }

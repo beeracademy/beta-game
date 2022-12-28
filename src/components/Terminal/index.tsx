@@ -133,6 +133,7 @@ const Terminal: FunctionComponent<TerminalProps> = (props) => {
     return (
         <Dialog
             open={props.open}
+            maxWidth="xl"
             onClose={() => {
                 inputRef.current?.focus();
             }}
@@ -159,7 +160,7 @@ const Terminal: FunctionComponent<TerminalProps> = (props) => {
             <Stack
                 ref={containerRef}
                 sx={{
-                    width: 550,
+                    width: 700,
                     height: 400,
                     color: theme.palette.secondary.contrastText,
                     backgroundColor: theme.palette.secondary.main,

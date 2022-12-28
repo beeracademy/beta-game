@@ -10,21 +10,20 @@ import { secondsToHHMMSS } from "../../../utilities/time";
 import useSettings from "../../../stores/settings";
 import { MdWbSunny } from "react-icons/md";
 import { BsMoonStarsFill } from "react-icons/bs";
+import { useGameMetrics } from "../../../stores/metrics";
 
 const Header: FunctionComponent = () => {
     const theme = useTheme();
     const navigate = useNavigate();
 
-    const game = useGame((state) => ({
-        cardCount: state.cardCount,
-        totalCardCount: state.totalCardCount,
-        roundCount: state.roundCount,
-        totalRoundCount: state.totalRoundCount,
+    const game = useGame(state => ({
         gameStartTimestamp: state.gameStartTimestamp,
         turnStartTimestamp: state.turnStartTimestamp,
-        done: state.done,
-        ExitGame: state.ExitGame,
+        numberOfRounds: state.numberOfRounds,
+        ExitGame: state.Exit,
     }));
+
+    const gameMetrics = useGameMetrics();
 
     const settings = useSettings((state) => ({
         themeMode: state.themeMode,
@@ -56,7 +55,7 @@ const Header: FunctionComponent = () => {
     };
 
     useEffect(() => {
-        if (game.done) {
+        if (gameMetrics.done) {
             // TODO
         }
 
@@ -65,7 +64,7 @@ const Header: FunctionComponent = () => {
         const interval = setInterval(updateTimes, 1000);
 
         return () => clearInterval(interval);
-    }, [game.done, game.gameStartTimestamp, game.turnStartTimestamp]);
+    }, [gameMetrics.done, game.gameStartTimestamp, game.turnStartTimestamp]);
 
     return (
         <>
@@ -129,7 +128,7 @@ const Header: FunctionComponent = () => {
                             },
                         }}
                     >
-                        Round {game.roundCount} / {game.totalRoundCount}
+                        Round {gameMetrics.currentRound} / {game.numberOfRounds}
                     </Typography>
                     <Stack
                         sx={{
@@ -158,7 +157,7 @@ const Header: FunctionComponent = () => {
                             },
                         }}
                     >
-                        Card {game.cardCount} / {game.totalCardCount}
+                        Card {gameMetrics.numberOfCardsDrawn} / {gameMetrics.numberOfCards}
                     </Typography>
                 </Stack>
 

@@ -1,6 +1,5 @@
 import {
     alpha,
-    Box,
     Stack,
     Table,
     TableBody,
@@ -13,19 +12,18 @@ import {
 import { FunctionComponent } from "react";
 import { getCardASCIISymbol, getCardSuitColor } from "../../../models/card";
 import useGame from "../../../stores/game";
+import { useGameMetrics } from "../../../stores/metrics";
 
 interface GameTableProps {}
 
 const GameTable: FunctionComponent<GameTableProps> = () => {
     const game = useGame((state) => ({
-        cards: state.cards,
         players: state.players,
-        playerCount: state.playerCount,
-        totalRoundCount: state.totalRoundCount,
-        roundCount: state.roundCount,
-        activePlayerIndex: state.activePlayerIndex,
-        done: state.done,
+        numberOfRounds: state.numberOfRounds,
+        draws: state.draws,
     }));
+
+    const gameMetrics = useGameMetrics();
 
     return (
         <TableContainer
@@ -51,7 +49,10 @@ const GameTable: FunctionComponent<GameTableProps> = () => {
                             <TableCell
                                 key={i}
                                 sx={{
-                                    color: game.activePlayerIndex === i && !game.done ? "primary.main" : "text.primary",
+                                    color:
+                                        gameMetrics.activePlayerIndex === i && !gameMetrics.done
+                                            ? "primary.main"
+                                            : "text.primary",
                                 }}
                             >
                                 {player.username}
@@ -60,19 +61,19 @@ const GameTable: FunctionComponent<GameTableProps> = () => {
                     </TableRow>
                 </TableHead>
                 <TableBody>
-                    {new Array(game.totalRoundCount).fill(0).map((_, i) => (
+                    {new Array(game.numberOfRounds).fill(0).map((_, i) => (
                         <TableRow key={i + 1}>
                             <TableCell
                                 key={0}
                                 sx={{
-                                    color: game.roundCount === i + 1 ? "primary.main" : "text.primary",
+                                    color: gameMetrics.currentRound === i + 1 ? "primary.main" : "text.primary",
                                 }}
                             >
                                 {i + 1}
                             </TableCell>
 
-                            {new Array(game.playerCount).fill(0).map((_, j) => {
-                                const card = game.cards[i * game.playerCount + j];
+                            {new Array(gameMetrics.numberOfPlayers).fill(0).map((_, j) => {
+                                const card = game.draws[i * gameMetrics.numberOfPlayers + j];
 
                                 return (
                                     <TableCell
@@ -81,7 +82,7 @@ const GameTable: FunctionComponent<GameTableProps> = () => {
                                             padding: 0,
                                             height: 20,
                                             backgroundColor:
-                                                game.activePlayerIndex === j && !game.done
+                                                gameMetrics.activePlayerIndex === j && !gameMetrics.done
                                                     ? alpha("#666", 0.1)
                                                     : "transparent",
                                         }}
@@ -92,7 +93,7 @@ const GameTable: FunctionComponent<GameTableProps> = () => {
                                             justifyContent="space-between"
                                             sx={{
                                                 margin: "auto",
-                                                maxWidth: 50,
+                                                maxWidth: 40,
                                             }}
                                         >
                                             {card && (
@@ -101,7 +102,7 @@ const GameTable: FunctionComponent<GameTableProps> = () => {
                                                         color={getCardSuitColor(card)}
                                                         sx={{
                                                             width: 25,
-                                                            textAlign: "center",
+                                                            textAlign: "left",
                                                         }}
                                                     >
                                                         {getCardASCIISymbol(card)}
@@ -110,7 +111,7 @@ const GameTable: FunctionComponent<GameTableProps> = () => {
                                                     <Typography
                                                         sx={{
                                                             width: 25,
-                                                            textAlign: "center",
+                                                            textAlign: "right",
                                                         }}
                                                     >
                                                         {card?.value}

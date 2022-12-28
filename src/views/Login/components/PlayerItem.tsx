@@ -1,7 +1,7 @@
-import { Avatar, Box, Divider, Skeleton, Stack, TextField, useTheme } from "@mui/material";
+import { Avatar, Box, Divider, Stack, TextField, useTheme } from "@mui/material";
 import { FunctionComponent, useState } from "react";
 import * as AuthAPI from "../../../api/endpoints/authentication";
-import { useSounds  }from "../../../hooks/sounds";
+import { useSounds } from "../../../hooks/sounds";
 
 interface Player {
     username: string;
@@ -148,5 +148,5 @@ const PlayerItem: FunctionComponent<PlayerItemProps> = (props) => {
 
 export default PlayerItem;
 
-156
-263
+156;
+263;

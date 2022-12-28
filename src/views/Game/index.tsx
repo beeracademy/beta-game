@@ -4,6 +4,7 @@ import { Helmet } from "react-helmet";
 import { useCardFlash } from "../../components/CardFlash";
 import Terminal from "../../components/Terminal";
 import useGame from "../../stores/game";
+import { MetricsStore, useGameMetrics } from "../../stores/metrics";
 import CardInventory from "./components/CardInventory";
 import Chart from "./components/Chart";
 import ChugDialog from "./components/ChugDialog";
@@ -20,16 +21,19 @@ const GameView: FunctionComponent = () => {
     const flashCard = useCardFlash();
 
     const game = useGame((state) => ({
-        DrawCard: state.DrawCard,
+        DrawCard: state.Draw,
         cards: state.cards,
-        done: state.done,
     }));
+
+    const gameMetrics = useGameMetrics();
 
     let spacePressed = false;
 
     useEffect(() => {
-        console.log("To open the game terminal, press the ` key. (top left of keyboard, no not escape... the one below escape)");
-        
+        console.log(
+            "To open the game terminal, press the ` key. (top left of keyboard, no not escape... the one below escape)"
+        );
+
         window.addEventListener("keydown", handleKeyDown);
         window.addEventListener("keyup", handleKeyUp);
 
@@ -40,7 +44,7 @@ const GameView: FunctionComponent = () => {
     }, []);
 
     const handleKeyDown = (e: KeyboardEvent) => {
-        if (useGame.getState().done) {
+        if (MetricsStore.getState().game.done) {
             return;
         }
 
@@ -114,7 +118,7 @@ const GameView: FunctionComponent = () => {
                 <PlayerList />
             </Box>
 
-            <GameOverDialog open={game.done} />
+            <GameOverDialog open={gameMetrics.done} />
 
             <ChugDialog
                 open={showChugDialog}

@@ -5,21 +5,31 @@ interface ShuffleDialogProps extends DialogProps {}
 
 const ShuffleDialog: FunctionComponent<ShuffleDialogProps> = (props) => {
     return (
-        <Dialog {...props} maxWidth="lg" PaperProps={{
-            sx: {
-                padding: 2,
-            },
-        }}>
-            <DialogTitle textAlign="center" fontSize={24}>Shuffle player order before starting?</DialogTitle>
+        <Dialog
+            {...props}
+            maxWidth="lg"
+            PaperProps={{
+                sx: {
+                    padding: 2,
+                },
+            }}
+        >
+            <DialogTitle textAlign="center" fontSize={24}>
+                Shuffle player order before starting?
+            </DialogTitle>
 
-            <DialogContent sx={{
-                padding: 4
-            }}>
+            <DialogContent
+                sx={{
+                    padding: 4,
+                }}
+            >
                 <Stack spacing={2} direction="row" justifyContent="center">
                     {new Array(6).fill(0).map((_, i) => (
                         <Avatar
                             src={
-                                Math.random() > 0.5 ? "https://thiscatdoesnotexist.com/" : "https://thispersondoesnotexist.com/image"
+                                Math.random() > 0.5
+                                    ? "https://thiscatdoesnotexist.com/"
+                                    : "https://thispersondoesnotexist.com/image"
                             }
                             key={i}
                             sx={{

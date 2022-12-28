@@ -1,56 +1,57 @@
 import create from "zustand";
 import { persist } from "zustand/middleware";
-import { Card, CardSuit, CardValue } from "../models/card";
+import { Card, CardSuit, CardSuits, CardValue, CardValues } from "../models/card";
+import { Chug } from "../models/chug";
 import { Player } from "../models/player";
+import { GenerateShuffleIndices } from "../utilities/deck";
 import useGamesPlayed from "./gamesPlayed";
-import { useMetrics } from "./metrics";
+
+/*
+    Game state is only for essential game data that is required to resume a game.
+    All other derived data should be calculated in the metrics store.
+*/
 
 interface GameState {
-    cards: Card[];
-    players: Player[];
+    shuffleIndices: number[];
 
-    roundCount: number;
-    totalRoundCount: number;
-
-    cardCount: number;
-    totalCardCount: number;
-
-    playerCount: number;
-    activePlayerIndex: number;
+    sipsInABeer: number;
+    numberOfRounds: number;
 
     gameStartTimestamp: number;
     turnStartTimestamp: number;
 
-    sipsInABeer: number;
+    numberOfDraws: number;
 
-    done: boolean;
+    players: Player[];
+    chugs: Chug[];
+
+    // TODO
+
+    draws: Card[];
 }
 
 interface GameActions {
-    StartGame: (players: Player[]) => void;
-    DrawCard: () => Card;
-    ExitGame: () => void;
+    Start: (players: Player[]) => void;
+    Draw: () => Card;
+    Exit: () => void;
+    Resume: (state: GameState) => void;
 }
 
 const initialState: GameState = {
+    shuffleIndices: [],
+
+    sipsInABeer: 14,
+    numberOfRounds: 13,
+
     gameStartTimestamp: 0,
     turnStartTimestamp: 0,
 
-    cards: [],
+    numberOfDraws: 0,
+
     players: [],
+    chugs: [],
 
-    sipsInABeer: 14,
-
-    roundCount: 1,
-    totalRoundCount: 13,
-
-    cardCount: 0,
-    totalCardCount: 0,
-
-    playerCount: 0,
-    activePlayerIndex: 0,
-
-    done: false,
+    draws: [],
 };
 
 const useGame = create<GameState & GameActions>()(
@@ -58,52 +59,58 @@ const useGame = create<GameState & GameActions>()(
         (set) => ({
             ...initialState,
 
-            StartGame: (players: Player[]) => {
+            Start: (
+                players: Player[],
+                options = {
+                    sipsInABeer: 14,
+                    numberOfRounds: 13,
+                }
+            ) => {
                 console.debug("[Game]", "Starting game");
 
                 set({
-                    players: players,
-                    playerCount: players.length,
+                    shuffleIndices: GenerateShuffleIndices(players.length), // TODO
                     gameStartTimestamp: Date.now(),
                     turnStartTimestamp: Date.now(),
-                    totalCardCount: players.length * 13,
+                    sipsInABeer: options.sipsInABeer,
+                    numberOfRounds: options.numberOfRounds,
+                    players: players,
+                    chugs: [],
                 });
 
                 useGamesPlayed.getState().incrementStarted();
             },
 
-            DrawCard: () => {
+            Draw: () => {
                 console.debug("[Game]", "Drawing card");
 
-                const card: Card = {
-                    value: (Math.floor(Math.random() * 13) + 2) as CardValue,
-                    suit: ["S", "C", "H", "D", "A", "I"][Math.floor(Math.random() * 6)] as CardSuit,
+                const suit = CardSuits[Math.floor(Math.random() * 4)];
+                const value = CardValues[Math.floor(Math.random() * 13)];
+
+                const card = {
+                    suit: suit,
+                    value: value,
                 };
 
-                set((state) => {
-                    const isDone = state.cards.length + 1 >= state.playerCount * state.totalRoundCount;
-                    if (isDone) {
-                        useGamesPlayed.getState().incrementCompleted();
-                    }
-
-                    return {
-                        cards: [...state.cards, card],
-                        cardCount: state.cards.length + 1,
-                        roundCount: Math.floor((state.cards.length + 1) / state.playerCount) + 1,
-                        activePlayerIndex: (state.cards.length + 1) % state.playerCount,
-                        totalCardCount: state.playerCount * 13,
-                        turnStartTimestamp: Date.now(),
-                        done: isDone,
-                    };
-                });
+                set((state) => ({
+                    turnStartTimestamp: Date.now(),
+                    numberOfDraws: state.numberOfDraws + 1,
+                    draws: [...state.draws, card],
+                }));
 
                 return card;
             },
 
-            ExitGame: () => {
+            Exit: () => {
                 console.debug("[Game]", "Exiting game");
 
                 set(initialState);
+            },
+
+            Resume: (state: GameState) => {
+                console.debug("[Game]", "Resuming game");
+
+                set(state);
             },
         }),
         {

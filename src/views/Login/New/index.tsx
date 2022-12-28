@@ -17,10 +17,9 @@ import PlayerList from "../components/PlayerList";
 import { IoInformationCircleOutline, IoPlay } from "react-icons/io5";
 import GameModeSelector, { GameMode } from "../components/GameModeSelector";
 import NumberOfPlayersSelector from "../components/NumberOfPlayersSelector";
-import { useSounds  }from "../../../hooks/sounds";
+import { useSounds } from "../../../hooks/sounds";
 import { Helmet } from "react-helmet";
 import useGame from "../../../stores/game";
-import useGamesPlayed from "../../../stores/gamesPlayed";
 import ShuffleDialog from "./components/ShuffleDialog";
 
 const MIN_PLAYERS = 2;
@@ -34,7 +33,7 @@ const NewGameView: FunctionComponent = () => {
     const [numberOfPlayers, setNumberOfPlayers] = useState(4);
     const [gameMode, setGameMode] = useState<GameMode>("online");
 
-    const StartGame = useGame((state) => state.StartGame);
+    const StartGame = useGame((state) => state.Start);
 
     const startGame = () => {
         StartGame([
@@ -165,7 +164,7 @@ const NewGameView: FunctionComponent = () => {
                 </Card>
             </Fade>
 
-            <ShuffleDialog open={false}/>
+            <ShuffleDialog open={false} />
         </>
     );
 };

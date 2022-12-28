@@ -6,7 +6,6 @@ import {
     Divider,
     Fade,
     List,
-    ListItem,
     ListItemButton,
     ListItemText,
     useTheme,

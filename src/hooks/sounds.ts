@@ -29,7 +29,7 @@ const SoundNames = [
     "triplekill",
     "tryk_paa_den_lange_tast",
     "ultrakill",
-    "wicked"
+    "wicked",
 ];
 
 type SoundName = typeof SoundNames[number];
@@ -49,7 +49,7 @@ const play = (soundName: SoundName, loop?: boolean) => {
     sound.play();
 
     return sound;
-}
+};
 
 function stopAll() {
     Howler.stop();

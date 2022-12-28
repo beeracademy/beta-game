@@ -1,17 +1,20 @@
 import { Card, Stack, Typography } from "@mui/material";
 import { FunctionComponent } from "react";
 import useGame from "../../../stores/game";
+import { useGameMetrics } from "../../../stores/metrics";
 
 interface CardInventoryProps {}
 
 const CardInventory: FunctionComponent<CardInventoryProps> = () => {
-    const { cards, playersCount } = useGame((state) => ({
-        cards: state.cards,
-        playersCount: state.playerCount,
+    const game = useGame((state) => ({
+        players: state.players,
+        draws: state.draws,
     }));
 
+    const gameMetrics = useGameMetrics();
+
     const cardsLeftOfValue = (value: number) => {
-        return playersCount - cards.filter((card) => card.value === value).length;
+        return gameMetrics.numberOfPlayers - game.draws.filter((card) => card.value === value).length;
     };
 
     return (
@@ -35,7 +38,8 @@ const CardInventory: FunctionComponent<CardInventoryProps> = () => {
 
                             ...(empty && {
                                 opacity: 0.75,
-                                background: (t) => t.palette.mode === "dark" ? "url('/whiteheart.svg')" : "url('/blackheart.svg')",
+                                background: (t) =>
+                                    t.palette.mode === "dark" ? "url('/whiteheart.svg')" : "url('/blackheart.svg')",
                                 backgroundSize: "36px",
                                 backgroundRepeat: "no-repeat",
                                 backgroundPosition: "center",

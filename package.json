@@ -21,6 +21,7 @@
     "chart.js": "^4.0.1",
     "focus-trap-react": "^10.0.2",
     "howler": "^2.2.3",
+    "random-js": "^2.1.0",
     "react": "^18.2.0",
     "react-chartjs-2": "^5.0.1",
     "react-confetti": "^6.1.0",

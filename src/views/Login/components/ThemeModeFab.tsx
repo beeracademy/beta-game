@@ -9,10 +9,10 @@ interface ThemeModeFabProps {
 }
 
 const ThemeModeFab: FunctionComponent<ThemeModeFabProps> = (props) => {
-    const {themeMode, SetThemeMode} = useSettings(state => ({
+    const { themeMode, SetThemeMode } = useSettings((state) => ({
         themeMode: state.themeMode,
         SetThemeMode: state.SetThemeMode,
-    }))
+    }));
 
     return (
         <Fab
