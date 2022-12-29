@@ -77,7 +77,8 @@ const PlayerItem: FunctionComponent<PlayerItemProps> = (props) => {
                     position: "relative",
                     display: "flex",
                     backgroundColor: color(),
-                    color: (t) => t.palette.getContrastText(color()),
+                    // color: (t) => t.palette.getContrastText(color()),
+                    color: "white",
                 }}
                 onClick={() => settings.SetSimpleCardsMode(!settings.simpleCardsMode)}
             >

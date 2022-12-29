@@ -4,9 +4,10 @@ import { persist } from "zustand/middleware";
 type ThemeMode = "light" | "dark";
 
 interface SettingsState {
+    themeMode: ThemeMode;
     simpleCardsMode: boolean;
     remoteControl: boolean;
-    themeMode: ThemeMode;
+    remoteToken?: string;
 }
 
 interface SettingsActions {
@@ -16,9 +17,10 @@ interface SettingsActions {
 }
 
 const initialState: SettingsState = {
+    themeMode: "light",
     simpleCardsMode: false,
     remoteControl: false,
-    themeMode: "light",
+    remoteToken: "",
 };    
 
 const useSettings = create<SettingsState & SettingsActions>()(
@@ -31,7 +33,10 @@ const useSettings = create<SettingsState & SettingsActions>()(
             },
 
             SetRemoteControl: (value: boolean) => {
-                set((state) => ({ remoteControl: value }));
+                set((state) => ({ 
+                    remoteControl: value,
+                    remoteToken: value ?  window.crypto.randomUUID() : undefined,
+                }));
             },
 
             SetThemeMode: (value: ThemeMode) => {

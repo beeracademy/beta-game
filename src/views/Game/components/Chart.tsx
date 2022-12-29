@@ -31,7 +31,8 @@ const Chart: FunctionComponent<ChartProps> = () => {
                 data: pm.cumulativeSips,
                 fill: false,
                 borderColor: (theme.player as any)[i],
-                tension: 0.1,
+                tension: 0,
+                
             };
         });
 
@@ -56,6 +57,7 @@ const Chart: FunctionComponent<ChartProps> = () => {
                 options={{
                     animation: false,
                     responsive: true,
+                    
                     scales: {
                         y: {
                             title: {

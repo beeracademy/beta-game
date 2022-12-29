@@ -9,8 +9,9 @@ import {
     Stack,
     Switch,
     Typography,
+    useTheme,
 } from "@mui/material";
-import { FunctionComponent, useState } from "react";
+import { FunctionComponent, useEffect, useState } from "react";
 import { GoDeviceDesktop, GoDeviceMobile } from "react-icons/go";
 import QRCode from "react-qr-code";
 import useSettings from "../../../stores/settings";
@@ -18,14 +19,23 @@ import useSettings from "../../../stores/settings";
 interface RemoteDialogProps extends DialogProps {}
 
 const RemoteDialog: FunctionComponent<RemoteDialogProps> = (props) => {
+    const theme = useTheme();
+
     const settings = useSettings((state) => ({
         remoteControl: state.remoteControl,
+        remoteToken: state.remoteToken,
         SetRemoteControl: state.SetRemoteControl,
     }));
 
-    const [url, _] = useState(`
-        ${window.location.origin}/remote?token=${generateRemoteToken()}
-    `);
+    const [url, setUrl] = useState("");
+
+    useEffect(() => {
+        if (!settings.remoteControl) {
+            return;
+        }
+
+        setUrl(`${window.location.origin}/remote?token=${settings.remoteToken}`);
+    }, [settings.remoteControl, settings.remoteToken]);
 
     return (
         <Dialog {...props}>
@@ -42,6 +52,7 @@ const RemoteDialog: FunctionComponent<RemoteDialogProps> = (props) => {
                         color="primary"
                         checked={settings.remoteControl}
                         onChange={(event) => {
+                            setUrl("");
                             settings.SetRemoteControl(event.target.checked);
                         }}
                     />
@@ -88,7 +99,13 @@ const RemoteDialog: FunctionComponent<RemoteDialogProps> = (props) => {
                             textAlign: "center",
                         }}
                     >
-                        <QRCode value={url} />
+                        <QRCode
+                            value={url}
+                            style={{
+                                opacity: url ? 1 : 0,
+                                transition: theme.transitions.create("opacity"),
+                            }}
+                        />
 
                         <Typography color="text.secondary">
                             Scan this QR code with your phone to connect or share the link
@@ -98,8 +115,8 @@ const RemoteDialog: FunctionComponent<RemoteDialogProps> = (props) => {
                             <Button
                                 variant="contained"
                                 color="primary"
-                                onClick={() => {
-                                    navigator.clipboard.writeText(url);
+                                onClick={async () => {
+                                    await navigator.clipboard.writeText(url);
                                 }}
                             >
                                 copy link
@@ -125,9 +142,5 @@ const RemoteDialog: FunctionComponent<RemoteDialogProps> = (props) => {
         </Dialog>
     );
 };
-
-export function generateRemoteToken(): string {
-    return window.crypto.randomUUID();
-}
 
 export default RemoteDialog;

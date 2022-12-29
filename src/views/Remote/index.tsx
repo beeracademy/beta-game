@@ -1,43 +1,89 @@
-import { Button, Container } from "@mui/material";
-import { FunctionComponent, useEffect, useState } from "react";
+import { Box, Button, Container, Typography } from "@mui/material";
+import { FunctionComponent, useEffect } from "react";
 import { useSearchParam } from "react-use";
 import useWebSocket from "../../api/websocket";
 import useGame from "../../stores/game";
 import GameTable from "../Game/components/Table";
+import LastCardDrawn from "./components/LastCardDrawn";
 
 interface RemoteViewProps {}
 
 const RemoteView: FunctionComponent<RemoteViewProps> = () => {
     const token = useSearchParam("token");
-    const game = useGame((state) => state);
+    const game = useGame();
 
-    const [wsinst, setWsinst] = useState<any>(null);
-        
+    const ws = useWebSocket();
+
     useEffect(() => {
-        const ws = useWebSocket(`wss://academy.beer/ws/remote/${token}/`);
+        if (!token) {
+            return;
+        }
 
-        ws.receive((message) => {
-            useGame.setState(message);
+        ws.connect(`wss://academy.beer/ws/remote/${token}/`);
+
+        return () => {
+            ws.close();
+        };
+    }, [token]);
+
+    useEffect(() => {
+        if (!ws.ready) {
+            return;
+        }
+
+        ws.receive((data) => {
+            if (data.event === "GAME_STATE") {
+                useGame.setState(data.payload);
+            }
         });
 
-        setWsinst(ws);
-    }, []);
+        ws.send({
+            event: "GET_GAME_STATE",
+        });
+    }, [ws.ready]);
 
     return (
         <Container
             sx={{
                 backgroundColor: "background.paper",
+                color: "text.primary",
+                display: "flex",
+                flexDirection: "column",
+                padding: 2,
             }}
         >
-            <GameTable />
+            <Box
+                sx={{
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    flexDirection: "column",
+                    flex: 1,
+                    gap: 4,
+                }}
+            >
+                <Typography variant="h4">Latest Card Drawn</Typography>
+
+                <LastCardDrawn />
+            </Box>
             <Button
+                variant="contained"
+                color="primary"
+                sx={{
+                    height: 64,
+                    fontSize: 24,
+                }}
                 onClick={() => {
-                    wsinst.send({
-                        type: "draw",
+                    if (!ws.ready) {
+                        return;
+                    }
+
+                    ws.send({
+                        event: "DRAW_CARD",
                     });
                 }}
             >
-                Draw
+                Draw Card
             </Button>
         </Container>
     );

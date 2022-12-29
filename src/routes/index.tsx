@@ -35,10 +35,10 @@ const Routes: FunctionComponent = () => {
                         <Route path="continue" element={<ContinueGameView />} />
                     </Route>
 
-                    <Route path="remote" element={<RemoteView />} />
-
                     <Route path="*" element={<Navigate to="/login" />} />
                 </Route>
+
+                <Route path="remote" element={<RemoteView />} />
             </RouterRoutes>
         </Suspense>
     );

@@ -53,6 +53,8 @@ const GameTable: FunctionComponent<GameTableProps> = () => {
                                         gameMetrics.activePlayerIndex === i && !gameMetrics.done
                                             ? "primary.main"
                                             : "text.primary",
+                                    
+                                    fontWeight: gameMetrics.activePlayerIndex === i && !gameMetrics.done ? "bold" : "normal",
                                 }}
                             >
                                 {player.username}
@@ -67,6 +69,7 @@ const GameTable: FunctionComponent<GameTableProps> = () => {
                                 key={0}
                                 sx={{
                                     color: gameMetrics.currentRound === i + 1 ? "primary.main" : "text.primary",
+                                    fontWeight: gameMetrics.currentRound === i + 1 ? "bold" : "normal",
                                 }}
                             >
                                 {i + 1}

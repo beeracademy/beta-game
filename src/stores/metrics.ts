@@ -77,7 +77,6 @@ const MetricsStore = create<MetricsState & MetricsActions>()((set, get) => ({
 
         const numberOfCards = game.players.length * game.numberOfRounds;
 
-
         const numberOfCardsDrawn = draws.length;
         const numberOfCardsRemaining = numberOfCards - numberOfCardsDrawn;
 

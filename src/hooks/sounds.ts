@@ -34,6 +34,13 @@ const SoundNames = [
 
 type SoundName = typeof SoundNames[number];
 
+SoundNames.forEach((soundName) => {
+    new Howl({
+        src: [`sounds/${soundName}.mp3`, `sounds/${soundName}.ogg`],
+        preload: true,
+    });
+});
+
 const useSounds = () => {
     return {
         play: play,
@@ -57,3 +64,4 @@ function stopAll() {
 
 export { useSounds, play, stopAll, SoundNames };
 export type { SoundName };
+

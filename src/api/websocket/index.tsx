@@ -1,13 +1,14 @@
 import { useEffect, useState } from "react";
 
-const useWebSocket = (url: string) => {
+const useWebSocket = () => {
     const [socket, setSocket] = useState<WebSocket | null>(null);
     const [ready, setReady] = useState(false);
     const [error, setError] = useState(false);
 
     useEffect(() => {
-        const socket = new WebSocket(url);
-        setSocket(socket);
+        if (!socket) {
+            return;
+        }
 
         socket.onopen = () => {
             setReady(true);
@@ -24,10 +25,16 @@ const useWebSocket = (url: string) => {
         return () => {
             socket.close();
         };
-    }, [url]);
+    }, [socket]);
+
+    const connect = (url: string) => {
+        const socket = new WebSocket(url);
+        setSocket(socket);
+    };
 
     const send = (data: any) => {
         if (socket) {
+            console.log("sending", data);
             socket.send(JSON.stringify(data));
         }
     };
@@ -40,7 +47,13 @@ const useWebSocket = (url: string) => {
         }
     };
 
-    return { send, receive, ready, error };
+    const close = () => {
+        if (socket) {
+            socket.close();
+        }
+    };
+
+    return { connect, send, receive, close, ready, error };
 };
 
 export default useWebSocket;

@@ -20,7 +20,7 @@ const MemeDialog: FunctionComponent<MemeDialogProps> = (props) => {
             const memeURL = await GetRandomMemeByTag(paramTag);
             setUrl(memeURL);
         })();
-    }, []);
+    }, [props.tag]);
 
     return (
         <Dialog open={props.open}>

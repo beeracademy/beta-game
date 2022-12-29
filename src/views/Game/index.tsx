@@ -6,6 +6,7 @@ import { useCardFlash } from "../../components/CardFlash";
 import Terminal from "../../components/Terminal";
 import useGame from "../../stores/game";
 import { MetricsStore, useGameMetrics } from "../../stores/metrics";
+import useSettings from "../../stores/settings";
 import CardInventory from "./components/CardInventory";
 import Chart from "./components/Chart";
 import ChugDialog from "./components/ChugDialog";
@@ -16,7 +17,6 @@ import GameTable from "./components/Table";
 
 const GameView: FunctionComponent = () => {
     const [showTerminal, setShowTerminal] = useState<boolean>(false);
-
     const [showChugDialog, setShowChugDialog] = useState<boolean>(false);
 
     const flashCard = useCardFlash();
@@ -26,9 +26,16 @@ const GameView: FunctionComponent = () => {
         cards: state.draws,
     }));
 
+    const settings = useSettings((state) => ({
+        remoteControl: state.remoteControl,
+        remoteToken: state.remoteToken,
+    }));
+
     const gameMetrics = useGameMetrics();
 
     let spacePressed = false;
+
+    const ws = useWebSocket();
 
     useEffect(() => {
         console.log(
@@ -43,6 +50,49 @@ const GameView: FunctionComponent = () => {
             window.removeEventListener("keyup", handleKeyUp);
         };
     }, []);
+
+    useEffect(() => {
+        if (!settings.remoteControl) {
+            ws.close();
+            return;
+        }
+
+        ws.connect(`wss://academy.beer/ws/remote/${settings.remoteToken}/`);
+
+        return () => {
+            ws.close();
+        };
+    }, [settings.remoteControl, settings.remoteToken]);
+
+    useEffect(() => {
+        if (!ws.ready) {
+            return;
+        }
+
+        ws.receive((data) => {
+            if (data.event === "GET_GAME_STATE") {
+                ws.send({
+                    event: "GAME_STATE",
+                    payload: useGame.getState(),
+                });
+            }
+
+            if (data.event === "DRAW_CARD") {
+                const card = game.DrawCard();
+            }
+        });
+
+        const unsubscribe = useGame.subscribe((state) => {
+            ws.send({
+                event: "GAME_STATE",
+                payload: state,
+            });
+        });
+
+        return () => {
+            unsubscribe();
+        };
+    }, [ws.ready]);
 
     const handleKeyDown = (e: KeyboardEvent) => {
         if (MetricsStore.getState().game.done) {
@@ -134,6 +184,8 @@ const GameView: FunctionComponent = () => {
                     setShowTerminal(false);
                 }}
             />
+
+            {/* <MemeDialog open={true} tag="bowling meme"/> */}
         </>
     );
 };
