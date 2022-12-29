@@ -94,7 +94,7 @@ const Header: FunctionComponent = () => {
                         },
                     }}
                 >
-                    <Tooltip title="Remote control settings" placement="right">
+                    <Tooltip title="Game remote settings" placement="right">
                         <IconButton
                             sx={{
                                 color: "primary.contrastText",

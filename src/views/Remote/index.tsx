@@ -1,5 +1,7 @@
-import { Box, Button, Container, Typography } from "@mui/material";
-import { FunctionComponent, useEffect } from "react";
+import { Box, Button, CircularProgress, Container, Typography, useTheme } from "@mui/material";
+import { FunctionComponent, useEffect, useState } from "react";
+import { IoLogoGameControllerB } from "react-icons/io";
+import { IoGameController } from "react-icons/io5";
 import { useSearchParam } from "react-use";
 import useWebSocket from "../../api/websocket";
 import useGame from "../../stores/game";
@@ -9,6 +11,11 @@ import LastCardDrawn from "./components/LastCardDrawn";
 interface RemoteViewProps {}
 
 const RemoteView: FunctionComponent<RemoteViewProps> = () => {
+    const [connecting, setConnecting] = useState<boolean>(true);
+    const [disconnected, setDisconnected] = useState<boolean>(false);
+
+    const theme = useTheme();
+
     const token = useSearchParam("token");
     const game = useGame();
 
@@ -18,6 +25,8 @@ const RemoteView: FunctionComponent<RemoteViewProps> = () => {
         if (!token) {
             return;
         }
+
+        setConnecting(true);
 
         ws.connect(`wss://academy.beer/ws/remote/${token}/`);
 
@@ -33,7 +42,13 @@ const RemoteView: FunctionComponent<RemoteViewProps> = () => {
 
         ws.receive((data) => {
             if (data.event === "GAME_STATE") {
+                setConnecting(false);
+
                 useGame.setState(data.payload);
+            }
+
+            if (data.event === "REMOTES_DISCONNECT") {
+                setDisconnected(true);
             }
         });
 
@@ -50,41 +65,88 @@ const RemoteView: FunctionComponent<RemoteViewProps> = () => {
                 display: "flex",
                 flexDirection: "column",
                 padding: 2,
+
+                [theme.breakpoints.up("md")]: {
+                    borderRadius: t => `${t.shape.borderRadius}px`,
+                    width: 500,
+                    height: 800,
+                    margin: "auto",
+                },
             }}
         >
-            <Box
-                sx={{
-                    display: "flex",
-                    justifyContent: "center",
-                    alignItems: "center",
-                    flexDirection: "column",
-                    flex: 1,
-                    gap: 4,
-                }}
-            >
-                <Typography variant="h4">Latest Card Drawn</Typography>
+            {!connecting && !disconnected && (
+                <>
+                    <Box
+                        sx={{
+                            display: "flex",
+                            justifyContent: "center",
+                            alignItems: "center",
+                            flexDirection: "column",
+                            flex: 1,
+                            gap: 4,
+                        }}
+                    >
+                        <Typography variant="h4">Latest Card Drawn</Typography>
 
-                <LastCardDrawn />
-            </Box>
-            <Button
-                variant="contained"
-                color="primary"
-                sx={{
-                    height: 64,
-                    fontSize: 24,
-                }}
-                onClick={() => {
-                    if (!ws.ready) {
-                        return;
-                    }
+                        <LastCardDrawn />
+                    </Box>
+                    <Button
+                        variant="contained"
+                        color="primary"
+                        sx={{
+                            height: 64,
+                            fontSize: 24,
+                        }}
+                        onClick={() => {
+                            if (!ws.ready) {
+                                return;
+                            }
 
-                    ws.send({
-                        event: "DRAW_CARD",
-                    });
-                }}
-            >
-                Draw Card
-            </Button>
+                            ws.send({
+                                event: "DRAW_CARD",
+                            });
+                        }}
+                    >
+                        Draw Card
+                    </Button>
+                </>
+            )}
+
+            {connecting && !disconnected && (
+                <Box
+                    sx={{
+                        display: "flex",
+                        justifyContent: "center",
+                        alignItems: "center",
+                        flexDirection: "column",
+                        flex: 1,
+                        gap: 4,
+                    }}
+                >
+                    <CircularProgress />
+                    <Typography variant="body1" color="text.secondary">
+                        connecting to game
+                    </Typography>
+                </Box>
+            )}
+
+            {disconnected && (
+                <Box
+                    sx={{
+                        display: "flex",
+                        justifyContent: "center",
+                        alignItems: "center",
+                        flexDirection: "column",
+                        flex: 1,
+                        gap: 4,
+                    }}
+                >
+                    <IoLogoGameControllerB size={74} color={theme.palette.primary.main} />
+                    <Typography variant="body1" color="text.secondary">
+                        Game Remote Unavailable
+                    </Typography>
+                </Box>
+            )}
         </Container>
     );
 };

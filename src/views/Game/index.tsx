@@ -53,7 +53,6 @@ const GameView: FunctionComponent = () => {
 
     useEffect(() => {
         if (!settings.remoteControl) {
-            ws.close();
             return;
         }
 
@@ -78,7 +77,7 @@ const GameView: FunctionComponent = () => {
             }
 
             if (data.event === "DRAW_CARD") {
-                const card = game.DrawCard();
+                const card = drawCard();
             }
         });
 
@@ -93,6 +92,21 @@ const GameView: FunctionComponent = () => {
             unsubscribe();
         };
     }, [ws.ready]);
+
+    useEffect(() => {
+        if (!ws.ready) {
+            return;
+        }
+
+        if (settings.remoteControl) {
+            return;
+        }
+        ws.send({
+            event: "REMOTES_DISCONNECT",
+        });
+        
+        ws.close();
+    }, [settings.remoteControl]);
 
     const handleKeyDown = (e: KeyboardEvent) => {
         if (MetricsStore.getState().game.done) {
@@ -111,19 +125,24 @@ const GameView: FunctionComponent = () => {
             }
 
             spacePressed = true;
-            const card = game.DrawCard();
 
-            if (card.value == 14) {
-                setShowChugDialog(true);
-                return;
-            }
-
-            flashCard(card);
+            drawCard();
         }
     };
 
     const handleKeyUp = (e: KeyboardEvent) => {
         spacePressed = false;
+    };
+
+    const drawCard = () => {
+        const card = game.DrawCard();
+
+        if (card.value == 14) {
+            setShowChugDialog(true);
+            return;
+        }
+
+        flashCard(card);
     };
 
     return (

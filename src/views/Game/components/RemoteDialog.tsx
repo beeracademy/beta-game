@@ -14,12 +14,17 @@ import {
 import { FunctionComponent, useEffect, useState } from "react";
 import { GoDeviceDesktop, GoDeviceMobile } from "react-icons/go";
 import QRCode from "react-qr-code";
+import useGame from "../../../stores/game";
 import useSettings from "../../../stores/settings";
 
 interface RemoteDialogProps extends DialogProps {}
 
 const RemoteDialog: FunctionComponent<RemoteDialogProps> = (props) => {
     const theme = useTheme();
+
+    const game = useGame((state) => ({
+        players: state.players,
+    }));
 
     const settings = useSettings((state) => ({
         remoteControl: state.remoteControl,
@@ -46,7 +51,7 @@ const RemoteDialog: FunctionComponent<RemoteDialogProps> = (props) => {
                             fontSize: 20,
                         }}
                     >
-                        Remote Control
+                        Game Remote
                     </Typography>
                     <Switch
                         color="primary"
@@ -79,9 +84,8 @@ const RemoteDialog: FunctionComponent<RemoteDialogProps> = (props) => {
                     </Box>
 
                     <Typography>
-                        Remote control is a feature that allows you to control the game from another device. This is
-                        useful if you want to play with a large group of people and you don't want to have to pass the
-                        device around.
+                        Game remote allows you to control the game from your phone. You can use it to draw cards, see
+                        game metrics, and more.
                     </Typography>
                 </DialogContent>
             )}
@@ -111,8 +115,9 @@ const RemoteDialog: FunctionComponent<RemoteDialogProps> = (props) => {
                             Scan this QR code with your phone to connect or share the link
                         </Typography>
 
-                        <Stack direction="row" spacing={2} alignItems="center" justifyContent="space-between">
+                        {!navigator.share && (
                             <Button
+                                fullWidth
                                 variant="contained"
                                 color="primary"
                                 onClick={async () => {
@@ -121,21 +126,24 @@ const RemoteDialog: FunctionComponent<RemoteDialogProps> = (props) => {
                             >
                                 copy link
                             </Button>
+                        )}
 
+                        {navigator.share && (
                             <Button
+                                fullWidth
                                 variant="contained"
                                 color="primary"
                                 onClick={() => {
                                     navigator.share({
-                                        title: "Academy Remote Control",
-                                        text: "Game 420 with player1, player2, player3",
+                                        title: "Academy Game Remote",
+                                        text: game.players.map((player) => player.username).join(", "),
                                         url: url,
                                     });
                                 }}
                             >
                                 share link
                             </Button>
-                        </Stack>
+                        )}
                     </DialogContent>
                 </>
             )}
