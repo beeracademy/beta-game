@@ -13,6 +13,7 @@ interface RemoteViewProps {}
 const RemoteView: FunctionComponent<RemoteViewProps> = () => {
     const [connecting, setConnecting] = useState<boolean>(true);
     const [disconnected, setDisconnected] = useState<boolean>(false);
+    const [loading, setLoading] = useState<boolean>(false);
 
     const theme = useTheme();
 
@@ -43,6 +44,7 @@ const RemoteView: FunctionComponent<RemoteViewProps> = () => {
         ws.receive((data) => {
             if (data.event === "GAME_STATE") {
                 setConnecting(false);
+                setLoading(false);
 
                 useGame.setState(data.payload);
             }
@@ -67,7 +69,7 @@ const RemoteView: FunctionComponent<RemoteViewProps> = () => {
                 padding: 2,
 
                 [theme.breakpoints.up("md")]: {
-                    borderRadius: t => `${t.shape.borderRadius}px`,
+                    borderRadius: (t) => `${t.shape.borderRadius}px`,
                     width: 500,
                     height: 800,
                     margin: "auto",
@@ -93,6 +95,7 @@ const RemoteView: FunctionComponent<RemoteViewProps> = () => {
                     <Button
                         variant="contained"
                         color="primary"
+                        disabled={loading}
                         sx={{
                             height: 64,
                             fontSize: 24,
@@ -102,12 +105,15 @@ const RemoteView: FunctionComponent<RemoteViewProps> = () => {
                                 return;
                             }
 
+                            setLoading(true);
+
                             ws.send({
                                 event: "DRAW_CARD",
                             });
                         }}
                     >
-                        Draw Card
+                        {loading && <CircularProgress size={24} color="inherit" />}
+                        {!loading && "Draw Card"}
                     </Button>
                 </>
             )}
