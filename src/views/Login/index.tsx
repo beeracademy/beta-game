@@ -1,5 +1,5 @@
 import { Box, Container, Stack } from "@mui/material";
-import { FunctionComponent, useEffect } from "react";
+import { FunctionComponent, memo, useEffect, useMemo } from "react";
 import { Outlet } from "react-router-dom";
 import SoundMuteFab from "./components/SoundMuteFab";
 import useWindowSize from "react-use/lib/useWindowSize";
@@ -46,23 +46,7 @@ const LoginView: FunctionComponent = () => {
                     <ThemeModeFab absolutePosition={false} />
                 </Stack>
 
-                {/* backgrund box */}
-                <Box
-                    sx={{
-                        position: "absolute",
-                        top: 0,
-                        left: 0,
-                        width: "100%",
-                        height: "100%",
-                        opacity: 0.2,
-                        zIndex: -1,
-
-                        backgroundImage: "url(wallpaper/" + Math.floor(Math.random() * 2 + 1) + ".png)",
-                        backgroundSize: "cover",
-                        backgroundPosition: "center",
-                        backgroundRepeat: "no-repeat",
-                    }}
-                />
+                <Wallpaper />
 
                 <ConfirmDialog
                     title="Create new user"
@@ -75,5 +59,26 @@ const LoginView: FunctionComponent = () => {
         </>
     );
 };
+
+const Wallpaper = memo(() => {
+    return (
+        <Box
+            sx={{
+                position: "absolute",
+                top: 0,
+                left: 0,
+                width: "100%",
+                height: "100%",
+                opacity: 0.2,
+                zIndex: -1,
+
+                backgroundImage: "url(wallpaper/" + Math.floor(Math.random() * 2 + 1) + ".png)",
+                backgroundSize: "cover",
+                backgroundPosition: "center",
+                backgroundRepeat: "no-repeat",
+            }}
+        />
+    );
+});
 
 export default LoginView;
