@@ -1,4 +1,4 @@
-import { Container, Stack } from "@mui/material";
+import { Box, Container, Stack } from "@mui/material";
 import { FunctionComponent, useEffect } from "react";
 import { Outlet } from "react-router-dom";
 import SoundMuteFab from "./components/SoundMuteFab";
@@ -45,6 +45,24 @@ const LoginView: FunctionComponent = () => {
                     <SoundMuteFab absolutePosition={false} />
                     <ThemeModeFab absolutePosition={false} />
                 </Stack>
+
+                {/* backgrund box */}
+                <Box
+                    sx={{
+                        position: "absolute",
+                        top: 0,
+                        left: 0,
+                        width: "100%",
+                        height: "100%",
+                        opacity: 0.2,
+                        zIndex: -1,
+
+                        backgroundImage: "url(wallpaper/" + Math.floor(Math.random() * 2 + 1) + ".png)",
+                        backgroundSize: "cover",
+                        backgroundPosition: "center",
+                        backgroundRepeat: "no-repeat",
+                    }}
+                />
 
                 <ConfirmDialog
                     title="Create new user"
