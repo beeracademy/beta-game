@@ -3,7 +3,6 @@ import { FunctionComponent, memo, useEffect, useMemo } from "react";
 import { Outlet } from "react-router-dom";
 import SoundMuteFab from "./components/SoundMuteFab";
 import useWindowSize from "react-use/lib/useWindowSize";
-import Confetti from "react-confetti";
 import BottomGamesCount from "./components/BottomGamesCount";
 import { useSounds } from "../../hooks/sounds";
 import ConfirmDialog from "../../components/ConfirmDialog";
@@ -20,8 +19,6 @@ const LoginView: FunctionComponent = () => {
 
     return (
         <>
-            <Confetti width={width} height={height} opacity={0.25} />
-
             <Container
                 sx={{
                     display: "flex",

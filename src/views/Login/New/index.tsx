@@ -139,7 +139,7 @@ const NewGameView: FunctionComponent = () => {
 
                             <Stack spacing={1}>
                                 <Typography variant="body1" sx={{}}>
-                                    Player login
+                                    {gameMode === "offline" ? "Players" : "Player login"}
                                 </Typography>
 
                                 <PlayerList numberOfPlayers={numberOfPlayers} offline={gameMode === "offline"} />
