@@ -1,21 +1,17 @@
 import { FunctionComponent, useCallback } from "react";
 import useGame from "../../../stores/game";
-import { Line } from "react-chartjs-2";
-import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement } from "chart.js";
 import { Box, useTheme } from "@mui/material";
 import useSettings from "../../../stores/settings";
 import { usePlayerMetrics } from "../../../stores/metrics";
+import ApexChart from "react-apexcharts";
 
-ChartJS.register(LinearScale, PointElement, LineElement, CategoryScale);
-
-interface ChartProps {}
-
-const Chart: FunctionComponent<ChartProps> = () => {
+const Chart: FunctionComponent = () => {
     const theme = useTheme();
 
     const game = useGame((state) => ({
         players: state.players,
         numberOfRounds: state.numberOfRounds,
+        sipsInABeer: state.sipsInABeer,
     }));
 
     const playerMetrics = usePlayerMetrics();
@@ -25,14 +21,12 @@ const Chart: FunctionComponent<ChartProps> = () => {
     }));
 
     const datasets = useCallback(() => {
-        const data = playerMetrics.map((pm, i) => {
+        const data: ApexAxisChartSeries = playerMetrics.map((pm, i) => {
             return {
-                label: game.players[i].username,
                 data: pm.cumulativeSips,
-                fill: false,
-                borderColor: (theme.player as any)[i],
-                tension: 0,
-                
+                name: game.players[i].username,
+                type: "line",
+                color: (theme.player as any)[i],
             };
         });
 
@@ -43,60 +37,46 @@ const Chart: FunctionComponent<ChartProps> = () => {
         <Box
             sx={{
                 flex: 1,
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-                margin: 2,
             }}
         >
-            <Line
-                data={{
-                    labels: Array.from(Array(game.numberOfRounds + 1).keys()),
-                    datasets: [...datasets()],
-                }}
+            <ApexChart
                 options={{
-                    animation: false,
-                    responsive: true,
-                    
-                    scales: {
-                        y: {
-                            title: {
-                                display: true,
-                                text: "Sips",
-                                color: theme.palette.text.primary,
-                            },
-                            beginAtZero: true,
-                            suggestedMax: 60,
-                            grid: {
-                                display: true,
-                                color: theme.palette.divider,
-                            },
-                            border: {
-                                display: false,
-                            },
-                            ticks: {
-                                color: theme.palette.text.primary,
-                            },
+                    chart: {
+                        animations: {
+                            enabled: false,
                         },
-                        x: {
-                            title: {
-                                display: true,
-                                text: "Round",
-                                color: theme.palette.text.primary,
-                            },
-                            grid: {
-                                display: true,
-                                color: theme.palette.divider,
-                            },
-                            border: {
-                                display: false,
-                            },
-                            ticks: {
-                                color: theme.palette.text.primary,
-                            },
+                        zoom: {
+                            enabled: false,
                         },
+                        toolbar: {
+                            show: false,
+                        },
+                        selection: {
+                            enabled: false,
+                        },
+                        redrawOnParentResize: true,
+                        redrawOnWindowResize: true,
+                        fontFamily: "AUPassata",
+                    },
+                    yaxis: {
+                        title: {
+                            text: "Sips",
+                        },
+                        min: 0,
+                        forceNiceScale: true,
+                    },
+                    xaxis: {
+                        min: 0,
+                        max: game.numberOfRounds,
+                    },
+                    theme: {
+                        mode: settings.themeMode,
                     },
                 }}
+                series={datasets()}
+                type="line"
+                height="450px"
+                width="100%"
             />
         </Box>
     );
