@@ -58,16 +58,39 @@ const Chart: FunctionComponent = () => {
                         redrawOnWindowResize: true,
                         fontFamily: "AUPassata",
                     },
+                    grid: {
+                        borderColor: theme.palette.divider,
+                    },
+                    markers: {
+                        size: 4,
+                        strokeColors: Object.values(theme.player),
+                        hover: {
+                            size: 8,
+                        },
+                    },
                     yaxis: {
                         title: {
                             text: "Sips",
                         },
                         min: 0,
                         forceNiceScale: true,
+                        labels: {
+                            style: {
+                                colors: theme.palette.text.primary,
+                            },
+                        },
                     },
                     xaxis: {
                         min: 0,
                         max: game.numberOfRounds,
+                        labels: {
+                            style: {
+                                colors: theme.palette.text.primary,
+                            },
+                        },
+                        axisBorder: {
+                            show: false,
+                        },
                     },
                     theme: {
                         mode: settings.themeMode,
