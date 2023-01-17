@@ -3,7 +3,9 @@ import AxiosMockAdapter from "axios-mock-adapter";
 import * as AxiosLogger from "axios-logger";
 import { TokenInteceptor } from "../inteceptors/token";
 
-const mockInstance = axios.create();
+const mockInstance = axios.create({
+    baseURL: "https://academy.beer", // TODO: move to config
+});
 
 mockInstance.interceptors.request.use((request) => {
     return AxiosLogger.requestLogger(request, {

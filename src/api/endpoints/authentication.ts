@@ -17,7 +17,28 @@ export async function login(username: string, password: string): Promise<ILoginR
         password: password,
     };
 
-    const response = await client.post<ILoginResponse>("https://academy.beer/api-token-auth/", data, {
+    const response = await client.post<ILoginResponse>("/api-token-auth/", data, {
+        headers: {
+            Authorization: "", // Skip auth interceptor
+        },
+    });
+
+    return response.data;
+}
+
+export interface ICreateUserResponse {
+    token: string;
+    id: number;
+    image: string;
+}
+
+export async function createUser(username: string, password: string): Promise<ICreateUserResponse> {
+    const data: ILoginRequest = {
+        username: username,
+        password: password,
+    };
+
+    const response = await client.post<ILoginResponse>("/api/users/", data, {
         headers: {
             Authorization: "", // Skip auth interceptor
         },

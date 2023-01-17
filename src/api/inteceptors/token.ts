@@ -8,6 +8,7 @@ export function TokenInteceptor(inst: AxiosInstance) {
                 return request;
             }
 
+            // TODO: Get access token from somewhere
             // if (accessToken) {
             //     request.headers!.Authorization = `Bearer ${accessToken}`;
             // }
