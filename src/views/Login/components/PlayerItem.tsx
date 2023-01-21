@@ -1,18 +1,14 @@
 import { Avatar, Box, Divider, Stack, TextField, useTheme } from "@mui/material";
 import { FunctionComponent, useState } from "react";
+import { ImCross } from "react-icons/im";
 import * as AuthAPI from "../../../api/endpoints/authentication";
 import { useSounds } from "../../../hooks/sounds";
-
-interface Player {
-    username: string;
-    id?: number;
-    token?: string;
-    image?: string;
-}
+import { Player } from "../../../models/player";
 
 interface PlayerItemProps {
     hidePassword?: boolean;
-    onLoginSuccess?: (player: Player) => void;
+    onLogin?: (player: Player) => void;
+    onRemove?: () => void;
 }
 
 const PlayerItem: FunctionComponent<PlayerItemProps> = (props) => {
@@ -27,7 +23,7 @@ const PlayerItem: FunctionComponent<PlayerItemProps> = (props) => {
 
     const login = async () => {
         if (props.hidePassword) {
-            props.onLoginSuccess?.({
+            props.onLogin?.({
                 username: username,
             });
             return;
@@ -39,7 +35,7 @@ const PlayerItem: FunctionComponent<PlayerItemProps> = (props) => {
             const resp = await AuthAPI.login(username, password);
             setImage(resp.image);
 
-            props.onLoginSuccess?.({
+            props.onLogin?.({
                 username: username,
                 id: resp.id,
                 token: resp.token,
@@ -51,6 +47,14 @@ const PlayerItem: FunctionComponent<PlayerItemProps> = (props) => {
             setPassword("");
             setLocked(false);
         }
+    };
+
+    const remove = () => {
+        setUsername("");
+        setPassword("");
+        setImage(null);
+        setLocked(false);
+        props.onRemove?.();
     };
 
     return (
@@ -129,18 +133,55 @@ const PlayerItem: FunctionComponent<PlayerItemProps> = (props) => {
                     </>
                 )}
 
-                <Avatar
+                <Box
                     sx={{
                         width: 56,
                         height: 56,
                         borderRadius: 0,
                         backgroundColor: "#bdbdbd",
+                        position: "relative",
                         [theme.breakpoints.down("sm")]: {
                             display: "none",
                         },
                     }}
-                    src={image || ""}
-                />
+                >
+                    <Avatar
+                        sx={{
+                            width: 56,
+                            height: 56,
+                            borderRadius: 0,
+                        }}
+                        src={image || ""}
+                    />
+
+                    {locked && (
+                        <Box
+                            sx={{
+                                position: "absolute",
+                                top: 0,
+                                left: 0,
+                                bottom: 0,
+                                right: 0,
+                                display: "flex",
+                                justifyContent: "center",
+                                alignItems: "center",
+                                opacity: 0,
+                                transition: (t) =>
+                                    t.transitions.create("opacity", {
+                                        duration: t.transitions.duration.shortest,
+                                    }),
+                                "&:hover": {
+                                    opacity: 1,
+                                    background: "rgba(0, 0, 0, 0.5)",
+                                    cursor: "pointer",
+                                },
+                            }}
+                            onClick={remove}
+                        >
+                            <ImCross size={24} color={theme.palette.primary.main} />
+                        </Box>
+                    )}
+                </Box>
             </Stack>
         </Box>
     );

@@ -1,5 +1,5 @@
 interface Player {
-    id?: string;
+    id?: number;
     username: string;
     image?: string;
     token?: string;

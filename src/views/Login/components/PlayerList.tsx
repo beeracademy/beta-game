@@ -1,17 +1,46 @@
 import { Stack } from "@mui/material";
-import { FunctionComponent } from "react";
+import { FunctionComponent, useState } from "react";
+import { Player } from "../../../models/player";
 import PlayerItem from "./PlayerItem";
 
 interface PlayerListProps {
     numberOfPlayers: number;
-    offline?: boolean;
+    usernameOnly?: boolean;
+    onChange?: (players: Player[]) => void;
 }
 
 const PlayerList: FunctionComponent<PlayerListProps> = (props) => {
+    const [_, setPlayers] = useState<{ [key: number]: Player }>();
+
     return (
         <Stack spacing={1}>
             {Array.from(Array(props.numberOfPlayers).keys()).map((_, i) => {
-                return <PlayerItem key={i} hidePassword={props.offline} />;
+                return (
+                    <PlayerItem
+                        key={i}
+                        hidePassword={props.usernameOnly}
+                        onLogin={(p) => {
+                            setPlayers((prev) => {
+                                const newPlayers = { ...prev };
+                                newPlayers[i] = p;
+
+                                props.onChange?.(Object.values(newPlayers));
+
+                                return newPlayers;
+                            });
+                        }}
+                        onRemove={() => {
+                            setPlayers((prev) => {
+                                const newPlayers = { ...prev };
+                                delete newPlayers[i];
+
+                                props.onChange?.(Object.values(newPlayers));
+
+                                return newPlayers;
+                            });
+                        }}
+                    />
+                );
             })}
         </Stack>
     );

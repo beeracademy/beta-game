@@ -21,6 +21,7 @@ import { useSounds } from "../../../hooks/sounds";
 import { Helmet } from "react-helmet";
 import useGame from "../../../stores/game";
 import ShuffleDialog from "./components/ShuffleDialog";
+import { Player } from "../../../models/player";
 
 const MIN_PLAYERS = 2;
 const MAX_PLAYERS = 6;
@@ -35,27 +36,10 @@ const NewGameView: FunctionComponent = () => {
 
     const StartGame = useGame((state) => state.Start);
 
+    const [players, setPlayers] = useState<Player[]>([]);
+
     const startGame = () => {
-        StartGame([
-            {
-                username: "Player 1",
-            },
-            {
-                username: "Player 2",
-            },
-            {
-                username: "Player 3",
-            },
-            {
-                username: "Player 4",
-            },
-            {
-                username: "Player 5",
-            },
-            {
-                username: "Player 6",
-            },
-        ]);
+        StartGame(players);
 
         stopAll();
         play("baladada");
@@ -142,7 +126,11 @@ const NewGameView: FunctionComponent = () => {
                                     {gameMode === "offline" ? "Players" : "Player login"}
                                 </Typography>
 
-                                <PlayerList numberOfPlayers={numberOfPlayers} offline={gameMode === "offline"} />
+                                <PlayerList
+                                    numberOfPlayers={numberOfPlayers}
+                                    usernameOnly={gameMode === "offline"}
+                                    onChange={(players) => setPlayers(players)}
+                                />
                             </Stack>
                             <Divider />
 
@@ -152,11 +140,12 @@ const NewGameView: FunctionComponent = () => {
                                 size="large"
                                 onClick={startGame}
                                 endIcon={<IoPlay size={24} />}
+                                disabled={players.length !== numberOfPlayers}
                             >
                                 Start game
                             </Button>
 
-                            <Button component={NavLink} variant="outlined" to="/login/continue">
+                            <Button component={NavLink} variant="outlined" size="large" to="/login/continue">
                                 Continue game
                             </Button>
                         </Stack>

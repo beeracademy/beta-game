@@ -101,7 +101,14 @@ const ContinueGameView: FunctionComponent = () => {
                     <Divider />
 
                     <CardContent>
-                        <Button variant="contained" color="primary" fullWidth component={NavLink} to="/login">
+                        <Button
+                            variant="contained"
+                            color="primary"
+                            fullWidth
+                            component={NavLink}
+                            to="/login"
+                            size="large"
+                        >
                             Back to new game
                         </Button>
                     </CardContent>
