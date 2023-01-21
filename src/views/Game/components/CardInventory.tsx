@@ -63,7 +63,7 @@ const CardInventoryCard: FunctionComponent<CardInventoryCardProps> = (props) => 
                     position: "relative",
 
                     ...(props.value <= 0 && {
-                        opacity: 0.75,
+                        opacity: 0.5,
                         background: (t) =>
                             t.palette.mode === "dark" ? "url('/whiteheart.svg')" : "url('/blackheart.svg')",
                         backgroundSize: "36px",
