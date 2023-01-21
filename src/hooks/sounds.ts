@@ -36,7 +36,7 @@ type SoundName = typeof SoundNames[number];
 
 SoundNames.forEach((soundName) => {
     new Howl({
-        src: [`sounds/${soundName}.mp3`, `sounds/${soundName}.ogg`],
+        src: [`/sounds/${soundName}.mp3`, `sounds/${soundName}.ogg`],
         preload: true,
     });
 });
@@ -50,7 +50,7 @@ const useSounds = () => {
 
 const play = (soundName: SoundName, loop?: boolean) => {
     const sound = new Howl({
-        src: [`sounds/${soundName}.mp3`, `sounds/${soundName}.ogg`],
+        src: [`/sounds/${soundName}.mp3`, `/sounds/${soundName}.ogg`],
         loop,
     });
     sound.play();

@@ -2,7 +2,6 @@ import { Box, Container, Stack } from "@mui/material";
 import { FunctionComponent, memo, useEffect, useMemo } from "react";
 import { Outlet } from "react-router-dom";
 import SoundMuteFab from "./components/SoundMuteFab";
-import useWindowSize from "react-use/lib/useWindowSize";
 import BottomGamesCount from "./components/BottomGamesCount";
 import { useSounds } from "../../hooks/sounds";
 import ConfirmDialog from "../../components/ConfirmDialog";
@@ -10,7 +9,6 @@ import ThemeModeFab from "./components/ThemeModeFab";
 
 const LoginView: FunctionComponent = () => {
     const { play, stopAll } = useSounds();
-    const { width, height } = useWindowSize();
 
     useEffect(() => {
         stopAll();
@@ -69,7 +67,7 @@ const Wallpaper = memo(() => {
                 opacity: 0.2,
                 zIndex: -1,
 
-                backgroundImage: "url(wallpaper/" + Math.floor(Math.random() * 2 + 1) + ".png)",
+                backgroundImage: "url(/wallpaper/" + Math.floor(Math.random() * 2 + 1) + ".png)",
                 backgroundSize: "cover",
                 backgroundPosition: "center",
                 backgroundRepeat: "no-repeat",
