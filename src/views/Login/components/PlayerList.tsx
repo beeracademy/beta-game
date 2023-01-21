@@ -1,5 +1,5 @@
 import { Stack } from "@mui/material";
-import { FunctionComponent, useState } from "react";
+import { FunctionComponent, useEffect, useState } from "react";
 import { Player } from "../../../models/player";
 import PlayerItem from "./PlayerItem";
 
@@ -10,7 +10,26 @@ interface PlayerListProps {
 }
 
 const PlayerList: FunctionComponent<PlayerListProps> = (props) => {
-    const [_, setPlayers] = useState<{ [key: number]: Player }>();
+    const [players, setPlayers] = useState<{ [key: number]: Player }>();
+
+    useEffect(() => {
+        let newPlayers: { [key: number]: Player } = {};
+        setPlayers((prev) => {
+            newPlayers = { ...prev };
+
+            Object.keys(newPlayers).forEach((k) => {
+                const i = parseInt(k);
+
+                if (i >= props.numberOfPlayers) {
+                    delete newPlayers[i];
+                }
+            });
+
+            return newPlayers;
+        });
+
+        props.onChange?.(Object.values(newPlayers));
+    }, [props.numberOfPlayers]);
 
     return (
         <Stack spacing={1}>
