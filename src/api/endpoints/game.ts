@@ -62,3 +62,23 @@ export async function addPhoto(gameId: number, imageBlob: Blob): Promise<void> {
 export async function deletePhoto(gameId: number): Promise<void> {
     return await client.delete(`/api/games/${gameId}/delete_image/`);
 }
+
+export interface IResumableGame {
+    id: number;
+    start_datetime: string;
+    players: {
+        id: number;
+        username: string;
+        image: string;
+    }[];
+}
+
+export async function getResumableGames(token?: string): Promise<IResumableGame[]> {
+    const response = await client.get<IResumableGame[]>("/api/games/resumable/", {
+        headers: {
+            Authorization: `Token ${token}`,
+        },
+    });
+
+    return response.data;
+}

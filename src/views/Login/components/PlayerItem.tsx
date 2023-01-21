@@ -43,6 +43,7 @@ const PlayerItem: FunctionComponent<PlayerItemProps> = (props) => {
             });
         } catch (e) {
             console.error(e);
+            
             play("snack");
             setPassword("");
             setLocked(false);
@@ -188,6 +189,3 @@ const PlayerItem: FunctionComponent<PlayerItemProps> = (props) => {
 };
 
 export default PlayerItem;
-
-156;
-263;

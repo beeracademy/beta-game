@@ -5,3 +5,8 @@ export const secondsToHHMMSS = (seconds: number): string => {
 export const milisecondsToMMSSsss = (miliseconds: number): string => {
     return new Date(miliseconds).toISOString().slice(14, 23);
 }
+
+export const datetimeToddmmHHMMSS = (datetime: string): string => {
+    const date = new Date(datetime);
+    return date.toLocaleDateString() + " " + date.toLocaleTimeString();
+}

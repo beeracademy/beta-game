@@ -8,15 +8,35 @@ import {
     List,
     ListItemButton,
     ListItemText,
+    Typography,
     useTheme,
 } from "@mui/material";
-import { FunctionComponent } from "react";
+import { FunctionComponent, useEffect, useState } from "react";
 import { Helmet } from "react-helmet";
 import { NavLink } from "react-router-dom";
-import PlayerList from "../components/PlayerList";
+import PlayerItem from "../components/PlayerItem";
+import * as GameAPI from "../../../api/endpoints/game";
+import { Player } from "../../../models/player";
+import { datetimeToddmmHHMMSS } from "../../../utilities/time";
 
 const ContinueGameView: FunctionComponent = () => {
     const theme = useTheme();
+
+    const [player, setPlayer] = useState<Player | null>(null);
+    const [resumableGames, setResumableGames] = useState<GameAPI.IResumableGame[]>([]);
+
+    const fetchResumableGames = async () => {
+        if (player === null) {
+            return;
+        }
+
+        const response = await GameAPI.getResumableGames(player.token);
+        setResumableGames(response);
+    };
+
+    useEffect(() => {
+        fetchResumableGames();
+    }, [player]);
 
     return (
         <>
@@ -55,48 +75,58 @@ const ContinueGameView: FunctionComponent = () => {
                     </CardContent>
 
                     <CardContent>
-                        <PlayerList numberOfPlayers={1} />
+                        <PlayerItem
+                            onLogin={async (p) => {
+                                setPlayer(p);
+                            }}
+                            onRemove={() => {
+                                setPlayer(null);
+                                setResumableGames([]);
+                            }}
+                        />
                     </CardContent>
 
-                    <Divider />
+                    {player && <Divider />}
 
-                    <CardContent>
-                        {/* List of games with their name, users and creation date */}
-                        <List dense disablePadding>
-                            <ListItemButton onClick={() => {}}>
-                                <ListItemText primary="Game 1" secondary="Created 2021-09-01 12:00:00" />
-                                <ListItemText
-                                    sx={{
-                                        textAlign: "right",
-                                    }}
-                                >
-                                    player1, player2, player3, player4
-                                </ListItemText>
-                            </ListItemButton>
+                    {
+                        // If there are no resumable games, show a message
+                        player && resumableGames.length === 0 && (
+                            <CardContent
+                                sx={{
+                                    marginTop: 2,
+                                    marginBottom: 2,
+                                    textAlign: "center",
+                                }}
+                            >
+                                <Typography>There are no resumable games for this player</Typography>
+                            </CardContent>
+                        )
+                    }
 
-                            <ListItemButton onClick={() => {}}>
-                                <ListItemText primary="Game 1" secondary="Created 2021-09-01 12:00:00" />
-                                <ListItemText
-                                    sx={{
-                                        textAlign: "right",
-                                    }}
-                                >
-                                    player1, player2, player3, player4
-                                </ListItemText>
-                            </ListItemButton>
-
-                            <ListItemButton onClick={() => {}}>
-                                <ListItemText primary="Game 1" secondary="Created 2021-09-01 12:00:00" />
-                                <ListItemText
-                                    sx={{
-                                        textAlign: "right",
-                                    }}
-                                >
-                                    player1, player2, player3, player4
-                                </ListItemText>
-                            </ListItemButton>
-                        </List>
-                    </CardContent>
+                    {resumableGames.length > 0 && (
+                        <CardContent>
+                            {/* List of games with their name, users and creation date */}
+                            <List dense disablePadding>
+                                {resumableGames.map((game) => {
+                                    return (
+                                        <ListItemButton onClick={() => {}} key={game.id}>
+                                            <ListItemText
+                                                primary={`Game #${game.id}`}
+                                                secondary={datetimeToddmmHHMMSS(game.start_datetime)}
+                                            />
+                                            <ListItemText
+                                                sx={{
+                                                    textAlign: "right",
+                                                }}
+                                            >
+                                                {game.players.map((p) => p.username).join(", ")}
+                                            </ListItemText>
+                                        </ListItemButton>
+                                    );
+                                })}
+                            </List>
+                        </CardContent>
+                    )}
 
                     <Divider />
 
