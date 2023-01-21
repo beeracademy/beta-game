@@ -23,9 +23,16 @@ const PlayerItem: FunctionComponent<PlayerItemProps> = (props) => {
 
     const login = async () => {
         if (props.hidePassword) {
+            if (username === "") {
+                props.onRemove?.();
+                
+                return;
+            }
+            
             props.onLogin?.({
                 username: username,
             });
+
             return;
         }
 
