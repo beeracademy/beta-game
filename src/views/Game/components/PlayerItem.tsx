@@ -10,6 +10,8 @@ import Bubbles from "../../../components/Bubbles";
 import useGame from "../../../stores/game";
 import { Crown, Jester } from "../../../components/Hats";
 
+import wave from "./wave.svg";
+
 interface PlayerItemProps {
     player: Player;
     index: number;
@@ -253,15 +255,35 @@ const LiquidBox: FunctionComponent<LiquidBoxProps> = memo((props) => {
     return (
         <Box
             sx={{
-                borderTop: "1px solid rgba(255, 255, 255, 0.4)",
-                backgroundColor: "rgba(0, 0, 0, 0.1)",
+                backgroundColor: "rgba(0, 0, 0, 0.2)",
                 width: "100%",
                 height: "100%",
-                marginTop: props.percentage + "%",
+                marginTop: `calc(${props.percentage}% + 15px)`,
                 transition: "margin-top 300ms",
                 zIndex: 1,
             }}
         >
+            <Box
+                sx={{
+                    "@keyframes wave": {
+                        "0%": {
+                            transform: "translate3d(0, 0, 0)",
+                        },
+                        "100%": {
+                            transform: "translate3d(-400px, 0, 0)",
+                        },
+                    },
+
+                    background: `url(/wave.svg)`,
+                    backgroundSize: "200px",
+                    backgroundRepeat: "repeat-x",
+                    width: "1612px",
+                    height: "9px",
+                    marginTop: "-9px",
+                    animation: "wave 7s cubic-bezier(0.36, 0.45, 0.63, 0.53) infinite;",
+                    transform: "translate3d(0, 0, 0)",
+                }}
+            />
             <Bubbles />
         </Box>
     );
