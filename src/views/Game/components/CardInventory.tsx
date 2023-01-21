@@ -1,5 +1,5 @@
-import { Card, Stack, Typography } from "@mui/material";
-import { FunctionComponent } from "react";
+import { Box, Card, darken, Stack, Typography } from "@mui/material";
+import { FunctionComponent, memo } from "react";
 import useGame from "../../../stores/game";
 import { useGameMetrics } from "../../../stores/metrics";
 
@@ -29,57 +29,111 @@ const CardInventory: FunctionComponent<CardInventoryProps> = () => {
                 const empty = cardsLeftOfValue(i + 2) === 0;
 
                 return (
-                    <Card
-                        variant="outlined"
+                    <CardInventoryCard
                         key={i}
-                        sx={{
-                            width: 78,
-                            textAlign: "center",
-
-                            ...(empty && {
-                                opacity: 0.75,
-                                background: (t) =>
-                                    t.palette.mode === "dark" ? "url('/whiteheart.svg')" : "url('/blackheart.svg')",
-                                backgroundSize: "36px",
-                                backgroundRepeat: "no-repeat",
-                                backgroundPosition: "center",
-                            }),
-                        }}
-                    >
-                        {!empty && (
-                            <>
-                                <Typography
-                                    fontSize={14}
-                                    fontWeight={800}
-                                    textAlign="left"
-                                    paddingLeft="8px"
-                                    paddingTop="8px"
-                                >
-                                    {valueToSymbol(i + 2)}
-                                </Typography>
-
-                                <Typography fontSize={32}>{cardsLeftOfValue(i + 2)}</Typography>
-
-                                <Typography
-                                    fontSize={14}
-                                    fontWeight={800}
-                                    textAlign="left"
-                                    paddingLeft="8px"
-                                    paddingTop="8px"
-                                    sx={{
-                                        transform: "rotate(180deg)",
-                                        color: "primary.main",
-                                    }}
-                                >
-                                    {valueToSymbol(i + 2)}
-                                </Typography>
-                            </>
-                        )}
-                    </Card>
+                        kind={valueToSymbol(i + 2)}
+                        value={empty ? 0 : cardsLeftOfValue(i + 2)}
+                    />
                 );
             })}
         </Stack>
     );
+};
+
+interface CardInventoryCardProps {
+    kind: string;
+    value: number;
+}
+
+const CardInventoryCard: FunctionComponent<CardInventoryCardProps> = (props) => {
+    return (
+        <Box
+            sx={{
+                position: "relative",
+            }}
+        >
+            <Card
+                variant="outlined"
+                sx={{
+                    zIndex: 1,
+                    width: 78,
+                    height: 106,
+                    flexShrink: 0,
+                    textAlign: "center",
+                    position: "relative",
+
+                    ...(props.value <= 0 && {
+                        opacity: 0.75,
+                        background: (t) =>
+                            t.palette.mode === "dark" ? "url('/whiteheart.svg')" : "url('/blackheart.svg')",
+                        backgroundSize: "36px",
+                        backgroundRepeat: "no-repeat",
+                        backgroundPosition: "center",
+                    }),
+                }}
+            >
+                {props.value > 0 && (
+                    <>
+                        <Typography
+                            fontSize={14}
+                            fontWeight={800}
+                            textAlign="left"
+                            paddingLeft="8px"
+                            paddingTop="8px"
+                            zIndex={989}
+                        >
+                            {props.kind}
+                        </Typography>
+
+                        <Typography fontSize={32}>{props.value}</Typography>
+
+                        <Typography
+                            fontSize={14}
+                            fontWeight={800}
+                            textAlign="left"
+                            paddingLeft="8px"
+                            paddingTop="8px"
+                            sx={{
+                                transform: "rotate(180deg)",
+                                color: "primary.main",
+                            }}
+                        >
+                            {props.kind}
+                        </Typography>
+                    </>
+                )}
+            </Card>
+
+            <CardStack size={props.value} />
+        </Box>
+    );
+};
+
+const CardStack = memo((props: { size: number }) => {
+    return (
+        <>
+            {new Array(Math.max(0, props.size)).fill(0).map((_, i) => (
+                <Card
+                    variant="outlined"
+                    key={i}
+                    sx={{
+                        position: "absolute",
+                        top: 0,
+                        width: 78,
+                        height: 106,
+                        flexShrink: 0,
+                        opacity: 0.75,
+                        backgroundColor: (t) => darken(t.palette.background.paper, (i / props.size) * 0.15),
+                        transform: randomRotationBetween(-7, 7),
+                    }}
+                />
+            ))}
+        </>
+    );
+});
+
+const randomRotationBetween = (min: number, max: number): string => {
+    return `rotate(${Math.floor(Math.random() * (max - min + 1) + min)}deg)`;
 };
 
 const valueToSymbol = (value: number) => {
@@ -93,7 +147,7 @@ const valueToSymbol = (value: number) => {
         case 14:
             return "A";
         default:
-            return value;
+            return `${value}`;
     }
 };
 
