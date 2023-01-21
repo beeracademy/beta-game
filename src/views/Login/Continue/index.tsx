@@ -18,6 +18,7 @@ import PlayerItem from "../components/PlayerItem";
 import * as GameAPI from "../../../api/endpoints/game";
 import { Player } from "../../../models/player";
 import { datetimeToddmmHHMMSS } from "../../../utilities/time";
+import Conditional from "../../../components/Conditional";
 
 const ContinueGameView: FunctionComponent = () => {
     const theme = useTheme();
@@ -86,24 +87,23 @@ const ContinueGameView: FunctionComponent = () => {
                         />
                     </CardContent>
 
-                    {player && <Divider />}
+                    <Conditional value={player !== null}>
+                        <Divider />
+                    </Conditional>
 
-                    {
-                        // If there are no resumable games, show a message
-                        player && resumableGames.length === 0 && (
-                            <CardContent
-                                sx={{
-                                    marginTop: 2,
-                                    marginBottom: 2,
-                                    textAlign: "center",
-                                }}
-                            >
-                                <Typography>There are no resumable games for this player</Typography>
-                            </CardContent>
-                        )
-                    }
+                    <Conditional value={player !== null && resumableGames.length === 0}>
+                        <CardContent
+                            sx={{
+                                marginTop: 2,
+                                marginBottom: 2,
+                                textAlign: "center",
+                            }}
+                        >
+                            <Typography>There are no resumable games for this player</Typography>
+                        </CardContent>
+                    </Conditional>
 
-                    {resumableGames.length > 0 && (
+                    <Conditional value={player !== null && resumableGames.length > 0}>
                         <CardContent>
                             {/* List of games with their name, users and creation date */}
                             <List dense disablePadding>
@@ -126,7 +126,7 @@ const ContinueGameView: FunctionComponent = () => {
                                 })}
                             </List>
                         </CardContent>
-                    )}
+                    </Conditional>
 
                     <Divider />
 
