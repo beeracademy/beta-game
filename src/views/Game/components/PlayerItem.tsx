@@ -22,7 +22,7 @@ const PlayerItem: FunctionComponent<PlayerItemProps> = (props) => {
     const sipsInABeer = useGame((state) => state.sipsInABeer);
 
     const metrics = usePlayerMetricsByIndex(props.index);
-    
+
     const settings = useSettings((state) => ({
         simpleCardsMode: state.simpleCardsMode,
         SetSimpleCardsMode: state.SetSimpleCardsMode,
@@ -134,7 +134,18 @@ const PlayerItem: FunctionComponent<PlayerItemProps> = (props) => {
                             padding: 2,
                         }}
                     >
-                        <Typography fontSize={20} fontWeight={900} align="center" marginBottom={2}>
+                        <Typography
+                            fontSize={20}
+                            fontWeight={900}
+                            align="center"
+                            marginBottom={2}
+                            sx={{
+                                maxWidth: "100%",
+                                overflow: "hidden",
+                                textOverflow: "ellipsis",
+                                whiteSpace: "nowrap",
+                            }}
+                        >
                             {props.player.username}
                         </Typography>
 

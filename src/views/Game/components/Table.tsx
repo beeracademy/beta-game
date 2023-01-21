@@ -53,8 +53,12 @@ const GameTable: FunctionComponent<GameTableProps> = () => {
                                         gameMetrics.activePlayerIndex === i && !gameMetrics.done
                                             ? "primary.main"
                                             : "text.primary",
-                                    
-                                    fontWeight: gameMetrics.activePlayerIndex === i && !gameMetrics.done ? "bold" : "normal",
+
+                                    fontWeight:
+                                        gameMetrics.activePlayerIndex === i && !gameMetrics.done ? "bold" : "normal",
+                                    overflow: "hidden",
+                                    textOverflow: "ellipsis",
+                                    whiteSpace: "nowrap",
                                 }}
                             >
                                 {player.username}

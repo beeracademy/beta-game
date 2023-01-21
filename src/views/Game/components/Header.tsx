@@ -119,7 +119,7 @@ const Header: FunctionComponent = () => {
 
                 <Stack direction="row" alignItems="center">
                     <Typography
-                        variant="body1"
+                        variant="h5"
                         sx={{
                             [theme.breakpoints.down("sm")]: {
                                 display: "none",
@@ -148,7 +148,7 @@ const Header: FunctionComponent = () => {
                         <Typography>{secondsToHHMMSS(elapsedTurnTime)}</Typography>
                     </Stack>
                     <Typography
-                        variant="body1"
+                        variant="h5"
                         sx={{
                             [theme.breakpoints.down("sm")]: {
                                 display: "none",
