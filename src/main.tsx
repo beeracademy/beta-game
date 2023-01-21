@@ -6,6 +6,9 @@ import { Helmet } from "react-helmet";
 import ThemeProvider from "./theme/provider";
 import { CardFlashProvider } from "./components/CardFlash";
 
+// Log all environment variables
+console.table(import.meta.env);
+
 ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
     <BrowserRouter>
         <ThemeProvider>
