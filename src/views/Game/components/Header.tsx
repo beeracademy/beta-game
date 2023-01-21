@@ -11,12 +11,13 @@ import useSettings from "../../../stores/settings";
 import { MdWbSunny } from "react-icons/md";
 import { BsMoonStarsFill } from "react-icons/bs";
 import { useGameMetrics } from "../../../stores/metrics";
+import DNFDialog from "./DNFDialog";
 
 const Header: FunctionComponent = () => {
     const theme = useTheme();
     const navigate = useNavigate();
 
-    const game = useGame(state => ({
+    const game = useGame((state) => ({
         gameStartTimestamp: state.gameStartTimestamp,
         turnStartTimestamp: state.turnStartTimestamp,
         numberOfRounds: state.numberOfRounds,
@@ -32,6 +33,7 @@ const Header: FunctionComponent = () => {
 
     const [remoteDialogOpen, setRemoteDialogOpen] = useState(false);
     const [exitGameDialogOpen, setExitGameDialogOpen] = useState(false);
+    const [dnfDialogOpen, setDNFDialogOpen] = useState(false);
 
     const closeExitGameDialog = (e: { ok: boolean }) => {
         setExitGameDialogOpen(false);
@@ -40,10 +42,6 @@ const Header: FunctionComponent = () => {
             game.ExitGame();
             navigate("/login"); // Should be handled by protected route
         }
-    };
-
-    const closeRemoteDialog = () => {
-        setRemoteDialogOpen(false);
     };
 
     const [elapsedGameTime, setElapsedGameTime] = useState(0);
@@ -183,6 +181,7 @@ const Header: FunctionComponent = () => {
                                 marginRight: 2,
                                 color: "primary.contrastText",
                             }}
+                            onClick={() => setDNFDialogOpen(true)}
                         >
                             DNF
                         </IconButton>
@@ -201,8 +200,9 @@ const Header: FunctionComponent = () => {
                 </Box>
             </Card>
 
-            <RemoteDialog open={remoteDialogOpen} onClose={closeRemoteDialog} />
+            <RemoteDialog open={remoteDialogOpen} onClose={() => setRemoteDialogOpen(false)} />
             <ExitGameDialog open={exitGameDialogOpen} onClose={closeExitGameDialog} />
+            <DNFDialog open={dnfDialogOpen} onClose={() => setDNFDialogOpen(false)} />
         </>
     );
 };
