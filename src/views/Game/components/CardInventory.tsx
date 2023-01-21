@@ -112,7 +112,7 @@ const CardInventoryCard: FunctionComponent<CardInventoryCardProps> = (props) => 
 const CardStack = memo((props: { size: number }) => {
     return (
         <>
-            {new Array(Math.max(0, props.size)).fill(0).map((_, i) => (
+            {new Array(Math.max(0, props.size - 1)).fill(0).map((_, i) => (
                 <Card
                     variant="outlined"
                     key={i}
