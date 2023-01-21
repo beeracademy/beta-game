@@ -9,6 +9,7 @@ import { MetricsStore, useGameMetrics } from "../../stores/metrics";
 import useSettings from "../../stores/settings";
 import CardInventory from "./components/CardInventory";
 import Chart from "./components/Chart";
+import Chat from "./components/Chat";
 import ChugDialog from "./components/ChugDialog";
 import GameOverDialog from "./components/GameOverDialog";
 import Header from "./components/Header";
@@ -104,7 +105,7 @@ const GameView: FunctionComponent = () => {
         ws.send({
             event: "REMOTES_DISCONNECT",
         });
-        
+
         ws.close();
     }, [settings.remoteControl]);
 
@@ -154,38 +155,55 @@ const GameView: FunctionComponent = () => {
             <Box
                 sx={{
                     display: "flex",
-                    flexDirection: "column",
+                    flexDirection: "row",
                     width: "100vw",
                     backgroundColor: "background.default",
                     padding: 1,
                     gap: 2,
                 }}
             >
-                <Header />
-
-                <CardInventory />
-
-                <Card
-                    variant="outlined"
+                {/* <Box
                     sx={{
-                        marginBottom: "auto",
+                        display: "flex",
                     }}
                 >
-                    <CardContent
+                    <Chat />
+                </Box> */}
+
+                <Box
+                    sx={{
+                        display: "flex",
+                        flexDirection: "column",
+                        flex: 1,
+                        gap: 2,
+                    }}
+                >
+                    <Header />
+
+                    <CardInventory />
+
+                    <Card
+                        variant="outlined"
                         sx={{
-                            justifyContent: "center",
-                            alignItems: "center",
-                            display: "flex",
-                            gap: 2,
-                            height: "450px",
+                            marginBottom: "auto",
                         }}
                     >
-                        <GameTable />
-                        <Chart />
-                    </CardContent>
-                </Card>
+                        <CardContent
+                            sx={{
+                                justifyContent: "center",
+                                alignItems: "center",
+                                display: "flex",
+                                gap: 2,
+                                height: "450px",
+                            }}
+                        >
+                            <GameTable />
+                            <Chart />
+                        </CardContent>
+                    </Card>
 
-                <PlayerList />
+                    <PlayerList />
+                </Box>
             </Box>
 
             <GameOverDialog open={gameMetrics.done} />
