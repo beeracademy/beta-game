@@ -40,7 +40,11 @@ const NewGameView: FunctionComponent = () => {
     const [players, setPlayers] = useState<Player[]>([]);
 
     const startGame = () => {
-        StartGame(players);
+        StartGame(players, {
+            offline: gameMode === "offline",
+            numberOfRounds: 13,
+            sipsInABeer: 14,
+        });
 
         stopAll();
         play("baladada");

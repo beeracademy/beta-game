@@ -35,7 +35,14 @@ interface GameState {
 }
 
 interface GameActions {
-    Start: (players: Player[]) => Promise<void>;
+    Start: (
+        players: Player[],
+        options?: {
+            sipsInABeer: number;
+            numberOfRounds: number;
+            offline: boolean;
+        }
+    ) => Promise<void>;
     Draw: () => Card;
     Exit: () => void;
     Resume: (state: GameState) => void;
@@ -81,7 +88,7 @@ const useGame = create<GameState & GameActions>()(
                 useSettings.setState({
                     remoteControl: false,
                     remoteToken: undefined,
-                })
+                });
 
                 // Set up game state
 
