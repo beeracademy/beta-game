@@ -22,6 +22,7 @@ import Conditional from "../../../components/Conditional";
 import useGame from "../../../stores/game";
 import { mapToLocal } from "../../../stores/game.mapper";
 import { stopAll } from "../../../hooks/sounds";
+import ContinueGameDialog from "../components/ContinueGameDialog";
 
 const ContinueGameView: FunctionComponent = () => {
     const theme = useTheme();
@@ -32,6 +33,7 @@ const ContinueGameView: FunctionComponent = () => {
 
     const [player, setPlayer] = useState<Player | null>(null);
     const [resumableGames, setResumableGames] = useState<GameAPI.IResumableGame[]>([]);
+    const [selectedGame, setSelectedGame] = useState<GameAPI.IGameState | null>(null);
 
     const fetchResumableGames = async () => {
         if (!player || !player.token) {
@@ -50,9 +52,17 @@ const ContinueGameView: FunctionComponent = () => {
         const response = await GameAPI.postResumeGame(player.token, gameId);
 
         if (response) {
-            stopAll();
-            Resume(mapToLocal(response));
+            setSelectedGame(response);
         }
+    };
+
+    const confirmResume = () => {
+        if (!selectedGame) {
+            return;
+        }
+
+        stopAll();
+        Resume(mapToLocal(selectedGame));
     };
 
     useEffect(() => {
@@ -124,10 +134,12 @@ const ContinueGameView: FunctionComponent = () => {
                     </Conditional>
 
                     <Conditional value={player !== null && resumableGames.length > 0}>
-                        <CardContent sx={{
-                            maxHeight: 400,
-                            overflowY: "auto",
-                        }}>
+                        <CardContent
+                            sx={{
+                                maxHeight: 400,
+                                overflowY: "auto",
+                            }}
+                        >
                             {/* List of games with their name, users and creation date */}
                             <List dense disablePadding>
                                 {resumableGames.map((game) => {
@@ -167,6 +179,20 @@ const ContinueGameView: FunctionComponent = () => {
                     </CardContent>
                 </Card>
             </Fade>
+
+            {selectedGame && (
+                <ContinueGameDialog
+                    open={!!selectedGame}
+                    game={selectedGame}
+                    onClose={(e: { ok: boolean }) => {
+                        if (e.ok) {
+                            confirmResume();
+                        } else {
+                            setSelectedGame(null);
+                        }
+                    }}
+                />
+            )}
         </>
     );
 };

@@ -15,19 +15,28 @@ export async function postStart(tokens: string[], official: boolean): Promise<IG
 }
 
 export interface IGameState {
-    start_datetime: string;
-    official: boolean;
-    player_names: string[];
-    cards: ICard[];
-    has_ended: boolean;
-    description?: string;
-    dnf: boolean;
-    dnf_player_ids: number[];
     id: number;
-    player_ids: number[];
-    token: string;
+    start_datetime: string;
+    end_datetime?: string;
+    description: string;
+    official: boolean;
+    dnf: boolean;
     shuffle_indices: number[];
-    location?: ILocation;
+    cards: ICard[];
+    players: IPlayer[];
+    sips_per_beer: number;
+    has_ended: boolean;
+    description_html: string;
+    location: ILocation;
+    image?: string;
+    token: string;
+}
+
+export interface IPlayer {
+    id: number;
+    username: string;
+    is_superuser: boolean;
+    image_url: string;
 }
 
 export interface ILocation {
