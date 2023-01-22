@@ -6,12 +6,15 @@ import { Player } from "../models/player";
 import { GenerateShuffleIndices } from "../utilities/deck";
 import useGamesPlayed from "./gamesPlayed";
 import * as GameAPI from "../api/endpoints/game";
+import { mapToRemote } from "./game.mapper";
 /*
     Game state is only for essential game data that is required to resume a game.
     All other derived data should be calculated in the metrics store.
 */
 
 interface GameState {
+    id?: number;
+
     offline: boolean;
     token?: string;
 
@@ -38,6 +41,8 @@ interface GameActions {
 }
 
 const initialState: GameState = {
+    id: undefined,
+
     offline: false,
     token: undefined,
 
@@ -70,6 +75,7 @@ const useGame = create<GameState & GameActions>()(
             ) => {
                 console.debug("[Game]", "Starting game");
 
+                let id = undefined;
                 let gameStartTimestamp = Date.now();
                 let turnStartTimestamp = Date.now();
                 let shuffleIndices = GenerateShuffleIndices(players.length);
@@ -80,12 +86,14 @@ const useGame = create<GameState & GameActions>()(
 
                     const resp = await GameAPI.postStart(playerTokens, true);
 
+                    id = resp.id;
                     token = resp.token;
                     gameStartTimestamp = Date.parse(resp.start_datetime);
                     shuffleIndices = resp.shuffle_indices;
                 }
 
                 set({
+                    id: id,
                     offline: options.offline,
                     token: token,
                     shuffleIndices: shuffleIndices,
@@ -95,6 +103,7 @@ const useGame = create<GameState & GameActions>()(
                     numberOfRounds: options.numberOfRounds,
                     players: players,
                     chugs: [],
+                    draws: [],
                 });
 
                 useGamesPlayed.getState().incrementStarted();
@@ -111,10 +120,23 @@ const useGame = create<GameState & GameActions>()(
                     value: value,
                 };
 
-                set((state) => ({
-                    turnStartTimestamp: Date.now(),
-                    draws: [...state.draws, card],
-                }));
+                set((state) => {
+                    const updates = {
+                        turnStartTimestamp: Date.now(),
+                        draws: [...state.draws, card],
+                    };
+
+                    if (!state.offline) {
+                        GameAPI.postUpdate(
+                            mapToRemote({
+                                ...state,
+                                ...updates,
+                            })
+                        );
+                    }
+
+                    return updates;
+                });
 
                 return card;
             },
@@ -138,4 +160,5 @@ const useGame = create<GameState & GameActions>()(
 );
 
 export default useGame;
+export { initialState };
 export type { GameState, GameActions };

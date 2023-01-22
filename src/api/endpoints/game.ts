@@ -73,12 +73,26 @@ export interface IResumableGame {
     }[];
 }
 
-export async function getResumableGames(token?: string): Promise<IResumableGame[]> {
+export async function getResumableGames(token: string): Promise<IResumableGame[]> {
     const response = await client.get<IResumableGame[]>("/api/games/resumable/", {
         headers: {
             Authorization: `Token ${token}`,
         },
     });
+
+    return response.data;
+}
+
+export async function postResumeGame(token: string, gameId: number): Promise<IGameState> {
+    const response = await client.post(
+        `/api/games/${gameId}/resume/`,
+        {},
+        {
+            headers: {
+                Authorization: `Token ${token}`,
+            },
+        }
+    );
 
     return response.data;
 }

@@ -19,20 +19,40 @@ import * as GameAPI from "../../../api/endpoints/game";
 import { Player } from "../../../models/player";
 import { datetimeToddmmHHMMSS } from "../../../utilities/time";
 import Conditional from "../../../components/Conditional";
+import useGame from "../../../stores/game";
+import { mapToLocal } from "../../../stores/game.mapper";
+import { stopAll } from "../../../hooks/sounds";
 
 const ContinueGameView: FunctionComponent = () => {
     const theme = useTheme();
+
+    const { Resume } = useGame((state) => ({
+        Resume: state.Resume,
+    }));
 
     const [player, setPlayer] = useState<Player | null>(null);
     const [resumableGames, setResumableGames] = useState<GameAPI.IResumableGame[]>([]);
 
     const fetchResumableGames = async () => {
-        if (player === null) {
+        if (!player || !player.token) {
             return;
         }
 
         const response = await GameAPI.getResumableGames(player.token);
         setResumableGames(response);
+    };
+
+    const resumeGame = async (gameId: number) => {
+        if (!player || !player.token) {
+            return;
+        }
+
+        const response = await GameAPI.postResumeGame(player.token, gameId);
+
+        if (response) {
+            stopAll();
+            Resume(mapToLocal(response));
+        }
     };
 
     useEffect(() => {
@@ -104,12 +124,15 @@ const ContinueGameView: FunctionComponent = () => {
                     </Conditional>
 
                     <Conditional value={player !== null && resumableGames.length > 0}>
-                        <CardContent>
+                        <CardContent sx={{
+                            maxHeight: 400,
+                            overflowY: "auto",
+                        }}>
                             {/* List of games with their name, users and creation date */}
                             <List dense disablePadding>
                                 {resumableGames.map((game) => {
                                     return (
-                                        <ListItemButton onClick={() => {}} key={game.id}>
+                                        <ListItemButton onClick={() => resumeGame(game.id)} key={game.id}>
                                             <ListItemText
                                                 primary={`Game #${game.id}`}
                                                 secondary={datetimeToddmmHHMMSS(game.start_datetime)}

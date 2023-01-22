@@ -9,7 +9,7 @@ interface GameGuardProps {
 
 const GameGuard: FunctionComponent<GameGuardProps> = (props) => {
     const game = useGame((state) => ({
-        started: state.players.length > 0,
+        started: !!state.gameStartTimestamp,
     }));
 
     if (props.started && !game.started) {
