@@ -6,7 +6,7 @@ import { IoExitOutline } from "react-icons/io5";
 import ExitGameDialog from "./ExitGameDialog";
 import { useNavigate } from "react-router-dom";
 import useGame from "../../../stores/game";
-import { secondsToHHMMSS } from "../../../utilities/time";
+import { secondsToHHMMSS, secondsToHHMMSSsss } from "../../../utilities/time";
 import useSettings from "../../../stores/settings";
 import { MdWbSunny } from "react-icons/md";
 import { BsMoonStarsFill } from "react-icons/bs";
@@ -59,7 +59,7 @@ const Header: FunctionComponent = () => {
 
         updateTimes();
 
-        const interval = setInterval(updateTimes, 1000);
+        const interval = setInterval(updateTimes, 1);
 
         return () => clearInterval(interval);
     }, [gameMetrics.done, game.gameStartTimestamp, game.turnStartTimestamp]);
@@ -145,7 +145,7 @@ const Header: FunctionComponent = () => {
                         >
                             {secondsToHHMMSS(elapsedGameTime)}
                         </Typography>
-                        <Typography>{secondsToHHMMSS(elapsedTurnTime)}</Typography>
+                        <Typography>{secondsToHHMMSSsss(elapsedTurnTime)}</Typography>
                     </Stack>
                     <Typography
                         variant="h5"
