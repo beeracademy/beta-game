@@ -37,6 +37,11 @@ const mapToLocal = (state: IGameState): GameState => {
         gameStartTimestamp: Date.parse(state.start_datetime),
         shuffleIndices: state.shuffle_indices,
         offline: !state.official,
+        players: state.players.map((player) => ({
+            id: player.id,
+            username: player.username,
+            image: player.image_url,
+        })),
     };
 };
 
