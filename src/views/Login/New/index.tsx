@@ -22,6 +22,8 @@ import { Helmet } from "react-helmet";
 import useGame from "../../../stores/game";
 import ShuffleDialog from "./components/ShuffleDialog";
 import { Player } from "../../../models/player";
+import Conditional from "../../../components/Conditional";
+import TimeAttackSettings from "../components/TimeAttackSettings";
 
 const MIN_PLAYERS = 2;
 const MAX_PLAYERS = 6;
@@ -32,7 +34,7 @@ const NewGameView: FunctionComponent = () => {
     const { play, stopAll } = useSounds();
 
     const [numberOfPlayers, setNumberOfPlayers] = useState(4);
-    const [gameMode, setGameMode] = useState<GameMode>("online");
+    const [gameMode, setGameMode] = useState<GameMode>("normal");
 
     const StartGame = useGame((state) => state.Start);
 
@@ -104,6 +106,10 @@ const NewGameView: FunctionComponent = () => {
                                         setGameMode(value);
                                     }}
                                 />
+
+                                <Conditional value={gameMode === "time-attack"}>
+                                    <TimeAttackSettings />
+                                </Conditional>
                             </Stack>
 
                             <Stack spacing={1}>

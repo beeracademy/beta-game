@@ -1,7 +1,7 @@
 import { ToggleButton, ToggleButtonGroup } from "@mui/material";
 import { FunctionComponent, useState } from "react";
 
-type GameMode = "online" | "offline";
+type GameMode = "normal" | "time-attack" | "offline";
 
 interface GameModeSelectorProps {
     value: GameMode;
@@ -22,7 +22,8 @@ const GameModeSelector: FunctionComponent<GameModeSelectorProps> = (props) => {
             }}
             size="small"
         >
-            <ToggleButton value="online">Online</ToggleButton>
+            <ToggleButton value="normal">Normal</ToggleButton>
+            {/* <ToggleButton value="time-attack">Time Attack</ToggleButton> */}
             <ToggleButton value="offline">Offline</ToggleButton>
         </ToggleButtonGroup>
     );
