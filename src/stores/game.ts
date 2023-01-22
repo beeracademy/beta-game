@@ -7,6 +7,7 @@ import { GenerateShuffleIndices } from "../utilities/deck";
 import useGamesPlayed from "./gamesPlayed";
 import * as GameAPI from "../api/endpoints/game";
 import { mapToRemote } from "./game.mapper";
+import useSettings from "./settings";
 /*
     Game state is only for essential game data that is required to resume a game.
     All other derived data should be calculated in the metrics store.
@@ -74,6 +75,15 @@ const useGame = create<GameState & GameActions>()(
                 }
             ) => {
                 console.debug("[Game]", "Starting game");
+
+                // Disable remote control if it is enabled
+
+                useSettings.setState({
+                    remoteControl: false,
+                    remoteToken: undefined,
+                })
+
+                // Set up game state
 
                 let id = undefined;
                 let gameStartTimestamp = Date.now();
