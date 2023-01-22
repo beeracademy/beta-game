@@ -12,7 +12,7 @@ import {
     useTheme,
 } from "@mui/material";
 import { FunctionComponent, useState } from "react";
-import { NavLink, useNavigate } from "react-router-dom";
+import { NavLink } from "react-router-dom";
 import PlayerList from "../components/PlayerList";
 import { IoInformationCircleOutline, IoPlay } from "react-icons/io5";
 import GameModeSelector, { GameMode } from "../components/GameModeSelector";
@@ -30,7 +30,6 @@ const MAX_PLAYERS = 6;
 
 const NewGameView: FunctionComponent = () => {
     const theme = useTheme();
-    const navigate = useNavigate();
     const { play, stopAll } = useSounds();
 
     const [numberOfPlayers, setNumberOfPlayers] = useState(4);
@@ -45,7 +44,6 @@ const NewGameView: FunctionComponent = () => {
 
         stopAll();
         play("baladada");
-        navigate("/");
     };
 
     return (

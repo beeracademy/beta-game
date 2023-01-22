@@ -5,13 +5,16 @@ import { Chug } from "../models/chug";
 import { Player } from "../models/player";
 import { GenerateShuffleIndices } from "../utilities/deck";
 import useGamesPlayed from "./gamesPlayed";
-
+import * as GameAPI from "../api/endpoints/game";
 /*
     Game state is only for essential game data that is required to resume a game.
     All other derived data should be calculated in the metrics store.
 */
 
 interface GameState {
+    offline: boolean;
+    token?: string;
+
     shuffleIndices: number[];
 
     sipsInABeer: number;
@@ -20,24 +23,24 @@ interface GameState {
     gameStartTimestamp: number;
     turnStartTimestamp: number;
 
-    numberOfDraws: number;
+    draws: Card[];
 
     players: Player[];
+
     chugs: Chug[];
-
-    // TODO
-
-    draws: Card[];
 }
 
 interface GameActions {
-    Start: (players: Player[]) => void;
+    Start: (players: Player[]) => Promise<void>;
     Draw: () => Card;
     Exit: () => void;
     Resume: (state: GameState) => void;
 }
 
 const initialState: GameState = {
+    offline: false,
+    token: undefined,
+
     shuffleIndices: [],
 
     sipsInABeer: 14,
@@ -45,8 +48,6 @@ const initialState: GameState = {
 
     gameStartTimestamp: 0,
     turnStartTimestamp: 0,
-
-    numberOfDraws: 0,
 
     players: [],
     chugs: [],
@@ -59,19 +60,37 @@ const useGame = create<GameState & GameActions>()(
         (set) => ({
             ...initialState,
 
-            Start: (
+            Start: async (
                 players: Player[],
                 options = {
                     sipsInABeer: 14,
                     numberOfRounds: 13,
+                    offline: false,
                 }
             ) => {
                 console.debug("[Game]", "Starting game");
 
+                let gameStartTimestamp = Date.now();
+                let turnStartTimestamp = Date.now();
+                let shuffleIndices = GenerateShuffleIndices(players.length);
+                let token = undefined;
+
+                if (!options.offline) {
+                    const playerTokens = players.map((player) => player.token as string);
+
+                    const resp = await GameAPI.postStart(playerTokens, true);
+
+                    token = resp.token;
+                    gameStartTimestamp = Date.parse(resp.start_datetime);
+                    shuffleIndices = resp.shuffle_indices;
+                }
+
                 set({
-                    shuffleIndices: GenerateShuffleIndices(players.length), // TODO
-                    gameStartTimestamp: Date.now(),
-                    turnStartTimestamp: Date.now(),
+                    offline: options.offline,
+                    token: token,
+                    shuffleIndices: shuffleIndices,
+                    gameStartTimestamp: gameStartTimestamp,
+                    turnStartTimestamp: turnStartTimestamp,
                     sipsInABeer: options.sipsInABeer,
                     numberOfRounds: options.numberOfRounds,
                     players: players,
@@ -94,7 +113,6 @@ const useGame = create<GameState & GameActions>()(
 
                 set((state) => ({
                     turnStartTimestamp: Date.now(),
-                    numberOfDraws: state.numberOfDraws + 1,
                     draws: [...state.draws, card],
                 }));
 

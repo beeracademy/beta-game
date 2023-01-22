@@ -5,17 +5,17 @@ export interface IPostStartRequest {
     official: boolean;
 }
 
-export async function postStart(tokens: string[], official: boolean): Promise<void> {
+export async function postStart(tokens: string[], official: boolean): Promise<IGameState> {
     const data: IPostStartRequest = {
         tokens: tokens,
         official: official,
     };
 
-    await client.post("/api/games/", data);
+    return (await client.post("/api/games/", data)).data;
 }
 
 export interface IGameState {
-    state_datetime: string;
+    start_datetime: string;
     official: boolean;
     player_names: string[];
     cards: ICard[];
