@@ -24,7 +24,7 @@ const Chart: FunctionComponent = () => {
         const data: ApexAxisChartSeries = playerMetrics.map((pm, i) => {
             return {
                 data: pm.cumulativeSips,
-                name: game.players[i].username,
+                name: game.players[i]?.username,
                 type: "line",
                 color: (theme.player as any)[i],
             };
