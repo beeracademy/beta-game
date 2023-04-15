@@ -67,7 +67,7 @@ const Wallpaper = memo(() => {
                 opacity: 0.2,
                 zIndex: -1,
 
-                backgroundImage: "url(/wallpaper/" + Math.floor(Math.random() * 2 + 1) + ".png)",
+                backgroundImage: "url(/wallpaper/" + Math.floor(Math.random() * 5 + 1) + ".png)",
                 backgroundSize: "cover",
                 backgroundPosition: "center",
                 backgroundRepeat: "no-repeat",
