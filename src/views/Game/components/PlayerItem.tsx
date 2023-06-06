@@ -20,8 +20,6 @@ import Bubbles from "../../../components/Bubbles";
 import useGame from "../../../stores/game";
 import { Crown, Jester } from "../../../components/Hats";
 
-import wave from "./wave.svg";
-
 interface PlayerItemProps {
   player: Player;
   index: number;

@@ -15,7 +15,6 @@ import {
 import { FunctionComponent } from "react";
 import useGame from "../../../stores/game";
 import { useSounds } from "../../../hooks/sounds";
-
 interface DNFDialogProps extends DialogProps {}
 
 const DNFDialog: FunctionComponent<DNFDialogProps> = (props) => {
@@ -83,6 +82,18 @@ const DNFDialog: FunctionComponent<DNFDialogProps> = (props) => {
                 >
                   {player.username}
                 </Typography>
+
+                <Box sx={{
+                  background: `url(/cross.svg)`,
+                  backgroundSize: "contain",
+                  backgroundRepeat: "no-repeat",
+                  backgroundPosition: "center", 
+                  opacity: 0.75,     
+                  position: "absolute",
+                  top: -8,
+                  width: 90,
+                  height: 90,                              
+                }} />
               </Box>
             );
           })}
