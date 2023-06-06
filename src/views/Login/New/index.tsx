@@ -50,6 +50,16 @@ const NewGameView: FunctionComponent = () => {
     play("baladada");
   };
 
+  const changeGameMode = (mode: GameMode) => {
+    setPlayers([]);    
+    play("click");
+  };
+
+  const changeNumberOfPlayers = (value: number) => {
+    setNumberOfPlayers(value);
+    play("click");
+  };
+
   return (
     <>
       <Helmet>
@@ -104,9 +114,7 @@ const NewGameView: FunctionComponent = () => {
 
                 <GameModeSelector
                   value={gameMode}
-                  onChange={(value) => {
-                    setGameMode(value);
-                  }}
+                  onChange={changeGameMode}
                 />
 
                 <Conditional value={gameMode === "time-attack"}>
@@ -121,9 +129,7 @@ const NewGameView: FunctionComponent = () => {
                   min={MIN_PLAYERS}
                   max={MAX_PLAYERS}
                   value={numberOfPlayers}
-                  onChange={(value) => {
-                    setNumberOfPlayers(value);
-                  }}
+                  onChange={changeNumberOfPlayers}
                 />
               </Stack>
 

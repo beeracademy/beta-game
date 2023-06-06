@@ -25,8 +25,8 @@ const PlayerItem: FunctionComponent<PlayerItemProps> = (props) => {
   const [image, setImage] = useState<string | null>(null);
   const [locked, setLocked] = useState(false);
 
-  const [username, setUsername] = useState("player1"); // TODO: remove
-  const [password, setPassword] = useState("test");
+  const [username, setUsername] = useState(""); // TODO: remove
+  const [password, setPassword] = useState("");
 
   const login = async () => {
     if (props.hidePassword) {

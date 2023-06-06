@@ -20,10 +20,13 @@ import { MdWbSunny } from "react-icons/md";
 import { BsMoonStarsFill } from "react-icons/bs";
 import { useGameMetrics } from "../../../stores/metrics";
 import DNFDialog from "./DNFDialog";
+import { useSounds } from "../../../hooks/sounds";
 
 const Header: FunctionComponent = () => {
   const theme = useTheme();
   const navigate = useNavigate();
+
+  const sound = useSounds();
 
   const game = useGame((state) => ({
     gameStartTimestamp: state.gameStartTimestamp,
@@ -105,7 +108,9 @@ const Header: FunctionComponent = () => {
               sx={{
                 color: "primary.contrastText",
               }}
-              onClick={() => setRemoteDialogOpen(true)}
+              onClick={() => {
+                setRemoteDialogOpen(true);
+              }}
             >
               <IoLogoGameControllerB />
             </IconButton>
@@ -117,6 +122,8 @@ const Header: FunctionComponent = () => {
                 color: "primary.contrastText",
               }}
               onClick={() => {
+                sound.play("click");
+
                 settings.SetThemeMode(
                   settings.themeMode === "light" ? "dark" : "light"
                 );
