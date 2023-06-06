@@ -135,8 +135,8 @@ const MetricsStore = create<MetricsState & MetricsActions>()((set, get) => ({
       // Only updated in the beginning of a new round, or first time calculating metrics
       ...((currentPlayerIndex === 0 || currentPlayerMetrics.length === 0) &&
         numberOfCardsDrawn !== 0 && {
-          isLeading: index === leadingPlayerIndex,
-          isLast: index === lastPlayerIndex,
+          isLeading: index === leadingPlayerIndex && index !== lastPlayerIndex,
+          isLast: index === lastPlayerIndex && index !== leadingPlayerIndex,
         }),
     }));
 

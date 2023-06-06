@@ -76,7 +76,7 @@ const ContinueGameView: FunctionComponent = () => {
   return (
     <>
       <Helmet>
-        <title>Academy - Continue Game</title>
+        <title>Academy - Continue a game</title>
       </Helmet>
 
       <Fade in={true}>
@@ -95,7 +95,7 @@ const ContinueGameView: FunctionComponent = () => {
             },
           }}
         >
-          <CardHeader title="Continue game" />
+          <CardHeader title="Continue a game" />
 
           <Divider
             sx={{

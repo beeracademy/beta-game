@@ -14,7 +14,7 @@ const ContinueGameDialog: FunctionComponent<ContinueGameDialogProps> = (
   return (
     <ConfirmDialog
       {...props}
-      title="Continue game"
+      title="Continue a game"
       message={`Are you sure you want to continue game ${
         props.game.id
       } started at ${datetimeToddmmHHMMSS(

@@ -165,7 +165,7 @@ const NewGameView: FunctionComponent = () => {
                 size="large"
                 to="/login/continue"
               >
-                Continue game
+                Continue a game
               </Button>
             </Stack>
           </CardContent>
