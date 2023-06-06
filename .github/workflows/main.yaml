@@ -23,6 +23,7 @@ jobs:
         run: |
           echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io --username "${{ github.actor }}" --password-stdin
           docker push "$DOCKER_IMAGE_NAME"
+
       - name: Deploy image to production
         run: curl --fail -X POST "$WEBHOOK_URL"
         env:

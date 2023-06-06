@@ -1,5 +1,5 @@
 interface Chug {
-    duration: number;
+  duration: number;
 }
 
 export type { Chug };

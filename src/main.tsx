@@ -10,15 +10,15 @@ import { CardFlashProvider } from "./components/CardFlash";
 console.table(import.meta.env);
 
 ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
-    <BrowserRouter>
-        <ThemeProvider>
-            <CardFlashProvider>
-                <Helmet>
-                    <title>Academy</title>
-                </Helmet>
+  <BrowserRouter>
+    <ThemeProvider>
+      <CardFlashProvider>
+        <Helmet>
+          <title>Academy</title>
+        </Helmet>
 
-                <Routes />
-            </CardFlashProvider>
-        </ThemeProvider>
-    </BrowserRouter>
+        <Routes />
+      </CardFlashProvider>
+    </ThemeProvider>
+  </BrowserRouter>
 );

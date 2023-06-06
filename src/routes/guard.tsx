@@ -3,24 +3,24 @@ import { Navigate } from "react-router-dom";
 import useGame from "../stores/game";
 
 interface GameGuardProps {
-    children: React.ReactNode | React.ReactNode[];
-    started?: boolean;
+  children: React.ReactNode | React.ReactNode[];
+  started?: boolean;
 }
 
 const GameGuard: FunctionComponent<GameGuardProps> = (props) => {
-    const game = useGame((state) => ({
-        started: !!state.gameStartTimestamp,
-    }));
+  const game = useGame((state) => ({
+    started: !!state.gameStartTimestamp,
+  }));
 
-    if (props.started && !game.started) {
-        return <Navigate to="/login" />;
-    }
+  if (props.started && !game.started) {
+    return <Navigate to="/login" />;
+  }
 
-    if (!props.started && game.started) {
-        return <Navigate to="/" />;
-    }
+  if (!props.started && game.started) {
+    return <Navigate to="/" />;
+  }
 
-    return <>{props.children}</>;
+  return <>{props.children}</>;
 };
 
 export { GameGuard };

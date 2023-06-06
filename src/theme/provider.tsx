@@ -5,13 +5,17 @@ import { light } from "./light";
 import { dark } from "./dark";
 
 interface ThemeProviderProps {
-    children: ReactNode | ReactNode[];
+  children: ReactNode | ReactNode[];
 }
 
 const ThemeProvider: FunctionComponent<ThemeProviderProps> = (props) => {
-    const themeMode = useSettings((state) => state.themeMode);
+  const themeMode = useSettings((state) => state.themeMode);
 
-    return <MuiThemeProvider theme={themeMode === "light" ? light : dark}>{props.children}</MuiThemeProvider>;
+  return (
+    <MuiThemeProvider theme={themeMode === "light" ? light : dark}>
+      {props.children}
+    </MuiThemeProvider>
+  );
 };
 
 export default ThemeProvider;

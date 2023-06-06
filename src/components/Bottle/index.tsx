@@ -1,22 +1,26 @@
 import { FunctionComponent } from "react";
 
 interface BottleProps {
-    color: string;
-    size?: number;
+  color: string;
+  size?: number;
 }
 
 const Bottle: FunctionComponent<BottleProps> = (props) => {
-    return (
-        <svg
-            version="1.0"
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 441.000000 1280.000000"
-            preserveAspectRatio="xMidYMid meet"
-            height={props.size || "30px"}
-        >
-            <g transform="translate(0.000000,1280.000000) scale(0.100000,-0.100000)" fill={props.color} stroke="#0000001f">
-                <path
-                    d="M1879 12460 c-179 -14 -362 -55 -425 -96 -40 -27 -72 -109 -89 -231
+  return (
+    <svg
+      version="1.0"
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 441.000000 1280.000000"
+      preserveAspectRatio="xMidYMid meet"
+      height={props.size || "30px"}
+    >
+      <g
+        transform="translate(0.000000,1280.000000) scale(0.100000,-0.100000)"
+        fill={props.color}
+        stroke="#0000001f"
+      >
+        <path
+          d="M1879 12460 c-179 -14 -362 -55 -425 -96 -40 -27 -72 -109 -89 -231
   -9 -62 -14 -117 -10 -123 3 -5 15 -10 26 -10 10 0 19 -4 19 -9 0 -6 20 -13 45
   -16 l44 -7 -39 -72 c-68 -126 -74 -196 -19 -247 l28 -26 -54 -484 c-30 -266
   -59 -513 -65 -549 -6 -36 -29 -202 -51 -370 -22 -168 -57 -433 -79 -590 -21
@@ -29,10 +33,10 @@ const Bottle: FunctionComponent<BottleProps> = (props) => {
   c68 65 64 137 -14 248 -42 58 -43 64 -10 64 14 0 25 5 25 10 0 6 14 10 30 10
   19 0 33 6 37 16 10 26 -14 238 -32 280 -33 79 -88 115 -223 144 -48 10 -134
   23 -192 29 -150 14 -536 21 -661 11z"
-                />
-            </g>
-        </svg>
-    );
+        />
+      </g>
+    </svg>
+  );
 };
 
 export default Bottle;

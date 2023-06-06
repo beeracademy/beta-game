@@ -5,21 +5,29 @@ import { useGameMetrics } from "../../../stores/metrics";
 import PlayerItem from "./PlayerItem";
 
 const PlayerList: FunctionComponent = () => {
-    const game = useGame((state) => ({
-        players: state.players,
-    }));
+  const game = useGame((state) => ({
+    players: state.players,
+  }));
 
-    const gameMetrics = useGameMetrics();
+  const gameMetrics = useGameMetrics();
 
-    return (
-        <Stack direction="row" alignItems="center" justifyContent="center" spacing={2}>
-            {game.players.map((p, i) => (
-                <PlayerItem key={i} player={p} index={i} active={
-                    gameMetrics.activePlayerIndex === i && !gameMetrics.done
-                } />
-            ))}
-        </Stack>
-    );
+  return (
+    <Stack
+      direction="row"
+      alignItems="center"
+      justifyContent="center"
+      spacing={2}
+    >
+      {game.players.map((p, i) => (
+        <PlayerItem
+          key={i}
+          player={p}
+          index={i}
+          active={gameMetrics.activePlayerIndex === i && !gameMetrics.done}
+        />
+      ))}
+    </Stack>
+  );
 };
 
 export default PlayerList;

@@ -6,22 +6,22 @@ import { TokenInteceptor } from "../inteceptors/token";
 const mockInstance = axios.create();
 
 mockInstance.interceptors.request.use((request) => {
-    return AxiosLogger.requestLogger(request, {
-        prefixText: "Mocked",
-        dateFormat: "HH:MM:ss",
-        headers: false,
-        data: false,
-    });
+  return AxiosLogger.requestLogger(request, {
+    prefixText: "Mocked",
+    dateFormat: "HH:MM:ss",
+    headers: false,
+    data: false,
+  });
 });
 
 const realInstance = axios.create({
-    baseURL: import.meta.env.VITE_API_BASE_URL,
+  baseURL: import.meta.env.VITE_API_BASE_URL,
 });
 
 TokenInteceptor(realInstance);
 
 export const mock = new AxiosMockAdapter(mockInstance, {
-    delayResponse: 200,
+  delayResponse: 200,
 });
 
 // if (env.MOCKED) {

@@ -5,34 +5,38 @@ import { MdWbSunny } from "react-icons/md";
 import useSettings from "../../../stores/settings";
 
 interface ThemeModeFabProps {
-    absolutePosition?: boolean;
+  absolutePosition?: boolean;
 }
 
 const ThemeModeFab: FunctionComponent<ThemeModeFabProps> = (props) => {
-    const { themeMode, SetThemeMode } = useSettings((state) => ({
-        themeMode: state.themeMode,
-        SetThemeMode: state.SetThemeMode,
-    }));
+  const { themeMode, SetThemeMode } = useSettings((state) => ({
+    themeMode: state.themeMode,
+    SetThemeMode: state.SetThemeMode,
+  }));
 
-    return (
-        <Fab
-            color="primary"
-            sx={{
-                position: props.absolutePosition ? "absolute" : undefined,
-                bottom: props.absolutePosition ? 16 : undefined,
-                right: props.absolutePosition ? 16 : undefined,
-            }}
-            onClick={() => {
-                SetThemeMode(themeMode === "light" ? "dark" : "light");
-            }}
-        >
-            {themeMode === "dark" ? <BsMoonStarsFill size={24} /> : <MdWbSunny size={24} />}
-        </Fab>
-    );
+  return (
+    <Fab
+      color="primary"
+      sx={{
+        position: props.absolutePosition ? "absolute" : undefined,
+        bottom: props.absolutePosition ? 16 : undefined,
+        right: props.absolutePosition ? 16 : undefined,
+      }}
+      onClick={() => {
+        SetThemeMode(themeMode === "light" ? "dark" : "light");
+      }}
+    >
+      {themeMode === "dark" ? (
+        <BsMoonStarsFill size={24} />
+      ) : (
+        <MdWbSunny size={24} />
+      )}
+    </Fab>
+  );
 };
 
 ThemeModeFab.defaultProps = {
-    absolutePosition: true,
+  absolutePosition: true,
 };
 
 export default ThemeModeFab;

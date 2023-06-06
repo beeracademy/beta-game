@@ -1,59 +1,59 @@
 import { useEffect, useState } from "react";
 
 const useWebSocket = () => {
-    const [socket, setSocket] = useState<WebSocket | null>(null);
-    const [ready, setReady] = useState(false);
-    const [error, setError] = useState(false);
+  const [socket, setSocket] = useState<WebSocket | null>(null);
+  const [ready, setReady] = useState(false);
+  const [error, setError] = useState(false);
 
-    useEffect(() => {
-        if (!socket) {
-            return;
-        }
+  useEffect(() => {
+    if (!socket) {
+      return;
+    }
 
-        socket.onopen = () => {
-            setReady(true);
-        };
-
-        socket.onclose = () => {
-            setReady(false);
-        };
-
-        socket.onerror = () => {
-            setError(true);
-        };
-
-        return () => {
-            socket.close();
-        };
-    }, [socket]);
-
-    const connect = (url: string) => {
-        const socket = new WebSocket(url);
-        setSocket(socket);
+    socket.onopen = () => {
+      setReady(true);
     };
 
-    const send = (data: any) => {
-        if (socket) {
-            console.log("sending", data);
-            socket.send(JSON.stringify(data));
-        }
+    socket.onclose = () => {
+      setReady(false);
     };
 
-    const receive = (callback: (data: any) => void) => {
-        if (socket) {
-            socket.onmessage = (event) => {
-                callback(JSON.parse(event.data));
-            };
-        }
+    socket.onerror = () => {
+      setError(true);
     };
 
-    const close = () => {
-        if (socket) {
-            socket.close();
-        }
+    return () => {
+      socket.close();
     };
+  }, [socket]);
 
-    return { connect, send, receive, close, ready, error };
+  const connect = (url: string) => {
+    const socket = new WebSocket(url);
+    setSocket(socket);
+  };
+
+  const send = (data: any) => {
+    if (socket) {
+      console.log("sending", data);
+      socket.send(JSON.stringify(data));
+    }
+  };
+
+  const receive = (callback: (data: any) => void) => {
+    if (socket) {
+      socket.onmessage = (event) => {
+        callback(JSON.parse(event.data));
+      };
+    }
+  };
+
+  const close = () => {
+    if (socket) {
+      socket.close();
+    }
+  };
+
+  return { connect, send, receive, close, ready, error };
 };
 
 export default useWebSocket;
