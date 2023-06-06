@@ -20,7 +20,7 @@ const light = createTheme({
       secondary: "#a4a4a4",
     },
     info: {
-      main: "#a3d2d2",
+      main: "#3498db",
       contrastText: "#fff",
     },
     warning: {

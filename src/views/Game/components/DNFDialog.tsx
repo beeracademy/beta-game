@@ -14,11 +14,17 @@ import {
 } from "@mui/material";
 import { FunctionComponent } from "react";
 import useGame from "../../../stores/game";
+import { useSounds } from "../../../hooks/sounds";
 
 interface DNFDialogProps extends DialogProps {}
 
 const DNFDialog: FunctionComponent<DNFDialogProps> = (props) => {
   const players = useGame((state) => state.players);
+  const sound = useSounds();
+
+  const toggle = (index: number) => {
+    sound.play("moops");
+  };
 
   return (
     <Dialog {...props}>
@@ -44,7 +50,7 @@ const DNFDialog: FunctionComponent<DNFDialogProps> = (props) => {
             marginTop: 4,
           }}
         >
-          {players.map((player) => {
+          {players.map((player, index) => {
             return (
               <Box
                 key={player.id}
@@ -56,6 +62,7 @@ const DNFDialog: FunctionComponent<DNFDialogProps> = (props) => {
                   borderRadius: (t) => `${t.shape.borderRadius}px`,
                 }}
                 component={ButtonBase}
+                onClick={() => toggle(index)}
               >
                 <Avatar
                   src={player.image}
