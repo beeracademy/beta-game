@@ -6,7 +6,7 @@ import {
   TextField,
   useTheme,
 } from "@mui/material";
-import { FunctionComponent, useState } from "react";
+import { FunctionComponent, useEffect, useState } from "react";
 import { ImCross } from "react-icons/im";
 import * as AuthAPI from "../../../api/endpoints/authentication";
 import { useSounds } from "../../../hooks/sounds";
@@ -14,7 +14,7 @@ import { Player } from "../../../models/player";
 
 interface PlayerItemProps {
   hidePassword?: boolean;
-  onLogin?: (player: Player) => void;
+  onReady?: (player: Player) => void;
   onRemove?: () => void;
 }
 
@@ -24,32 +24,29 @@ const PlayerItem: FunctionComponent<PlayerItemProps> = (props) => {
 
   const [image, setImage] = useState<string | null>(null);
   const [locked, setLocked] = useState(false);
+  const [ready, setReady] = useState(false);
 
-  const [username, setUsername] = useState(""); // TODO: remove
-  const [password, setPassword] = useState("");
+  const [username, setUsername] = useState("player1"); // TODO: remove
+  const [password, setPassword] = useState("test");
 
-  const login = async () => {
-    if (props.hidePassword) {
-      if (username === "") {
-        props.onRemove?.();
-
-        return;
-      }
-
-      props.onLogin?.({
+  useEffect(() => {
+    if (props.hidePassword && username.length > 0) {
+      setReady(true);
+      props.onReady?.({
         username: username,
       });
-
-      return;
     }
+  }, [username, password, props.hidePassword]);
 
-    setLocked(true);
-
+  const login = async () => {
     try {
+      setLocked(true);
+
       const resp = await AuthAPI.login(username, password);
       setImage(resp.image);
+      setReady(true);
 
-      props.onLogin?.({
+      props.onReady?.({
         username: username,
         id: resp.id,
         token: resp.token,
@@ -69,6 +66,8 @@ const PlayerItem: FunctionComponent<PlayerItemProps> = (props) => {
     setPassword("");
     setImage(null);
     setLocked(false);
+    setReady(false);
+
     props.onRemove?.();
   };
 
@@ -104,11 +103,6 @@ const PlayerItem: FunctionComponent<PlayerItemProps> = (props) => {
           disabled={locked}
           onKeyDown={(e) => {
             if (e.key === "Enter" && props.hidePassword) {
-              login();
-            }
-          }}
-          onBlur={() => {
-            if (props.hidePassword) {
               login();
             }
           }}

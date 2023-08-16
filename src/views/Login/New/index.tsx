@@ -24,6 +24,7 @@ import ShuffleDialog from "./components/ShuffleDialog";
 import { Player } from "../../../models/player";
 import Conditional from "../../../components/Conditional";
 import TimeAttackSettings from "../components/TimeAttackSettings";
+import useNewGameForm from "./stores/new";
 
 const MIN_PLAYERS = 2;
 const MAX_PLAYERS = 6;
@@ -32,16 +33,13 @@ const NewGameView: FunctionComponent = () => {
   const theme = useTheme();
   const { play, stopAll } = useSounds();
 
-  const [numberOfPlayers, setNumberOfPlayers] = useState(4);
-  const [gameMode, setGameMode] = useState<GameMode>("normal");
-
   const StartGame = useGame((state) => state.Start);
 
-  const [players, setPlayers] = useState<Player[]>([]);
+  const form = useNewGameForm();
 
   const startGame = () => {
-    StartGame(players, {
-      offline: gameMode === "offline",
+    StartGame(form.players, {
+      offline: form.gameMode === "offline",
       numberOfRounds: 13,
       sipsInABeer: 14,
     });
@@ -51,12 +49,12 @@ const NewGameView: FunctionComponent = () => {
   };
 
   const changeGameMode = (mode: GameMode) => {
-    setPlayers([]);    
+    form.SetGameMode(mode);
     play("click");
   };
 
   const changeNumberOfPlayers = (value: number) => {
-    setNumberOfPlayers(value);
+    form.SetNumberOfPlayers(value);
     play("click");
   };
 
@@ -113,13 +111,9 @@ const NewGameView: FunctionComponent = () => {
                 </Tooltip>
 
                 <GameModeSelector
-                  value={gameMode}
+                  value={form.gameMode}
                   onChange={changeGameMode}
                 />
-
-                <Conditional value={gameMode === "time-attack"}>
-                  <TimeAttackSettings />
-                </Conditional>
               </Stack>
 
               <Stack spacing={1}>
@@ -128,7 +122,7 @@ const NewGameView: FunctionComponent = () => {
                 <NumberOfPlayersSelector
                   min={MIN_PLAYERS}
                   max={MAX_PLAYERS}
-                  value={numberOfPlayers}
+                  value={form.numberOfPlayers}
                   onChange={changeNumberOfPlayers}
                 />
               </Stack>
@@ -137,13 +131,12 @@ const NewGameView: FunctionComponent = () => {
 
               <Stack spacing={1}>
                 <Typography variant="body1" sx={{}}>
-                  {gameMode === "offline" ? "Players" : "Player login"}
+                  {form.gameMode === "offline" ? "Players" : "Player login"}
                 </Typography>
 
                 <PlayerList
-                  numberOfPlayers={numberOfPlayers}
-                  usernameOnly={gameMode === "offline"}
-                  onChange={(players) => setPlayers(players)}
+                  numberOfPlayers={form.numberOfPlayers}
+                  usernameOnly={form.gameMode === "offline"}
                 />
               </Stack>
               <Divider />
@@ -154,7 +147,7 @@ const NewGameView: FunctionComponent = () => {
                 size="large"
                 onClick={startGame}
                 endIcon={<IoPlay size={24} />}
-                disabled={players.length !== numberOfPlayers}
+                disabled={!form.ready}
               >
                 Start game
               </Button>

@@ -6,7 +6,7 @@ import PlayerItem from "./PlayerItem";
 interface PlayerListProps {
   numberOfPlayers: number;
   usernameOnly?: boolean;
-  onChange?: (players: Player[]) => void;
+  onPlayerReadyChange?: (index: number, players: Player) => void;
 }
 
 const PlayerList: FunctionComponent<PlayerListProps> = (props) => {
@@ -38,7 +38,7 @@ const PlayerList: FunctionComponent<PlayerListProps> = (props) => {
           <PlayerItem
             key={i}
             hidePassword={props.usernameOnly}
-            onLogin={(p) => {
+            onReady={(p) => {
               setPlayers((prev) => {
                 const newPlayers = { ...prev };
                 newPlayers[i] = p;
