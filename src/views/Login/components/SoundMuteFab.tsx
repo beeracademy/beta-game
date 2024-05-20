@@ -1,6 +1,10 @@
 import { Fab, useTheme } from "@mui/material";
-import { FunctionComponent, useState } from "react";
-import { IoVolumeMute, IoVolumeHigh } from "react-icons/io5";
+import { FunctionComponent, useEffect } from "react";
+import { IoVolumeHigh, IoVolumeMute } from "react-icons/io5";
+import { SoundName, useSounds } from "../../../hooks/sounds";
+import useSettings from "../../../stores/settings";
+
+const lobbyMusic: SoundName = "homosangen_fuve";
 
 interface SoundMuteFabProps {
   absolutePosition?: boolean;
@@ -8,7 +12,24 @@ interface SoundMuteFabProps {
 
 const SoundMuteFab: FunctionComponent<SoundMuteFabProps> = (props) => {
   const theme = useTheme();
-  const [muted, setMuted] = useState(false);
+
+  const { lobbyMusicMuted, SetLobbyMusicMuted } = useSettings();
+  const { mute, unmute, play } = useSounds();
+
+  useEffect(() => {
+    play(lobbyMusic, {
+      loop: true,
+      oneInstance: true,
+    });
+  }, []);
+
+  useEffect(() => {
+    if (lobbyMusicMuted) {
+      mute(lobbyMusic);
+    } else {
+      unmute(lobbyMusic);
+    }
+  }, [lobbyMusicMuted]);
 
   return (
     <Fab
@@ -23,11 +44,15 @@ const SoundMuteFab: FunctionComponent<SoundMuteFabProps> = (props) => {
         },
       }}
       onClick={() => {
-        setMuted(!muted);
-        Howler.mute(!muted);
+        SetLobbyMusicMuted(!lobbyMusicMuted);
+        Howler.mute(!lobbyMusicMuted);
       }}
     >
-      {muted ? <IoVolumeMute size={32} /> : <IoVolumeHigh size={32} />}
+      {lobbyMusicMuted ? (
+        <IoVolumeMute size={32} />
+      ) : (
+        <IoVolumeHigh size={32} />
+      )}
     </Fab>
   );
 };

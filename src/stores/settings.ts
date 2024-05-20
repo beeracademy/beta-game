@@ -5,22 +5,31 @@ type ThemeMode = "light" | "dark";
 
 interface SettingsState {
   themeMode: ThemeMode;
+
   simpleCardsMode: boolean;
+
   remoteControl: boolean;
   remoteToken?: string;
+
+  lobbyMusicMuted: boolean;
 }
 
 interface SettingsActions {
   SetSimpleCardsMode: (value: boolean) => void;
   SetRemoteControl: (value: boolean) => void;
   SetThemeMode: (value: ThemeMode) => void;
+  SetLobbyMusicMuted: (value: boolean) => void;
 }
 
 const initialState: SettingsState = {
   themeMode: "light",
+
   simpleCardsMode: false,
+
   remoteControl: false,
   remoteToken: "",
+
+  lobbyMusicMuted: false,
 };
 
 const useSettings = create<SettingsState & SettingsActions>()(
@@ -42,6 +51,10 @@ const useSettings = create<SettingsState & SettingsActions>()(
       SetThemeMode: (value: ThemeMode) => {
         set((state) => ({ themeMode: value }));
       },
+
+      SetLobbyMusicMuted: (value: boolean) => {
+        set((state) => ({ lobbyMusicMuted: value }));
+      },
     }),
     {
       name: "settings",
@@ -50,4 +63,4 @@ const useSettings = create<SettingsState & SettingsActions>()(
 );
 
 export default useSettings;
-export type { SettingsState, SettingsActions, ThemeMode };
+export type { SettingsActions, SettingsState, ThemeMode };

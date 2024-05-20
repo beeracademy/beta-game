@@ -1,4 +1,9 @@
-import { Howl, Howler } from "howler";
+import { Howl } from "howler";
+
+/*
+  Add new sound files to the public/sounds folder and add the file name to the SoundNames array.
+  All sound files must be in .mp3 and .ogg format to support all browsers.
+*/
 
 const SoundNames = [
   "baladada",
@@ -30,9 +35,11 @@ const SoundNames = [
   "tryk_paa_den_lange_tast",
   "ultrakill",
   "wicked",
-];
+] as const;
 
 type SoundName = (typeof SoundNames)[number];
+
+const activeSounds = new Map<SoundName, Howl[]>();
 
 SoundNames.forEach((soundName) => {
   new Howl({
@@ -44,23 +51,100 @@ SoundNames.forEach((soundName) => {
 const useSounds = () => {
   return {
     play: play,
+
+    pause: pause,
+
+    mute: mute,
+    unmute: unmute,
+
+    stop: stop,
     stopAll: stopAll,
   };
 };
 
-const play = (soundName: SoundName, loop?: boolean) => {
+interface playOptions {
+  loop: boolean;
+  oneInstance: boolean;
+}
+
+const play = (
+  soundName: SoundName,
+  options: playOptions = {
+    loop: false,
+    oneInstance: false,
+  },
+) => {
   const sound = new Howl({
     src: [`/sounds/${soundName}.mp3`, `/sounds/${soundName}.ogg`],
-    loop,
+    loop: options.loop,
   });
+
+  if (options.oneInstance) {
+    const sounds = activeSounds.get(soundName);
+    if (sounds && sounds.length > 0) {
+      return sounds[0];
+    }
+  }
+
   sound.play();
+
+  if (!activeSounds.has(soundName)) {
+    activeSounds.set(soundName, []);
+  }
+
+  activeSounds.get(soundName)?.push(sound);
+
+  if (!options.loop) {
+    sound.once("end", () => {
+      const sounds = activeSounds.get(soundName);
+      if (sounds) {
+        activeSounds.set(
+          soundName,
+          sounds.filter((s) => s !== sound),
+        );
+      }
+    });
+  }
 
   return sound;
 };
 
-function stopAll() {
-  Howler.stop();
-}
+const pause = (soundName: SoundName) => {
+  const sounds = activeSounds.get(soundName);
+  if (sounds) {
+    sounds.forEach((sound) => sound.pause());
+  }
+};
 
-export { useSounds, play, stopAll, SoundNames };
+const mute = (soundName: SoundName) => {
+  const sounds = activeSounds.get(soundName);
+  if (sounds) {
+    sounds.forEach((sound) => sound.mute(true));
+  }
+};
+
+const unmute = (soundName: SoundName) => {
+  const sounds = activeSounds.get(soundName);
+  if (sounds) {
+    sounds.forEach((sound) => sound.mute(false));
+  }
+};
+
+const stop = (soundName: SoundName) => {
+  const sounds = activeSounds.get(soundName);
+  if (sounds) {
+    sounds.forEach((sound) => sound.stop());
+    activeSounds.set(soundName, []);
+  }
+};
+
+const stopAll = () => {
+  activeSounds.forEach((sounds) => {
+    sounds.forEach((sound) => sound.stop());
+  });
+
+  activeSounds.clear();
+};
+
+export { SoundNames, useSounds };
 export type { SoundName };

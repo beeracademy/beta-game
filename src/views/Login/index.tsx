@@ -1,19 +1,11 @@
 import { Box, Container, Stack } from "@mui/material";
-import { FunctionComponent, memo, useEffect } from "react";
+import { FunctionComponent, memo } from "react";
 import { Outlet } from "react-router-dom";
 import ConfirmDialog from "../../components/ConfirmDialog";
-import { useSounds } from "../../hooks/sounds";
 import BottomGamesCount from "./components/BottomGamesCount";
 import SoundMuteFab from "./components/SoundMuteFab";
 
 const LoginView: FunctionComponent = () => {
-  const { play, stopAll } = useSounds();
-
-  useEffect(() => {
-    stopAll();
-    play("homosangen_fuve", true);
-  }, []);
-
   return (
     <>
       <Container
