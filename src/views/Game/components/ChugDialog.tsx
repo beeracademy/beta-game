@@ -7,10 +7,13 @@ import {
   Stack,
   Typography,
 } from "@mui/material";
+import { detect } from "detect-browser";
 import { FunctionComponent, useEffect, useRef, useState } from "react";
 import ReactConfetti from "react-confetti";
 import { useSounds } from "../../../hooks/sounds";
 import { milisecondsToMMSSsss } from "../../../utilities/time";
+
+const browser = detect();
 
 interface ChugDialogProps extends DialogProps {}
 
@@ -86,7 +89,10 @@ const ChugDialog: FunctionComponent<ChugDialogProps> = (props) => {
 
   return (
     <>
-      {props.open && <ReactConfetti />}
+      {/* 
+        Firefox lags with confetti, don't know why, so we disable it for now
+      */}
+      {props.open && browser?.name !== "firefox" && <ReactConfetti />}
 
       <Dialog
         {...props}
