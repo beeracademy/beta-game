@@ -1,4 +1,3 @@
-import { FunctionComponent, useEffect, useState } from "react";
 import {
   Box,
   Card,
@@ -8,19 +7,17 @@ import {
   Typography,
   useTheme,
 } from "@mui/material";
-import RemoteDialog from "./RemoteDialog";
-import { IoLogoGameControllerB } from "react-icons/io";
+import { FunctionComponent, useEffect, useState } from "react";
 import { IoExitOutline } from "react-icons/io5";
-import ExitGameDialog from "./ExitGameDialog";
 import { useNavigate } from "react-router-dom";
-import useGame from "../../../stores/game";
-import { secondsToHHMMSS, secondsToHHMMSSsss } from "../../../utilities/time";
-import useSettings from "../../../stores/settings";
-import { MdWbSunny } from "react-icons/md";
-import { BsMoonStarsFill } from "react-icons/bs";
-import { useGameMetrics } from "../../../stores/metrics";
-import DNFDialog from "./DNFDialog";
 import { useSounds } from "../../../hooks/sounds";
+import useGame from "../../../stores/game";
+import { useGameMetrics } from "../../../stores/metrics";
+import useSettings from "../../../stores/settings";
+import { secondsToHHMMSS, secondsToHHMMSSsss } from "../../../utilities/time";
+import DNFDialog from "./DNFDialog";
+import ExitGameDialog from "./ExitGameDialog";
+import RemoteDialog from "./RemoteDialog";
 
 const Header: FunctionComponent = () => {
   const theme = useTheme();
@@ -103,7 +100,7 @@ const Header: FunctionComponent = () => {
             },
           }}
         >
-          <Tooltip title="Game remote settings" placement="right">
+          {/* <Tooltip title="Game remote settings" placement="right">
             <IconButton
               sx={{
                 color: "primary.contrastText",
@@ -135,7 +132,7 @@ const Header: FunctionComponent = () => {
                 <MdWbSunny size={24} />
               )}
             </IconButton>
-          </Tooltip>
+          </Tooltip> */}
         </Box>
 
         <Stack direction="row" alignItems="center">
@@ -193,7 +190,7 @@ const Header: FunctionComponent = () => {
             },
           }}
         >
-          <Tooltip title="Mark players as 'Did not finish'" placement="left">
+          {/* <Tooltip title="Mark players as 'Did not finish'" placement="left">
             <IconButton
               sx={{
                 fontSize: 12,
@@ -206,7 +203,7 @@ const Header: FunctionComponent = () => {
             >
               DNF
             </IconButton>
-          </Tooltip>
+          </Tooltip> */}
 
           <Tooltip title="Exit game" placement="left">
             <IconButton

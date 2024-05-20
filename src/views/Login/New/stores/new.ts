@@ -19,7 +19,7 @@ interface NewGameAction {
 }
 
 const initialState: NewGameState = {
-  ready: false,
+  ready: true,
   numberOfPlayers: 4,
   gameMode: "normal",
   players: [],

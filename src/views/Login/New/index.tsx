@@ -11,19 +11,15 @@ import {
   Typography,
   useTheme,
 } from "@mui/material";
-import { FunctionComponent, useState } from "react";
-import { NavLink } from "react-router-dom";
-import PlayerList from "../components/PlayerList";
+import { FunctionComponent } from "react";
+import { Helmet } from "react-helmet";
 import { IoInformationCircleOutline, IoPlay } from "react-icons/io5";
+import { useSounds } from "../../../hooks/sounds";
+import useGame from "../../../stores/game";
 import GameModeSelector, { GameMode } from "../components/GameModeSelector";
 import NumberOfPlayersSelector from "../components/NumberOfPlayersSelector";
-import { useSounds } from "../../../hooks/sounds";
-import { Helmet } from "react-helmet";
-import useGame from "../../../stores/game";
+import PlayerList from "../components/PlayerList";
 import ShuffleDialog from "./components/ShuffleDialog";
-import { Player } from "../../../models/player";
-import Conditional from "../../../components/Conditional";
-import TimeAttackSettings from "../components/TimeAttackSettings";
 import useNewGameForm from "./stores/new";
 
 const MIN_PLAYERS = 2;
@@ -152,14 +148,14 @@ const NewGameView: FunctionComponent = () => {
                 Start game
               </Button>
 
-              <Button
+              {/* <Button
                 component={NavLink}
                 variant="outlined"
                 size="large"
                 to="/login/continue"
               >
                 Continue a game
-              </Button>
+              </Button> */}
             </Stack>
           </CardContent>
         </Card>

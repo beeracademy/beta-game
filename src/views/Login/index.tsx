@@ -1,11 +1,10 @@
 import { Box, Container, Stack } from "@mui/material";
-import { FunctionComponent, memo, useEffect, useMemo } from "react";
+import { FunctionComponent, memo, useEffect } from "react";
 import { Outlet } from "react-router-dom";
-import SoundMuteFab from "./components/SoundMuteFab";
-import BottomGamesCount from "./components/BottomGamesCount";
-import { useSounds } from "../../hooks/sounds";
 import ConfirmDialog from "../../components/ConfirmDialog";
-import ThemeModeFab from "./components/ThemeModeFab";
+import { useSounds } from "../../hooks/sounds";
+import BottomGamesCount from "./components/BottomGamesCount";
+import SoundMuteFab from "./components/SoundMuteFab";
 
 const LoginView: FunctionComponent = () => {
   const { play, stopAll } = useSounds();
@@ -38,7 +37,7 @@ const LoginView: FunctionComponent = () => {
           }}
         >
           <SoundMuteFab absolutePosition={false} />
-          <ThemeModeFab absolutePosition={false} />
+          {/* <ThemeModeFab absolutePosition={false} /> */}
         </Stack>
 
         <Wallpaper />
