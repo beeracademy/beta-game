@@ -126,6 +126,13 @@ const Terminal: FunctionComponent<TerminalProps> = (props) => {
       },
     },
     {
+      name: "whoami",
+      description: "print the user name associated with the current effective user ID.",
+      execute: (args: string[], buffer: Buffer) => {
+        buffer.write("an idiot");
+      },
+    },
+    {
       name: "exit",
       description: "close the terminal",
       execute: (args: string[], buffer: Buffer) => {
