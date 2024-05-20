@@ -1,18 +1,12 @@
 import create from "zustand";
 import { persist } from "zustand/middleware";
-import {
-  Card,
-  CardSuit,
-  CardSuits,
-  CardValue,
-  CardValues,
-} from "../models/card";
+import * as GameAPI from "../api/endpoints/game";
+import { Card, CardSuits, CardValues } from "../models/card";
 import { Chug } from "../models/chug";
 import { Player } from "../models/player";
 import { GenerateShuffleIndices } from "../utilities/deck";
-import useGamesPlayed from "./gamesPlayed";
-import * as GameAPI from "../api/endpoints/game";
 import { mapToRemote } from "./game.mapper";
+import useGamesPlayed from "./gamesPlayed";
 import useSettings from "./settings";
 /*
     Game state is only for essential game data that is required to resume a game.
@@ -184,4 +178,4 @@ const useGame = create<GameState & GameActions>()(
 
 export default useGame;
 export { initialState };
-export type { GameState, GameActions };
+export type { GameActions, GameState };

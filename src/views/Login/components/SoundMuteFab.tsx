@@ -10,7 +10,9 @@ interface SoundMuteFabProps {
   absolutePosition?: boolean;
 }
 
-const SoundMuteFab: FunctionComponent<SoundMuteFabProps> = (props) => {
+const SoundMuteFab: FunctionComponent<SoundMuteFabProps> = ({
+  absolutePosition = true,
+}) => {
   const theme = useTheme();
 
   const { lobbyMusicMuted, SetLobbyMusicMuted } = useSettings();
@@ -35,9 +37,9 @@ const SoundMuteFab: FunctionComponent<SoundMuteFabProps> = (props) => {
     <Fab
       color="primary"
       sx={{
-        position: props.absolutePosition ? "absolute" : undefined,
-        bottom: props.absolutePosition ? 16 : undefined,
-        right: props.absolutePosition ? 16 : undefined,
+        position: absolutePosition ? "absolute" : undefined,
+        bottom: absolutePosition ? 16 : undefined,
+        right: absolutePosition ? 16 : undefined,
 
         [theme.breakpoints.down("md")]: {
           display: "none",
@@ -55,10 +57,6 @@ const SoundMuteFab: FunctionComponent<SoundMuteFabProps> = (props) => {
       )}
     </Fab>
   );
-};
-
-SoundMuteFab.defaultProps = {
-  absolutePosition: true,
 };
 
 export default SoundMuteFab;

@@ -1,9 +1,9 @@
 import {
-  useState,
-  useContext,
   FunctionComponent,
   ReactNode,
   createContext,
+  useContext,
+  useState,
 } from "react";
 import { Card } from "../../models/card";
 import { CardFlashDialog } from "./dialog";
@@ -26,9 +26,10 @@ export interface flashCardOptions {
   duration?: number;
 }
 
-export const CardFlashProvider: FunctionComponent<CardFlashProviderProps> = (
-  props,
-) => {
+export const CardFlashProvider: FunctionComponent<CardFlashProviderProps> = ({
+  duration = 500,
+  ...props
+}) => {
   const [show, setShow] = useState(false);
   const [card, setCard] = useState<Card>();
   const [_, setTimeoutRef] = useState<ReturnType<typeof setInterval>>();
@@ -40,7 +41,7 @@ export const CardFlashProvider: FunctionComponent<CardFlashProviderProps> = (
       prev && clearTimeout(prev);
       return setTimeout(() => {
         setShow(false);
-      }, options?.duration || props.duration);
+      }, options?.duration || duration);
     });
 
     setShow(true);
@@ -57,8 +58,4 @@ export const CardFlashProvider: FunctionComponent<CardFlashProviderProps> = (
       {props.children}
     </CardFlashContext.Provider>
   );
-};
-
-CardFlashProvider.defaultProps = {
-  duration: 500,
 };

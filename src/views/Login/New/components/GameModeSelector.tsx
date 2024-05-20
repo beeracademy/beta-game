@@ -1,15 +1,13 @@
 import { ToggleButton, ToggleButtonGroup } from "@mui/material";
 import { FunctionComponent, useState } from "react";
 
-type GameMode = "normal" | "time-attack" | "offline";
-
 interface GameModeSelectorProps {
-  value: GameMode;
-  onChange: (value: GameMode) => void;
+  value: boolean;
+  onChange: (value: boolean) => void;
 }
 
 const GameModeSelector: FunctionComponent<GameModeSelectorProps> = (props) => {
-  const [value, setValue] = useState<GameMode>(props.value);
+  const [value, setValue] = useState<boolean>(props.value);
 
   return (
     <ToggleButtonGroup
@@ -22,12 +20,11 @@ const GameModeSelector: FunctionComponent<GameModeSelectorProps> = (props) => {
       }}
       size="small"
     >
-      <ToggleButton value="normal">Normal</ToggleButton>
-      {/* <ToggleButton value="time-attack">Time Attack</ToggleButton> */}
-      <ToggleButton value="offline">Offline</ToggleButton>
+      <ToggleButton value={false}>Normal</ToggleButton>
+      <ToggleButton value={true}>Offline</ToggleButton>
     </ToggleButtonGroup>
   );
 };
 
 export default GameModeSelector;
-export type { GameMode, GameModeSelectorProps };
+export type { GameModeSelectorProps };

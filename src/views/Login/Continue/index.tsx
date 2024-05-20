@@ -20,8 +20,7 @@ import { Player } from "../../../models/player";
 import useGame from "../../../stores/game";
 import { mapToLocal } from "../../../stores/game.mapper";
 import { datetimeToddmmHHMMSS } from "../../../utilities/time";
-import ContinueGameDialog from "../components/ContinueGameDialog";
-import PlayerItem from "../components/PlayerItem";
+import ContinueGameDialog from "./components/ContinueGameDialog";
 
 const ContinueGameView: FunctionComponent = () => {
   const theme = useTheme();
@@ -109,7 +108,7 @@ const ContinueGameView: FunctionComponent = () => {
           </CardContent>
 
           <CardContent>
-            <PlayerItem
+            {/* <PlayerItem
               onReady={async (p) => {
                 setPlayer(p);
               }}
@@ -117,7 +116,7 @@ const ContinueGameView: FunctionComponent = () => {
                 setPlayer(null);
                 setResumableGames([]);
               }}
-            />
+            /> */}
           </CardContent>
 
           <Conditional value={player !== null}>

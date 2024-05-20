@@ -1,8 +1,8 @@
 import { DialogProps } from "@mui/material";
 import { FunctionComponent } from "react";
-import { IGameState } from "../../../api/endpoints/game";
-import ConfirmDialog from "../../../components/ConfirmDialog";
-import { datetimeToddmmHHMMSS } from "../../../utilities/time";
+import { IGameState } from "../../../../api/endpoints/game";
+import ConfirmDialog from "../../../../components/ConfirmDialog";
+import { datetimeToddmmHHMMSS } from "../../../../utilities/time";
 
 interface ContinueGameDialogProps extends DialogProps {
   game: IGameState;
