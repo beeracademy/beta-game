@@ -71,6 +71,8 @@ const PlayerItem: FunctionComponent<PlayerItemProps> = (props) => {
   };
 
   const remove = () => {
+    play("click");
+
     newGame.setPlayer(props.index, {
       username: "",
       password: "",

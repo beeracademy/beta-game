@@ -16,13 +16,17 @@ const SoundMuteFab: FunctionComponent<SoundMuteFabProps> = ({
   const theme = useTheme();
 
   const { lobbyMusicMuted, SetLobbyMusicMuted } = useSettings();
-  const { mute, unmute, play } = useSounds();
+  const { mute, unmute, play, stop } = useSounds();
 
   useEffect(() => {
     play(lobbyMusic, {
       loop: true,
       oneInstance: true,
     });
+
+    return () => {
+      stop(lobbyMusic);
+    };
   }, []);
 
   useEffect(() => {

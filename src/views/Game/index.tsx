@@ -9,7 +9,6 @@ import { MetricsStore, useGameMetrics } from "../../stores/metrics";
 import useSettings from "../../stores/settings";
 import CardInventory from "./components/CardInventory";
 import Chart from "./components/Chart";
-import Chat from "./components/Chat";
 import ChugDialog from "./components/ChugDialog";
 import GameOverDialog from "./components/GameOverDialog";
 import Header from "./components/Header";
