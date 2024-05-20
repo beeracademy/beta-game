@@ -1,5 +1,6 @@
 import {
   alpha,
+  Chip,
   Stack,
   Table,
   TableBody,
@@ -45,27 +46,36 @@ const GameTable: FunctionComponent<GameTableProps> = () => {
         <TableHead>
           <TableRow>
             <TableCell>Round</TableCell>
-            {game.players.map((player, i) => (
-              <TableCell
-                key={i}
-                sx={{
-                  color:
-                    gameMetrics.activePlayerIndex === i && !gameMetrics.done
-                      ? "primary.main"
-                      : "text.primary",
+            {game.players.map((player, i) => {
+              const isActive =
+                gameMetrics.activePlayerIndex === i && !gameMetrics.done;
 
-                  fontWeight:
-                    gameMetrics.activePlayerIndex === i && !gameMetrics.done
-                      ? "bold"
-                      : "normal",
-                  overflow: "hidden",
-                  textOverflow: "ellipsis",
-                  whiteSpace: "nowrap",
-                }}
-              >
-                {player.username}
-              </TableCell>
-            ))}
+              return (
+                <TableCell
+                  key={i}
+                  sx={{
+                    color: isActive ? "primary.main" : "text.primary",
+
+                    fontWeight: isActive ? "bold" : "normal",
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                    whiteSpace: "nowrap",
+                  }}
+                >
+                  {isActive ? (
+                    <Chip
+                      label={player.username}
+                      color="primary"
+                      sx={{
+                        borderRadius: (t) => `${t.shape.borderRadius}px `,
+                      }}
+                    />
+                  ) : (
+                    <>{player.username}</>
+                  )}
+                </TableCell>
+              );
+            })}
           </TableRow>
         </TableHead>
         <TableBody>

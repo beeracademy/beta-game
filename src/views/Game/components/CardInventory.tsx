@@ -132,7 +132,7 @@ const CardStack = memo((props: { size: number }) => {
             opacity: 0.75,
             backgroundColor: (t) =>
               darken(t.palette.background.paper, (i / props.size) * 0.15),
-            transform: randomRotationBetween(-8, 8),
+            transform: randomRotationBetween(-12, 12),
           }}
         />
       ))}
