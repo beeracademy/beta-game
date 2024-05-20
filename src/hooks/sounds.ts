@@ -63,8 +63,8 @@ const useSounds = () => {
 };
 
 interface playOptions {
-  loop: boolean;
-  oneInstance: boolean;
+  loop?: boolean;
+  oneInstance?: boolean;
 }
 
 const play = (
@@ -146,5 +146,5 @@ const stopAll = () => {
   activeSounds.clear();
 };
 
-export { SoundNames, useSounds };
+export { SoundNames, mute, pause, play, stop, stopAll, unmute, useSounds };
 export type { SoundName };
