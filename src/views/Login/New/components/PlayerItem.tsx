@@ -84,18 +84,18 @@ const PlayerItem: FunctionComponent<PlayerItemProps> = (props) => {
         position: "relative",
         border: "1px solid",
         borderColor: "divider",
-        borderRadius: "8px",
+        borderRadius: theme.shape.borderRadius + "px",
       }}
     >
       <Box
         sx={{
-          borderRadius: "8px",
+          borderRadius: theme.shape.borderRadius + "px",
           overflow: "hidden",
         }}
       >
         <Stack direction="row">
           <TextField
-            label="username"
+            label={isOffline ? "display name" : "username"}
             fullWidth
             variant="filled"
             data-lpignore="true" // Disable LastPass
