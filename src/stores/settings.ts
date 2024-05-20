@@ -24,7 +24,7 @@ interface SettingsActions {
 const initialState: SettingsState = {
   themeMode: "light",
 
-  simpleCardsMode: false,
+  simpleCardsMode: true,
 
   remoteControl: false,
   remoteToken: "",
