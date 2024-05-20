@@ -1,7 +1,7 @@
-import { Buffer, Command } from "./models";
 import * as sounds from "../../hooks/sounds";
-import useGame from "../../stores/game";
 import { getCardSuitName } from "../../models/card";
+import useGame from "../../stores/game";
+import { Buffer, Command } from "./models";
 
 export const customCommands: Command[] = [
   {
@@ -37,7 +37,9 @@ export const customCommands: Command[] = [
       switch (args[0]) {
         case "play":
           buffer.write("Playing sound...");
-          sounds.play(args[1] as sounds.SoundName, args[2] === "--loop");
+          sounds.play(args[1] as sounds.SoundName, {
+            loop: args[2] === "--loop",
+          });
           break;
         case "stop":
           buffer.write("Stopping all sounds...");

@@ -27,8 +27,6 @@ const PlayerList: FunctionComponent<PlayerListProps> = (props) => {
 
       return newPlayers;
     });
-
-    props.onChange?.(Object.values(newPlayers));
   }, [props.numberOfPlayers]);
 
   return (
@@ -43,8 +41,6 @@ const PlayerList: FunctionComponent<PlayerListProps> = (props) => {
                 const newPlayers = { ...prev };
                 newPlayers[i] = p;
 
-                props.onChange?.(Object.values(newPlayers));
-
                 return newPlayers;
               });
             }}
@@ -52,8 +48,6 @@ const PlayerList: FunctionComponent<PlayerListProps> = (props) => {
               setPlayers((prev) => {
                 const newPlayers = { ...prev };
                 delete newPlayers[i];
-
-                props.onChange?.(Object.values(newPlayers));
 
                 return newPlayers;
               });

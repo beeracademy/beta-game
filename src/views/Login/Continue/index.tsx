@@ -14,15 +14,14 @@ import {
 import { FunctionComponent, useEffect, useState } from "react";
 import { Helmet } from "react-helmet";
 import { NavLink } from "react-router-dom";
-import PlayerItem from "../components/PlayerItem";
 import * as GameAPI from "../../../api/endpoints/game";
-import { Player } from "../../../models/player";
-import { datetimeToddmmHHMMSS } from "../../../utilities/time";
 import Conditional from "../../../components/Conditional";
+import { Player } from "../../../models/player";
 import useGame from "../../../stores/game";
 import { mapToLocal } from "../../../stores/game.mapper";
-import { stopAll } from "../../../hooks/sounds";
+import { datetimeToddmmHHMMSS } from "../../../utilities/time";
 import ContinueGameDialog from "../components/ContinueGameDialog";
+import PlayerItem from "../components/PlayerItem";
 
 const ContinueGameView: FunctionComponent = () => {
   const theme = useTheme();
@@ -65,7 +64,6 @@ const ContinueGameView: FunctionComponent = () => {
       return;
     }
 
-    stopAll();
     Resume(mapToLocal(selectedGame));
   };
 
@@ -112,7 +110,7 @@ const ContinueGameView: FunctionComponent = () => {
 
           <CardContent>
             <PlayerItem
-              onLogin={async (p) => {
+              onReady={async (p) => {
                 setPlayer(p);
               }}
               onRemove={() => {
