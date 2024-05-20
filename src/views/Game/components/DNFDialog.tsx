@@ -83,7 +83,7 @@ const DNFDialog: FunctionComponent<DNFDialogProps> = (props) => {
                 >
                   {player.username}
                 </Typography>
-                  
+
                 <PlayerCross />
               </Box>
             );

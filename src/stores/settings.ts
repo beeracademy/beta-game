@@ -45,8 +45,8 @@ const useSettings = create<SettingsState & SettingsActions>()(
     }),
     {
       name: "settings",
-    }
-  )
+    },
+  ),
 );
 
 export default useSettings;

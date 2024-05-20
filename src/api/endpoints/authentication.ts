@@ -13,7 +13,7 @@ export interface ILoginResponse {
 
 export async function login(
   username: string,
-  password: string
+  password: string,
 ): Promise<ILoginResponse> {
   const data: ILoginRequest = {
     username: username,
@@ -37,7 +37,7 @@ export interface ICreateUserResponse {
 
 export async function createUser(
   username: string,
-  password: string
+  password: string,
 ): Promise<ICreateUserResponse> {
   const data: ILoginRequest = {
     username: username,

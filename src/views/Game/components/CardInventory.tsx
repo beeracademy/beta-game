@@ -49,7 +49,7 @@ interface CardInventoryCardProps {
 }
 
 const CardInventoryCard: FunctionComponent<CardInventoryCardProps> = (
-  props
+  props,
 ) => {
   return (
     <Box

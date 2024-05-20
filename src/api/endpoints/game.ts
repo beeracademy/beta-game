@@ -7,7 +7,7 @@ export interface IPostStartRequest {
 
 export async function postStart(
   tokens: string[],
-  official: boolean
+  official: boolean,
 ): Promise<IGameState> {
   const data: IPostStartRequest = {
     tokens: tokens,
@@ -59,7 +59,7 @@ export interface ICard {
 export async function postUpdate(gameState: IGameState): Promise<void> {
   return await client.post(
     `/api/games/${gameState.id}/update_state/`,
-    gameState
+    gameState,
   );
 }
 
@@ -89,7 +89,7 @@ export interface IResumableGame {
 }
 
 export async function getResumableGames(
-  token: string
+  token: string,
 ): Promise<IResumableGame[]> {
   const response = await client.get<IResumableGame[]>("/api/games/resumable/", {
     headers: {
@@ -102,7 +102,7 @@ export async function getResumableGames(
 
 export async function postResumeGame(
   token: string,
-  gameId: number
+  gameId: number,
 ): Promise<IGameState> {
   const response = await client.post(
     `/api/games/${gameId}/resume/`,
@@ -111,7 +111,7 @@ export async function postResumeGame(
       headers: {
         Authorization: `Token ${token}`,
       },
-    }
+    },
   );
 
   return response.data;

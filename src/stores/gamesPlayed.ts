@@ -19,8 +19,8 @@ const useGamesPlayed = create<ComputerGamesCountState>()(
     }),
     {
       name: "computer-game-counts",
-    }
-  )
+    },
+  ),
 );
 
 export default useGamesPlayed;

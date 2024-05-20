@@ -47,7 +47,7 @@ interface GameActions {
       sipsInABeer: number;
       numberOfRounds: number;
       offline: boolean;
-    }
+    },
   ) => Promise<void>;
   Draw: () => Card;
   Exit: () => void;
@@ -85,7 +85,7 @@ const useGame = create<GameState & GameActions>()(
           sipsInABeer: 14,
           numberOfRounds: 13,
           offline: false,
-        }
+        },
       ) => {
         console.debug("[Game]", "Starting game");
 
@@ -154,7 +154,7 @@ const useGame = create<GameState & GameActions>()(
               mapToRemote({
                 ...state,
                 ...updates,
-              })
+              }),
             );
           }
 
@@ -178,8 +178,8 @@ const useGame = create<GameState & GameActions>()(
     }),
     {
       name: "game",
-    }
-  )
+    },
+  ),
 );
 
 export default useGame;

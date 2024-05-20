@@ -13,7 +13,7 @@ interface TimeAttackSettingsProps {
 }
 
 const TimeAttackSettings: FunctionComponent<TimeAttackSettingsProps> = (
-  props
+  props,
 ) => {
   const [value, setValue] = useState<TimeAttackMode>("total");
 

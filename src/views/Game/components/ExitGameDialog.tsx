@@ -15,7 +15,7 @@ const ExitGameDialog: FunctionComponent<ExitGameDialogProps> = (props) => {
           {
             ok: false,
           },
-          "backdropClick"
+          "backdropClick",
         )
       }
       onConfirm={() =>
@@ -23,7 +23,7 @@ const ExitGameDialog: FunctionComponent<ExitGameDialogProps> = (props) => {
           {
             ok: true,
           },
-          "backdropClick"
+          "backdropClick",
         )
       }
     />

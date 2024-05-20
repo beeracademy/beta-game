@@ -13,7 +13,7 @@ import {
   Select,
   Slider,
   Stack,
-  Switch
+  Switch,
 } from "@mui/material";
 import { BsSpeakerFill } from "react-icons/bs";
 import { FaGamepad, FaPencilRuler } from "react-icons/fa";
@@ -81,7 +81,7 @@ const SettingsDialog: FunctionComponent = () => {
                   checked={settings.themeMode === "dark"}
                   onChange={() => {
                     settings.SetThemeMode(
-                      settings.themeMode === "dark" ? "light" : "dark"
+                      settings.themeMode === "dark" ? "light" : "dark",
                     );
                   }}
                 />

@@ -9,7 +9,7 @@ interface CardFlashDialogProps {
 
 const CardFlashDialog: FunctionComponent<CardFlashDialogProps> = (props) => {
   const [cardImageURI, setCardImageURI] = useState<string | undefined>(
-    undefined
+    undefined,
   );
 
   useEffect(() => {

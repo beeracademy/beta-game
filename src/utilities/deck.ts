@@ -4,7 +4,7 @@ import { randInt } from "./random";
 
 const GenerateDeck = (
   shuffleIndices: number[],
-  numberOfPlayers: number
+  numberOfPlayers: number,
 ): Card[] => {
   if (shuffleIndices.length !== numberOfPlayers * CardValues.length) {
     throw new Error("Number of players and shuffle indices mismatch!");

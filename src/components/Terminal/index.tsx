@@ -62,7 +62,7 @@ const Terminal: FunctionComponent<TerminalProps> = (props) => {
     }
 
     const commandObj = [...builtInCommands, ...customCommands].find(
-      (c) => c.name === cmd
+      (c) => c.name === cmd,
     );
 
     if (commandObj === undefined) {
@@ -86,7 +86,7 @@ const Terminal: FunctionComponent<TerminalProps> = (props) => {
         [...builtInCommands, customCommands[0], customCommands[1]].forEach(
           (c) => {
             buffer.write(`  ${rightPad(c.name, 10)} ${c.description || ""}`);
-          }
+          },
         );
 
         buffer.write("  and maybe more...");
@@ -120,14 +120,15 @@ const Terminal: FunctionComponent<TerminalProps> = (props) => {
         files.forEach((f) => {
           let perm = f.name.endsWith("/") ? "drwxr-xr-x" : "-rw-r--r--";
           buffer.write(
-            `${perm} root root ${rightPad(f.size || "", 5)}  ${f.name}`
+            `${perm} root root ${rightPad(f.size || "", 5)}  ${f.name}`,
           );
         });
       },
     },
     {
       name: "whoami",
-      description: "print the user name associated with the current effective user ID.",
+      description:
+        "print the user name associated with the current effective user ID.",
       execute: (args: string[], buffer: Buffer) => {
         buffer.write("an idiot");
       },

@@ -26,65 +26,63 @@ const initialState: NewGameState = {
   playerReady: [],
 };
 
-const useNewGameForm = create<NewGameState & NewGameAction>()(
-  (set, get) => ({
-    ...initialState,
+const useNewGameForm = create<NewGameState & NewGameAction>()((set, get) => ({
+  ...initialState,
 
-    SetNumberOfPlayers: (value: number) => {
-      const { players, playerReady } = get();
+  SetNumberOfPlayers: (value: number) => {
+    const { players, playerReady } = get();
 
-      set((state) => ({ numberOfPlayers: value }));
+    set((state) => ({ numberOfPlayers: value }));
 
-      if (value < players.length) {
-        set((state) => ({ players: players.slice(0, value) }));
-        set((state) => ({ playerReady: playerReady.slice(0, value) }));
-      } else {
-        set((state) => ({
-          players: [
-            ...players,
-            ...Array(value - players.length).fill({
-              name: "",
-            }),
-          ],
-        }));
-        set((state) => ({
-          playerReady: [
-            ...playerReady,
-            ...Array(value - playerReady.length).fill(false),
-          ],
-        }));
-      }
-    },
+    if (value < players.length) {
+      set((state) => ({ players: players.slice(0, value) }));
+      set((state) => ({ playerReady: playerReady.slice(0, value) }));
+    } else {
+      set((state) => ({
+        players: [
+          ...players,
+          ...Array(value - players.length).fill({
+            name: "",
+          }),
+        ],
+      }));
+      set((state) => ({
+        playerReady: [
+          ...playerReady,
+          ...Array(value - playerReady.length).fill(false),
+        ],
+      }));
+    }
+  },
 
-    SetGameMode: (value: GameMode) => {
-      set((state) => ({ gameMode: value }));
-    },
+  SetGameMode: (value: GameMode) => {
+    set((state) => ({ gameMode: value }));
+  },
 
-    SetPlayer: (index: number, player: Player) => {
-      set((state) => {
-        const players = [...state.players];
-        players[index] = player;
-        return { players };
-      });
-    },
+  SetPlayer: (index: number, player: Player) => {
+    set((state) => {
+      const players = [...state.players];
+      players[index] = player;
+      return { players };
+    });
+  },
 
-    RemovePlayer: (index: number) => {
-      set((state) => {
-        const players = [...state.players];
-        players.splice(index, 1);
-        return { players };
-      });
-    },
+  RemovePlayer: (index: number) => {
+    set((state) => {
+      const players = [...state.players];
+      players.splice(index, 1);
+      return { players };
+    });
+  },
 
-    SetPlayerReady: (index: number, ready: boolean) => {
-      set((state) => {
-        const playerReady = [...state.playerReady];
-        playerReady[index] = ready;
-        
-        return { playerReady, ready: playerReady.every((ready) => ready) };
-      });
-    },
-  })
-);
+  SetPlayerReady: (index: number, ready: boolean) => {
+    set((state) => {
+      const playerReady = [...state.playerReady];
+      playerReady[index] = ready;
+
+      return { playerReady, ready: playerReady.every((ready) => ready) };
+    });
+  },
+}));
 
 export default useNewGameForm;

@@ -101,20 +101,20 @@ const MetricsStore = create<MetricsState & MetricsActions>()((set, get) => ({
         const playerIndex = index % game.players.length;
 
         acc[playerIndex].push(
-          (acc[playerIndex][acc[playerIndex].length - 1] || 0) + card.value
+          (acc[playerIndex][acc[playerIndex].length - 1] || 0) + card.value,
         );
 
         return acc;
       },
-      Array.from({ length: game.players.length }, () => [0])
+      Array.from({ length: game.players.length }, () => [0]),
     );
 
     const totalSips = cumulativeSips.map(
-      (cumulativeSips) => cumulativeSips[cumulativeSips.length - 1]
+      (cumulativeSips) => cumulativeSips[cumulativeSips.length - 1],
     );
 
     const numberOfBeers = totalSips.map((totalSips) =>
-      Math.floor(totalSips / game.sipsInABeer)
+      Math.floor(totalSips / game.sipsInABeer),
     );
 
     const leadingPlayerIndex = totalSips.indexOf(Math.max(...totalSips));

@@ -125,7 +125,7 @@ const Header: FunctionComponent = () => {
                 sound.play("click");
 
                 settings.SetThemeMode(
-                  settings.themeMode === "light" ? "dark" : "light"
+                  settings.themeMode === "light" ? "dark" : "light",
                 );
               }}
             >

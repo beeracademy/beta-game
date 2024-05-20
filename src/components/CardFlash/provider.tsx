@@ -27,7 +27,7 @@ export interface flashCardOptions {
 }
 
 export const CardFlashProvider: FunctionComponent<CardFlashProviderProps> = (
-  props
+  props,
 ) => {
   const [show, setShow] = useState(false);
   const [card, setCard] = useState<Card>();

@@ -40,7 +40,7 @@ const GameView: FunctionComponent = () => {
 
   useEffect(() => {
     console.log(
-      "To open the game terminal, press the ` key. (top left of keyboard, no not escape... the one below escape)"
+      "To open the game terminal, press the ` key. (top left of keyboard, no not escape... the one below escape)",
     );
 
     window.addEventListener("keydown", handleKeyDown);

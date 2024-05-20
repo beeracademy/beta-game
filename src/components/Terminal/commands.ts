@@ -68,7 +68,7 @@ export const customCommands: Command[] = [
       setTimeout(() => {
         window.open(
           "https://www.youtube.com/watch?v=q6EoRBvdVPQ&list=PLFsQleAWXsj_4yDeebiIADdH5FMayBiJo",
-          "_blank"
+          "_blank",
         );
       }, 1000);
     },

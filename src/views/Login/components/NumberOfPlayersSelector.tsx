@@ -17,7 +17,7 @@ const NumberOfPlayersSelector: FunctionComponent<
     <ToggleButtonGroup exclusive fullWidth size="small">
       {Array.from(
         { length: props.max - props.min + 1 },
-        (_, i) => i + props.min
+        (_, i) => i + props.min,
       ).map((i) => (
         <ToggleButton
           key={i}

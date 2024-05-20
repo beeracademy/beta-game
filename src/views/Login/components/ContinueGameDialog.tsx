@@ -9,7 +9,7 @@ interface ContinueGameDialogProps extends DialogProps {
 }
 
 const ContinueGameDialog: FunctionComponent<ContinueGameDialogProps> = (
-  props
+  props,
 ) => {
   return (
     <ConfirmDialog
@@ -18,14 +18,14 @@ const ContinueGameDialog: FunctionComponent<ContinueGameDialogProps> = (
       message={`Are you sure you want to continue game ${
         props.game.id
       } started at ${datetimeToddmmHHMMSS(
-        props.game.start_datetime
+        props.game.start_datetime,
       )} with ${props.game.players.map((p) => p.username).join(", ")}?`}
       onCancel={() =>
         props.onClose?.(
           {
             ok: false,
           },
-          "backdropClick"
+          "backdropClick",
         )
       }
       onConfirm={() =>
@@ -33,7 +33,7 @@ const ContinueGameDialog: FunctionComponent<ContinueGameDialogProps> = (
           {
             ok: true,
           },
-          "backdropClick"
+          "backdropClick",
         )
       }
     />

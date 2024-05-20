@@ -9,9 +9,8 @@ export interface IRankedCardResponse {
 }
 
 export async function getRankedCards(): Promise<IRankedCardResponse[]> {
-  const response = await client.get<IRankedCardResponse[]>(
-    "/api/ranked_cards/"
-  );
+  const response =
+    await client.get<IRankedCardResponse[]>("/api/ranked_cards/");
   return response.data;
 }
 
@@ -31,10 +30,10 @@ export interface IUserStatsResponse {
 }
 
 export async function getUserStats(
-  userId: number
+  userId: number,
 ): Promise<IUserStatsResponse> {
   const response = await client.get<IUserStatsResponse>(
-    `/api/stats/${userId}/`
+    `/api/stats/${userId}/`,
   );
   return response.data;
 }

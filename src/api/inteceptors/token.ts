@@ -17,6 +17,6 @@ export function TokenInteceptor(inst: AxiosInstance) {
     },
     (error) => {
       Promise.reject(error);
-    }
+    },
   );
 }

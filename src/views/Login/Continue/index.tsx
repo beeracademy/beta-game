@@ -36,7 +36,7 @@ const ContinueGameView: FunctionComponent = () => {
     GameAPI.IResumableGame[]
   >([]);
   const [selectedGame, setSelectedGame] = useState<GameAPI.IGameState | null>(
-    null
+    null,
   );
 
   const fetchResumableGames = async () => {
