@@ -1,6 +1,7 @@
 import {
   Avatar,
   Box,
+  CircularProgress,
   Divider,
   IconButton,
   Stack,
@@ -31,7 +32,7 @@ const PlayerItem: FunctionComponent<PlayerItemProps> = (props) => {
   const isOffline = newGame.offline;
 
   const login = async () => {
-    if (player.username === "" || player.password === "") {
+    if (!player.username || !player.password) {
       return;
     }
 
@@ -162,7 +163,18 @@ const PlayerItem: FunctionComponent<PlayerItemProps> = (props) => {
             </>
           )}
 
-          <Conditional value={!isOffline}>
+          {disabled ? (
+            <Avatar
+              sx={{
+                width: 56,
+                height: 56,
+                borderRadius: 0,
+              }}
+              src={player.avatar}
+            >
+              <CircularProgress color="inherit" size={24} />
+            </Avatar>
+          ) : (
             <Avatar
               sx={{
                 width: 56,
@@ -171,7 +183,7 @@ const PlayerItem: FunctionComponent<PlayerItemProps> = (props) => {
               }}
               src={player.avatar}
             />
-          </Conditional>
+          )}
         </Stack>
       </Box>
 

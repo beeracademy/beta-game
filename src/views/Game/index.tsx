@@ -161,14 +161,6 @@ const GameView: FunctionComponent = () => {
           gap: 2,
         }}
       >
-        {/* <Box
-                    sx={{
-                        display: "flex",
-                    }}
-                >
-                    <Chat />
-                </Box> */}
-
         <Box
           sx={{
             display: "flex",
