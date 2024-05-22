@@ -7,9 +7,11 @@ import {
   Typography,
   useTheme,
 } from "@mui/material";
-import { FunctionComponent, useEffect, useState } from "react";
+import { FunctionComponent, useEffect, useRef, useState } from "react";
+import { AiOutlineFullscreen, AiOutlineFullscreenExit } from "react-icons/ai";
 import { IoExitOutline } from "react-icons/io5";
 import { useNavigate } from "react-router-dom";
+import { useFullscreen, useToggle } from "react-use";
 import { useSounds } from "../../../hooks/sounds";
 import useGame from "../../../stores/game";
 import { useGameMetrics } from "../../../stores/metrics";
@@ -22,6 +24,15 @@ import RemoteDialog from "./RemoteDialog";
 const Header: FunctionComponent = () => {
   const theme = useTheme();
   const navigate = useNavigate();
+
+  const [fullscreen, toggleFullscreen] = useToggle(false);
+  const isFullscreen = useFullscreen(
+    useRef(document.documentElement),
+    fullscreen,
+    {
+      onClose: () => toggleFullscreen(false),
+    },
+  );
 
   const sound = useSounds();
 
@@ -208,7 +219,25 @@ const Header: FunctionComponent = () => {
             </IconButton>
           </Tooltip> */}
 
-          <Tooltip title="Exit game" placement="left">
+          <Tooltip
+            title={isFullscreen ? "Exit fullscreen" : "Enter fullscreen"}
+            placement="bottom"
+          >
+            <IconButton
+              sx={{
+                color: "primary.contrastText",
+              }}
+              onClick={toggleFullscreen}
+            >
+              {isFullscreen ? (
+                <AiOutlineFullscreenExit />
+              ) : (
+                <AiOutlineFullscreen />
+              )}
+            </IconButton>
+          </Tooltip>
+
+          <Tooltip title="Exit game" placement="bottom">
             <IconButton
               sx={{
                 color: "primary.contrastText",
