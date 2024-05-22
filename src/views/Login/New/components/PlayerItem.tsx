@@ -36,6 +36,18 @@ const PlayerItem: FunctionComponent<PlayerItemProps> = (props) => {
       return;
     }
 
+    const isPlayerWithSameUsernameLoggedIn = newGame.players.some(
+      (p) =>
+        p.username.toLowerCase() === player.username.toLowerCase() && p.ready,
+    );
+
+    if (isPlayerWithSameUsernameLoggedIn) {
+      play("snack");
+      updatePassword("");
+
+      return;
+    }
+
     try {
       setDisabled(true);
 
