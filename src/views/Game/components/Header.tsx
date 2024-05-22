@@ -158,7 +158,8 @@ const Header: FunctionComponent = () => {
               },
             }}
           >
-            Round {gameMetrics.currentRound} / {game.numberOfRounds}
+            Round {gameMetrics.currentRound.toString().padStart(2, "0")}/
+            {game.numberOfRounds}
           </Typography>
           <Stack
             sx={{
@@ -187,7 +188,8 @@ const Header: FunctionComponent = () => {
               },
             }}
           >
-            Card {gameMetrics.numberOfCardsDrawn} / {gameMetrics.numberOfCards}
+            Card {gameMetrics.numberOfCardsDrawn.toString().padStart(2, "0")}/
+            {gameMetrics.numberOfCards}
           </Typography>
         </Stack>
 

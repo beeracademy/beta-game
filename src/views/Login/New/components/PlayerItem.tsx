@@ -163,27 +163,29 @@ const PlayerItem: FunctionComponent<PlayerItemProps> = (props) => {
             </>
           )}
 
-          {disabled ? (
-            <Avatar
-              sx={{
-                width: 56,
-                height: 56,
-                borderRadius: 0,
-              }}
-              src={player.avatar}
-            >
-              <CircularProgress color="inherit" size={24} />
-            </Avatar>
-          ) : (
-            <Avatar
-              sx={{
-                width: 56,
-                height: 56,
-                borderRadius: 0,
-              }}
-              src={player.avatar}
-            />
-          )}
+          <Conditional value={!isOffline}>
+            {disabled ? (
+              <Avatar
+                sx={{
+                  width: 56,
+                  height: 56,
+                  borderRadius: 0,
+                }}
+                src={player.avatar}
+              >
+                <CircularProgress color="inherit" size={24} />
+              </Avatar>
+            ) : (
+              <Avatar
+                sx={{
+                  width: 56,
+                  height: 56,
+                  borderRadius: 0,
+                }}
+                src={player.avatar}
+              />
+            )}
+          </Conditional>
         </Stack>
       </Box>
 
