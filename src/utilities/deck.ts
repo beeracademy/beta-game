@@ -7,7 +7,9 @@ const GenerateDeck = (
   numberOfPlayers: number,
 ): Card[] => {
   if (shuffleIndices.length !== numberOfPlayers * CardValues.length - 1) {
-    throw new Error("Number of players and shuffle indices mismatch!");
+    throw new Error(
+      `Invalid shuffle indices length, got ${shuffleIndices.length}, expected ${numberOfPlayers * CardValues.length - 1}`,
+    );
   }
 
   const deck: Card[] = [];
@@ -29,7 +31,7 @@ const GenerateDeck = (
 };
 
 const GenerateShuffleIndices = (numberOfPlayers: number): number[] => {
-  const numberOfIndices = numberOfPlayers * CardValues.length;
+  const numberOfIndices = numberOfPlayers * CardValues.length - 1;
 
   const shuffleIndices = [];
   for (let i = numberOfIndices; i >= 1; i--) {
