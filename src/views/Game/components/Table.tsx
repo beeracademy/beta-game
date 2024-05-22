@@ -30,6 +30,7 @@ const GameTable: FunctionComponent<GameTableProps> = () => {
     <TableContainer
       sx={{
         flex: 1,
+        userSelect: "none",
       }}
     >
       <Table

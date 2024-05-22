@@ -6,7 +6,6 @@ import {
   DialogProps,
   DialogTitle,
   Stack,
-  Typography,
 } from "@mui/material";
 import { FunctionComponent } from "react";
 import useGame from "../../../stores/game";
@@ -20,8 +19,8 @@ const GameOverDialog: FunctionComponent<GameOverDialogProps> = (props) => {
 
   return (
     <Dialog {...props}>
-      <DialogTitle textAlign="center">
-        <Typography variant="h4">Game Over</Typography>
+      <DialogTitle textAlign="center" variant="h4">
+        Game Over
       </DialogTitle>
 
       <DialogContent

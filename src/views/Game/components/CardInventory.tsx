@@ -66,6 +66,7 @@ const CardInventoryCard: FunctionComponent<CardInventoryCardProps> = (
           flexShrink: 0,
           textAlign: "center",
           position: "relative",
+          userSelect: "none",
 
           ...(props.value <= 0 && {
             opacity: 0.5,

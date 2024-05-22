@@ -14,8 +14,8 @@ import {
   useTheme,
 } from "@mui/material";
 import { FunctionComponent } from "react";
-import useGame from "../../../stores/game";
 import { useSounds } from "../../../hooks/sounds";
+import useGame from "../../../stores/game";
 interface DNFDialogProps extends DialogProps {}
 
 const DNFDialog: FunctionComponent<DNFDialogProps> = (props) => {
@@ -28,8 +28,8 @@ const DNFDialog: FunctionComponent<DNFDialogProps> = (props) => {
 
   return (
     <Dialog {...props}>
-      <DialogTitle textAlign="center">
-        <Typography variant="h4">Did not finish?</Typography>
+      <DialogTitle textAlign="center" variant="h4">
+        Did not finish?
       </DialogTitle>
 
       <DialogContent
@@ -53,7 +53,7 @@ const DNFDialog: FunctionComponent<DNFDialogProps> = (props) => {
           {players.map((player, index) => {
             return (
               <Box
-                key={player.id}
+                key={index}
                 sx={{
                   display: "flex",
                   flexDirection: "column",

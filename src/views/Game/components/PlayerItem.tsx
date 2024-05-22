@@ -11,14 +11,14 @@ import {
 } from "@mui/material";
 import { FunctionComponent, memo, useCallback } from "react";
 import Bottle from "../../../components/Bottle";
+import Bubbles from "../../../components/Bubbles";
+import { Crown, Jester } from "../../../components/Hats";
 import { Player } from "../../../models/player";
+import useGame from "../../../stores/game";
+import { usePlayerMetricsByIndex } from "../../../stores/metrics";
 import useSettings from "../../../stores/settings";
 import { toBase14 } from "../../../utilities/base14";
 import { secondsToHHMMSS } from "../../../utilities/time";
-import { usePlayerMetricsByIndex } from "../../../stores/metrics";
-import Bubbles from "../../../components/Bubbles";
-import useGame from "../../../stores/game";
-import { Crown, Jester } from "../../../components/Hats";
 
 interface PlayerItemProps {
   player: Player;
@@ -88,6 +88,7 @@ const PlayerItem: FunctionComponent<PlayerItemProps> = (props) => {
           display: "flex",
           backgroundColor: color(),
           color: "white",
+          userSelect: "none",
         }}
         onClick={() => settings.SetSimpleCardsMode(!settings.simpleCardsMode)}
       >

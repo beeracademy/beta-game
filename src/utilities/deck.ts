@@ -6,7 +6,7 @@ const GenerateDeck = (
   shuffleIndices: number[],
   numberOfPlayers: number,
 ): Card[] => {
-  if (shuffleIndices.length !== numberOfPlayers * CardValues.length) {
+  if (shuffleIndices.length !== numberOfPlayers * CardValues.length - 1) {
     throw new Error("Number of players and shuffle indices mismatch!");
   }
 
@@ -39,4 +39,14 @@ const GenerateShuffleIndices = (numberOfPlayers: number): number[] => {
   return shuffleIndices;
 };
 
-export { GenerateDeck, GenerateShuffleIndices };
+const GetCardN = (
+  shuffleIndices: number[],
+  numberOfPlayers: number,
+  n: number,
+): Card => {
+  const deck = GenerateDeck(shuffleIndices, numberOfPlayers);
+
+  return deck[n];
+};
+
+export { GenerateDeck, GenerateShuffleIndices, GetCardN };

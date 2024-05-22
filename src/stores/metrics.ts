@@ -1,6 +1,4 @@
-import create from "zustand";
-import { Card } from "../models/card";
-import { GenerateDeck } from "../utilities/deck";
+import { create } from "zustand";
 import useGame from "./game";
 
 interface PlayerMetrics {
@@ -72,16 +70,18 @@ const MetricsStore = create<MetricsState & MetricsActions>()((set, get) => ({
     const draws = game.draws;
 
     /*
-            Calculate game metrics
-        */
+      Calculate game metrics
+    */
 
     const numberOfCards = game.players.length * game.numberOfRounds;
 
     const numberOfCardsDrawn = draws.length;
     const numberOfCardsRemaining = numberOfCards - numberOfCardsDrawn;
 
-    const currentRound =
-      Math.floor(numberOfCardsDrawn / game.players.length) + 1;
+    const currentRound = Math.min(
+      Math.floor(numberOfCardsDrawn / game.players.length) + 1,
+      13,
+    );
     const roundsRemaining = game.numberOfRounds - currentRound;
 
     const numberOfPlayers = game.players.length;
@@ -90,8 +90,8 @@ const MetricsStore = create<MetricsState & MetricsActions>()((set, get) => ({
     const done = numberOfCardsDrawn === numberOfCards;
 
     /*
-            Calculate player metrics
-        */
+      Calculate player metrics
+    */
 
     const currentPlayerMetrics = get().players;
     const currentPlayerIndex = draws.length % game.players.length;
@@ -141,8 +141,8 @@ const MetricsStore = create<MetricsState & MetricsActions>()((set, get) => ({
     }));
 
     /*
-            Update the metrics store state
-        */
+      Update the metrics store state
+    */
 
     set({
       players: playerMetrics,
@@ -192,8 +192,8 @@ const useGameMetrics = () => {
 
 export {
   MetricsStore,
-  usePlayerMetricsByIndex,
   useGameMetrics,
   usePlayerMetrics,
+  usePlayerMetricsByIndex,
 };
-export type { PlayerMetrics, GameMetrics, MetricsState, MetricsActions };
+export type { GameMetrics, MetricsActions, MetricsState, PlayerMetrics };

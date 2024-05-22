@@ -1,11 +1,14 @@
-import create from "zustand";
+import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import * as GameAPI from "../api/endpoints/game";
-import { Card, CardSuits, CardValues } from "../models/card";
+import { Card, CardValues } from "../models/card";
 import { Chug } from "../models/chug";
 import { Player } from "../models/player";
-import { GenerateShuffleIndices } from "../utilities/deck";
-import { mapToRemote } from "./game.mapper";
+import {
+  GenerateDeck,
+  GenerateShuffleIndices,
+  GetCardN,
+} from "../utilities/deck";
 import useGamesPlayed from "./gamesPlayed";
 import useSettings from "./settings";
 /*
@@ -25,13 +28,13 @@ interface GameState {
   numberOfRounds: number;
 
   gameStartTimestamp: number;
+  gameEndTimestamp: number;
   turnStartTimestamp: number;
-
-  draws: Card[];
 
   players: Player[];
 
   chugs: Chug[];
+  draws: Card[];
 }
 
 interface GameActions {
@@ -60,11 +63,12 @@ const initialState: GameState = {
   numberOfRounds: 13,
 
   gameStartTimestamp: 0,
+  gameEndTimestamp: 0,
   turnStartTimestamp: 0,
 
   players: [],
-  chugs: [],
 
+  chugs: [],
   draws: [],
 };
 
@@ -92,13 +96,15 @@ const useGame = create<GameState & GameActions>()(
 
         // Set up game state
 
-        let id = undefined;
+        let id;
+        let token;
+        let shuffleIndices;
         let gameStartTimestamp = Date.now();
         let turnStartTimestamp = Date.now();
-        let shuffleIndices = GenerateShuffleIndices(players.length);
-        let token = undefined;
 
-        if (!options.offline) {
+        if (options.offline) {
+          shuffleIndices = GenerateShuffleIndices(players.length);
+        } else {
           const playerTokens = players.map((player) => player.token as string);
 
           const resp = await GameAPI.postStart(playerTokens, true);
@@ -108,6 +114,8 @@ const useGame = create<GameState & GameActions>()(
           gameStartTimestamp = Date.parse(resp.start_datetime);
           shuffleIndices = resp.shuffle_indices;
         }
+
+        const deck = GenerateDeck(shuffleIndices, players.length);
 
         set({
           id: id,
@@ -129,31 +137,37 @@ const useGame = create<GameState & GameActions>()(
       Draw: () => {
         console.debug("[Game]", "Drawing card");
 
-        const suit = CardSuits[Math.floor(Math.random() * 4)];
-        const value = CardValues[Math.floor(Math.random() * 13)];
+        const state = useGame.getState();
 
-        const card = {
-          suit: suit,
-          value: value,
+        const deck = GenerateDeck(state.shuffleIndices, state.players.length);
+
+        if (deck.length === 0) {
+          throw new Error("Cannot draw from an empty deck!");
+        }
+
+        const card = GetCardN(
+          state.shuffleIndices,
+          state.players.length,
+          state.draws.length,
+        );
+
+        const draws = [...state.draws, card];
+        const turnStartTimestamp = Date.now();
+
+        const done =
+          draws.length === (CardValues.length - 1) * state.players.length;
+
+        const update: Partial<GameState> = {
+          draws: draws,
+          turnStartTimestamp: turnStartTimestamp,
         };
 
-        set((state) => {
-          const updates = {
-            turnStartTimestamp: Date.now(),
-            draws: [...state.draws, card],
-          };
+        if (done) {
+          useGamesPlayed.getState().incrementCompleted();
+          update.gameEndTimestamp = Date.now();
+        }
 
-          if (!state.offline) {
-            GameAPI.postUpdate(
-              mapToRemote({
-                ...state,
-                ...updates,
-              }),
-            );
-          }
-
-          return updates;
-        });
+        set(update);
 
         return card;
       },

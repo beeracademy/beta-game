@@ -27,6 +27,7 @@ const Header: FunctionComponent = () => {
 
   const game = useGame((state) => ({
     gameStartTimestamp: state.gameStartTimestamp,
+    gameEndTimestamp: state.gameEndTimestamp,
     turnStartTimestamp: state.turnStartTimestamp,
     numberOfRounds: state.numberOfRounds,
     ExitGame: state.Exit,
@@ -56,15 +57,16 @@ const Header: FunctionComponent = () => {
   const [elapsedTurnTime, setElapsedTurnTime] = useState(0);
 
   const updateTimes = () => {
-    setElapsedGameTime(Date.now() - game.gameStartTimestamp);
-    setElapsedTurnTime(Date.now() - game.turnStartTimestamp);
+    if (gameMetrics.done) {
+      setElapsedGameTime(game.gameEndTimestamp - game.gameStartTimestamp);
+      setElapsedTurnTime(0);
+    } else {
+      setElapsedGameTime(Date.now() - game.gameStartTimestamp);
+      setElapsedTurnTime(Date.now() - game.turnStartTimestamp);
+    }
   };
 
   useEffect(() => {
-    if (gameMetrics.done) {
-      // TODO
-    }
-
     updateTimes();
 
     const interval = setInterval(updateTimes, 1);
@@ -84,6 +86,7 @@ const Header: FunctionComponent = () => {
           paddingRight: 2,
           flexShrink: 0,
           display: "flex",
+          userSelect: "none",
         }}
       >
         <Box
