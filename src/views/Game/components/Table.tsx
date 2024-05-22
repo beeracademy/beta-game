@@ -1,6 +1,5 @@
 import {
   alpha,
-  Chip,
   Stack,
   Table,
   TableBody,
@@ -46,7 +45,7 @@ const GameTable: FunctionComponent<GameTableProps> = () => {
       >
         <TableHead>
           <TableRow>
-            <TableCell>Round</TableCell>
+            <TableCell width={48}>Round</TableCell>
             {game.players.map((player, i) => {
               const isActive =
                 gameMetrics.activePlayerIndex === i && !gameMetrics.done;
@@ -63,22 +62,13 @@ const GameTable: FunctionComponent<GameTableProps> = () => {
                     whiteSpace: "nowrap",
                   }}
                 >
-                  {isActive ? (
-                    <Chip
-                      label={player.username}
-                      color="primary"
-                      sx={{
-                        borderRadius: (t) => `${t.shape.borderRadius}px `,
-                      }}
-                    />
-                  ) : (
-                    <>{player.username}</>
-                  )}
+                  {player.username}
                 </TableCell>
               );
             })}
           </TableRow>
         </TableHead>
+
         <TableBody>
           {new Array(game.numberOfRounds).fill(0).map((_, i) => (
             <TableRow key={i + 1}>

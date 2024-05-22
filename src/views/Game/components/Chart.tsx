@@ -1,9 +1,9 @@
-import { FunctionComponent, useCallback } from "react";
-import useGame from "../../../stores/game";
 import { Box, useTheme } from "@mui/material";
-import useSettings from "../../../stores/settings";
-import { usePlayerMetrics } from "../../../stores/metrics";
+import { FunctionComponent, useCallback } from "react";
 import ApexChart from "react-apexcharts";
+import useGame from "../../../stores/game";
+import { usePlayerMetrics } from "../../../stores/metrics";
+import useSettings from "../../../stores/settings";
 
 const Chart: FunctionComponent = () => {
   const theme = useTheme();
@@ -25,9 +25,15 @@ const Chart: FunctionComponent = () => {
       return {
         data: pm.cumulativeSips,
         name: game.players[i]?.username,
-        type: "line",
         color: (theme.player as any)[i],
       };
+    });
+
+    // Pad data with null so all series have the same length
+    // otherwise ApexCharts will draw the chart incorrectly
+    const maxLength = Math.max(...data.map((d) => d.data.length));
+    data.forEach((d) => {
+      d.data.push(...Array(maxLength - d.data.length).fill(null));
     });
 
     return data;
@@ -67,12 +73,14 @@ const Chart: FunctionComponent = () => {
             hover: {
               size: 8,
             },
+            showNullDataPoints: false,
           },
           yaxis: {
             title: {
               text: "Sips",
             },
             min: 0,
+            opposite: true,
             forceNiceScale: true,
             labels: {
               style: {
