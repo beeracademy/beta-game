@@ -30,7 +30,7 @@ const GenerateDeck = (
   return deck;
 };
 
-const GenerateShuffleIndices = (numberOfPlayers: number): number[] => {
+function GenerateShuffleIndices(numberOfPlayers: number): number[] {
   const numberOfIndices = numberOfPlayers * CardValues.length - 1;
 
   const shuffleIndices = [];
@@ -39,14 +39,23 @@ const GenerateShuffleIndices = (numberOfPlayers: number): number[] => {
   }
 
   return shuffleIndices;
-};
+}
+
+const deckCache = new Map<string, Card[]>();
 
 const GetCardN = (
   shuffleIndices: number[],
   numberOfPlayers: number,
   n: number,
 ): Card => {
-  const deck = GenerateDeck(shuffleIndices, numberOfPlayers);
+  const paramHash = shuffleIndices.join("") + numberOfPlayers;
+
+  let deck = deckCache.get(paramHash);
+  if (!deck) {
+    deck = GenerateDeck(shuffleIndices, numberOfPlayers);
+
+    deckCache.set(paramHash, deck);
+  }
 
   return deck[n];
 };
