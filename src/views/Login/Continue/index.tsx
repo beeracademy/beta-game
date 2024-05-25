@@ -15,6 +15,7 @@ import { FunctionComponent, useEffect, useState } from "react";
 import { Helmet } from "react-helmet";
 import { NavLink } from "react-router-dom";
 import * as GameAPI from "../../../api/endpoints/game";
+import { Game } from "../../../api/models/game";
 import Conditional from "../../../components/Conditional";
 import { Player } from "../../../models/player";
 import useGame from "../../../stores/game";
@@ -33,9 +34,7 @@ const ContinueGameView: FunctionComponent = () => {
   const [resumableGames, setResumableGames] = useState<GameAPI.ResumableGame[]>(
     [],
   );
-  const [selectedGame, setSelectedGame] = useState<GameAPI.IGameState | null>(
-    null,
-  );
+  const [selectedGame, setSelectedGame] = useState<Game | null>(null);
 
   const fetchResumableGames = async () => {
     if (!player || !player.token) {

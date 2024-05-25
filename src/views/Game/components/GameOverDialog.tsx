@@ -51,7 +51,12 @@ const GameOverDialog: FunctionComponent<GameOverDialogProps> = (props) => {
           <Button variant="contained" color="primary" fullWidth size="large">
             Play Again
           </Button>
-          <Button variant="outlined" fullWidth size="large" onClick={game.Exit}>
+          <Button
+            variant="outlined"
+            fullWidth
+            size="large"
+            onClick={() => game.Exit()}
+          >
             Exit
           </Button>
         </Stack>
