@@ -19,7 +19,7 @@ export async function postStart(
 }
 
 export async function postUpdate(
-  token: string,
+  gameToken: string,
   gameState: Game,
 ): Promise<void> {
   return await client.post(
@@ -27,25 +27,37 @@ export async function postUpdate(
     gameState,
     {
       headers: {
-        Authorization: `GameToken ${token}`,
+        Authorization: `GameToken ${gameToken}`,
       },
     },
   );
 }
 
-export async function addPhoto(gameId: number, imageBlob: Blob): Promise<void> {
+export async function addPhoto(
+  gameToken: string,
+  gameId: number,
+  imageBlob: Blob,
+): Promise<void> {
   const formData = new FormData();
   formData.append("image", imageBlob);
 
   return await client.post(`/api/games/${gameId}/update_image/`, formData, {
     headers: {
+      Authorization: `GameToken ${gameToken}`,
       "Content-Type": "multipart/form-data",
     },
   });
 }
 
-export async function deletePhoto(gameId: number): Promise<void> {
-  return await client.delete(`/api/games/${gameId}/delete_image/`);
+export async function deletePhoto(
+  gameToken: string,
+  gameId: number,
+): Promise<void> {
+  return await client.delete(`/api/games/${gameId}/delete_image/`, {
+    headers: {
+      Authorization: `GameToken ${gameToken}`,
+    },
+  });
 }
 
 export interface ResumableGame {

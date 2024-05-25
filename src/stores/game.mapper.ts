@@ -1,47 +1,53 @@
-import { IGameState } from "../api/endpoints/game";
-import { GameState, initialState } from "./game";
+import { Game } from "../api/models/game";
+import { CardValues } from "../models/card";
+import { GameState } from "./game";
 
-const mapToRemote = (state: GameState): IGameState => {
-  // TODO: Implement
-
+const mapToRemote = (state: GameState): Game => {
   return {
     id: state.id as number,
     token: state.token as string,
-    shuffle_indices: state.shuffleIndices,
+
+    start_datetime: state.gameStartDateString,
+
+    player_names: state.players.map((player) => player.username),
+    player_ids: state.players.map((player) => player.id as number),
+
     official: !state.offline,
-    cards: [],
-    players: [],
-    sips_per_beer: 14,
-    has_ended: false,
-    description_html: "",
-    location: {
-      latitude: 0,
-      longitude: 0,
-      accuracy: 0,
-    },
-    start_datetime: new Date(state.gameStartTimestamp).toISOString(),
-    end_datetime: undefined,
-    description: "",
+    shuffle_indices: state.shuffleIndices,
+    has_ended:
+      state.draws.length === (CardValues.length - 1) * state.players.length,
+
+    cards: state.draws,
+
+    // TODO: Implement
+
+    dnf_player_ids: [],
     dnf: false,
-    image: undefined,
   };
 };
 
-const mapToLocal = (state: IGameState): GameState => {
-  // TODO: Implement
-
+const mapToLocal = (game: Game): GameState => {
   return {
-    ...initialState,
-    id: state.id,
-    token: state.token,
-    gameStartTimestamp: Date.parse(state.start_datetime),
-    shuffleIndices: state.shuffle_indices,
-    offline: !state.official,
-    players: state.players.map((player) => ({
-      id: player.id,
-      username: player.username,
-      image: player.image_url,
+    id: game.id,
+    token: game.token,
+
+    offline: !game.official,
+    sipsInABeer: 14,
+    numberOfRounds: 13,
+
+    gameStartDateString: game.start_datetime,
+    gameStartTimestamp: Date.parse(game.start_datetime),
+    turnStartTimestamp: 0, // TODO: Implement
+    gameEndTimestamp: 0,
+
+    players: game.player_names.map((name, index) => ({
+      id: game.player_ids[index],
+      username: name,
     })),
+
+    shuffleIndices: game.shuffle_indices,
+
+    draws: game.cards,
   };
 };
 

@@ -9,7 +9,10 @@ import {
 } from "@mui/material";
 import { FunctionComponent, useEffect, useRef, useState } from "react";
 import { AiOutlineFullscreen, AiOutlineFullscreenExit } from "react-icons/ai";
+import { BsMoonStarsFill } from "react-icons/bs";
+import { IoLogoGameControllerB } from "react-icons/io";
 import { IoExitOutline } from "react-icons/io5";
+import { MdWbSunny } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
 import { useFullscreen, useToggle } from "react-use";
 import { useSounds } from "../../../hooks/sounds";
@@ -59,7 +62,7 @@ const Header: FunctionComponent = () => {
     setExitGameDialogOpen(false);
 
     if (e.ok) {
-      game.ExitGame();
+      game.ExitGame(true); // DNF
       navigate("/login"); // Should be handled by protected route
     }
   };
@@ -114,7 +117,7 @@ const Header: FunctionComponent = () => {
             },
           }}
         >
-          {/* <Tooltip title="Game remote settings" placement="right">
+          <Tooltip title="Game remote settings" placement="bottom">
             <IconButton
               sx={{
                 color: "primary.contrastText",
@@ -127,7 +130,10 @@ const Header: FunctionComponent = () => {
             </IconButton>
           </Tooltip>
 
-          <Tooltip title="Toggle between light and dark mode" placement="right">
+          <Tooltip
+            title="Toggle between light and dark mode"
+            placement="bottom"
+          >
             <IconButton
               sx={{
                 color: "primary.contrastText",
@@ -146,7 +152,7 @@ const Header: FunctionComponent = () => {
                 <MdWbSunny size={24} />
               )}
             </IconButton>
-          </Tooltip> */}
+          </Tooltip>
         </Box>
 
         <Stack direction="row" alignItems="center">
@@ -200,6 +206,7 @@ const Header: FunctionComponent = () => {
             display: "flex",
             justifyContent: "flex-end",
             alignItems: "center",
+            gap: 2,
 
             [theme.breakpoints.down("sm")]: {
               display: "none",

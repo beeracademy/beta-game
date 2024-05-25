@@ -3,11 +3,8 @@ import { persist } from "zustand/middleware";
 import * as GameAPI from "../api/endpoints/game";
 import { Card, CardValues } from "../models/card";
 import { Player } from "../models/player";
-import {
-  GenerateDeck,
-  GenerateShuffleIndices,
-  GetCardN,
-} from "../utilities/deck";
+import { GenerateShuffleIndices, GetCardN } from "../utilities/deck";
+import { mapToRemote } from "./game.mapper";
 import useGamesPlayed from "./gamesPlayed";
 import useSettings from "./settings";
 /*
@@ -26,6 +23,7 @@ interface GameState {
   sipsInABeer: number;
   numberOfRounds: number;
 
+  gameStartDateString: string;
   gameStartTimestamp: number;
   gameEndTimestamp: number;
   turnStartTimestamp: number;
@@ -44,8 +42,14 @@ interface GameActions {
       offline: boolean;
     },
   ) => Promise<void>;
-  Draw: () => Card;
-  Exit: () => void;
+
+  StartChug: () => number;
+  StopChug: () => number;
+
+  DrawCard: () => Card;
+
+  Exit: (dnf?: boolean) => void;
+
   Resume: (state: GameState) => void;
 }
 
@@ -60,6 +64,7 @@ const initialState: GameState = {
   sipsInABeer: 14,
   numberOfRounds: 13,
 
+  gameStartDateString: "",
   gameStartTimestamp: 0,
   gameEndTimestamp: 0,
   turnStartTimestamp: 0,
@@ -96,20 +101,31 @@ const useGame = create<GameState & GameActions>()(
         let id;
         let token;
         let shuffleIndices: number[];
+        let gameStartDateString = "";
         let gameStartTimestamp = Date.now();
         let turnStartTimestamp = Date.now();
 
         if (options.offline) {
           shuffleIndices = GenerateShuffleIndices(players.length);
         } else {
-          const playerTokens = players.map((player) => player.token as string);
+          try {
+            const playerTokens = players.map(
+              (player) => player.token as string,
+            );
 
-          const resp = await GameAPI.postStart(playerTokens, true);
+            const resp = await GameAPI.postStart(playerTokens, true);
 
-          id = resp.id;
-          token = resp.token;
-          gameStartTimestamp = Date.parse(resp.start_datetime);
-          shuffleIndices = resp.shuffle_indices;
+            id = resp.id;
+            token = resp.token;
+
+            gameStartDateString = resp.start_datetime;
+            gameStartTimestamp = Date.parse(resp.start_datetime);
+
+            shuffleIndices = resp.shuffle_indices;
+          } catch (error) {
+            console.error("[Game]", "Failed to start game", error);
+            return;
+          }
         }
 
         set({
@@ -117,26 +133,35 @@ const useGame = create<GameState & GameActions>()(
           offline: options.offline,
           token: token,
           shuffleIndices: shuffleIndices,
+          gameStartDateString: gameStartDateString,
           gameStartTimestamp: gameStartTimestamp,
           turnStartTimestamp: turnStartTimestamp,
           sipsInABeer: options.sipsInABeer,
           numberOfRounds: options.numberOfRounds,
           players: players,
-          draws: [],
         });
+
+        // Update games played count
 
         useGamesPlayed.getState().incrementStarted();
       },
 
-      Draw: () => {
+      DrawCard: () => {
         console.debug("[Game]", "Drawing card");
 
         const state = useGame.getState();
 
-        // TODO: this can be optimized
-        const deck = GenerateDeck(state.shuffleIndices, state.players.length);
+        const latestCard = state.draws[state.draws.length - 1];
+        if (
+          latestCard &&
+          latestCard.value === 14 &&
+          !latestCard.chug_end_start_delta_ms
+        ) {
+          throw new Error("Cannot draw a new card while chugging");
+        }
 
-        if (deck.length === 0) {
+        const cardsLeft = (CardValues.length - 1) * state.players.length;
+        if (cardsLeft <= 0) {
           throw new Error("Cannot draw from an empty deck!");
         }
 
@@ -149,19 +174,23 @@ const useGame = create<GameState & GameActions>()(
         card.start_delta_ms = Date.now() - state.gameStartTimestamp;
 
         const draws = [...state.draws, card];
-        const turnStartTimestamp = Date.now();
 
         const done =
           draws.length === (CardValues.length - 1) * state.players.length;
 
         const update: Partial<GameState> = {
           draws: draws,
-          turnStartTimestamp: turnStartTimestamp,
         };
 
         if (done) {
           useGamesPlayed.getState().incrementCompleted();
           update.gameEndTimestamp = Date.now();
+        }
+
+        // Don't update turn start timestamp if
+        // A chug has been drawn
+        if (card.value !== 14) {
+          update.turnStartTimestamp = Date.now();
         }
 
         set(update);
@@ -170,30 +199,115 @@ const useGame = create<GameState & GameActions>()(
           return card;
         }
 
-        GameAPI.postUpdate(state.token as string, {
-          id: state.id as number,
-          token: state.token as string,
-          start_datetime: new Date(state.gameStartTimestamp).toISOString(),
-
-          player_names: state.players.map((player) => player.username),
-          player_ids: state.players.map((player) => player.id as number),
-
-          official: !state.offline,
-          shuffle_indices: state.shuffleIndices,
-          has_ended: done,
-
-          cards: [...state.draws, card],
-
-          // TODO: Implement
-          dnf_player_ids: [],
-          dnf: false,
-        });
-
-        return card;
+        try {
+          GameAPI.postUpdate(
+            state.token as string,
+            mapToRemote({
+              ...state,
+              ...update,
+            }),
+          );
+        } catch (error) {
+          console.error("[Game]", "Failed to update game state", error);
+        } finally {
+          return card;
+        }
       },
 
-      Exit: () => {
+      StartChug: () => {
+        console.debug("[Game]", "Starting chug");
+
+        const now = Date.now();
+        const state = useGame.getState();
+
+        const latestCard = state.draws[state.draws.length - 1];
+
+        // check if latest card is an Ace
+        if (latestCard.value !== 14) {
+          throw new Error("Last card is not an Ace");
+        }
+
+        // check if chug has already started
+        if (latestCard.chug_start_start_delta_ms) {
+          throw new Error("Chug has already started");
+        }
+
+        // set chug start timestamp
+        latestCard.chug_start_start_delta_ms = now - state.gameStartTimestamp;
+
+        const update = {
+          draws: [...state.draws.slice(0, -1), latestCard],
+        };
+
+        set({
+          draws: [...state.draws.slice(0, -1), latestCard],
+        });
+
+        try {
+          GameAPI.postUpdate(
+            state.token as string,
+            mapToRemote({
+              ...state,
+              ...update,
+            }),
+          );
+        } catch (error) {
+          console.error("[Game]", "Failed to update game state", error);
+        } finally {
+          return now;
+        }
+      },
+
+      StopChug: () => {
+        console.debug("[Game]", "Stopping chug");
+
+        const now = Date.now();
+        const state = useGame.getState();
+
+        // get latest card
+        const latestCard = state.draws[state.draws.length - 1];
+
+        // check if latest card is an Ace
+        if (latestCard.value !== 14) {
+          throw new Error("Last card is not an Ace");
+        }
+
+        // check if chug has already started
+        if (!latestCard.chug_start_start_delta_ms) {
+          throw new Error("Chug has not started yet");
+        }
+
+        // set chug end timestamp
+        latestCard.chug_end_start_delta_ms = now - state.gameStartTimestamp;
+
+        const update = {
+          draws: [...state.draws.slice(0, -1), latestCard],
+        };
+
+        set({
+          draws: [...state.draws.slice(0, -1), latestCard],
+          turnStartTimestamp: Date.now(),
+        });
+
+        try {
+          GameAPI.postUpdate(
+            state.token as string,
+            mapToRemote({
+              ...state,
+              ...update,
+            }),
+          );
+        } catch (error) {
+          console.error("[Game]", "Failed to update game state", error);
+        } finally {
+          return now;
+        }
+      },
+
+      Exit: (dnf = false) => {
         console.debug("[Game]", "Exiting game");
+
+        // TODO: Update game state on server
 
         set(initialState);
       },

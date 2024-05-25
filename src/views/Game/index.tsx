@@ -17,12 +17,11 @@ import GameTable from "./components/Table";
 
 const GameView: FunctionComponent = () => {
   const [showTerminal, setShowTerminal] = useState<boolean>(false);
-  const [showChugDialog, setShowChugDialog] = useState<boolean>(false);
 
   const flashCard = useCardFlash();
 
   const game = useGame((state) => ({
-    DrawCard: state.Draw,
+    DrawCard: state.DrawCard,
     cards: state.draws,
   }));
 
@@ -77,7 +76,7 @@ const GameView: FunctionComponent = () => {
       }
 
       if (data.event === "DRAW_CARD") {
-        const card = drawCard();
+        drawCard();
       }
     });
 
@@ -126,7 +125,11 @@ const GameView: FunctionComponent = () => {
 
       spacePressed = true;
 
-      drawCard();
+      try {
+        drawCard();
+      } catch (error) {
+        console.error(error);
+      }
     }
   };
 
@@ -136,11 +139,6 @@ const GameView: FunctionComponent = () => {
 
   const drawCard = () => {
     const card = game.DrawCard();
-
-    if (card.value == 14) {
-      setShowChugDialog(true);
-      return;
-    }
 
     flashCard(card);
   };
@@ -199,12 +197,7 @@ const GameView: FunctionComponent = () => {
 
       <GameOverDialog open={gameMetrics.done} />
 
-      <ChugDialog
-        open={showChugDialog}
-        onClose={() => {
-          setShowChugDialog(false);
-        }}
-      />
+      <ChugDialog open={gameMetrics.chugging} />
 
       <Terminal
         open={showTerminal}

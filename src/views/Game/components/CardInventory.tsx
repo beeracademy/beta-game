@@ -9,6 +9,7 @@ const CardInventory: FunctionComponent<CardInventoryProps> = () => {
   const game = useGame((state) => ({
     players: state.players,
     draws: state.draws,
+    DrawCard: state.DrawCard,
   }));
 
   const gameMetrics = useGameMetrics();
@@ -36,6 +37,7 @@ const CardInventory: FunctionComponent<CardInventoryProps> = () => {
             key={i}
             kind={valueToSymbol(i + 2)}
             value={empty ? 0 : cardsLeftOfValue(i + 2)}
+            onClick={game.DrawCard}
           />
         );
       })}
@@ -46,6 +48,7 @@ const CardInventory: FunctionComponent<CardInventoryProps> = () => {
 interface CardInventoryCardProps {
   kind: string;
   value: number;
+  onClick?: () => void;
 }
 
 const CardInventoryCard: FunctionComponent<CardInventoryCardProps> = (
@@ -59,6 +62,7 @@ const CardInventoryCard: FunctionComponent<CardInventoryCardProps> = (
     >
       <Card
         variant="outlined"
+        onClick={props.onClick}
         sx={{
           zIndex: 1,
           width: 78,

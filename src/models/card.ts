@@ -70,8 +70,8 @@ const getCardSuitName = (card: Card): string => {
   }
 };
 
-const getCardImageURI = (card: Card): string => {
-  return `/cards/${card.suit}-${card.value}.png`;
+const getCardImageURI = (card?: Card): string => {
+  return card ? `/cards/${card.suit}-${card.value}.png` : "";
 };
 
 export {

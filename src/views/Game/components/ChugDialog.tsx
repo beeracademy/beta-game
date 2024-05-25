@@ -11,6 +11,8 @@ import { detect } from "detect-browser";
 import { FunctionComponent, useEffect, useRef, useState } from "react";
 import ReactConfetti from "react-confetti";
 import { useSounds } from "../../../hooks/sounds";
+import { default as useGame } from "../../../stores/game";
+import { useGameMetrics } from "../../../stores/metrics";
 import { milisecondsToMMSSsss } from "../../../utilities/time";
 
 const browser = detect();
@@ -20,47 +22,68 @@ interface ChugDialogProps extends DialogProps {}
 const ChugDialog: FunctionComponent<ChugDialogProps> = (props) => {
   const sounds = useSounds();
 
+  const game = useGame();
+  const metrics = useGameMetrics();
+
+  const card = metrics.latestCard;
+  const started = metrics.chugging && card?.chug_start_start_delta_ms;
+
   const buttonRef = useRef<HTMLButtonElement>(null);
 
   const [elapsedTime, setElapsedTime] = useState(0);
-  const [running, setRunning] = useState(false);
 
   const [intervalRef, setIntervalRef] =
     useState<ReturnType<typeof setInterval>>();
 
-  const start = () => {
-    if (elapsedTime) {
+  useEffect(() => {
+    if (!started) {
+      clearInterval(intervalRef);
+      setIntervalRef(undefined);
+
+      sounds.stop("bubbi_fuve");
+    } else {
+      if (!intervalRef) {
+        clearInterval(intervalRef);
+      }
+
+      const interval = setInterval(updateElapsedTime, 1);
+      setIntervalRef(interval);
+
+      sounds.play("bubbi_fuve");
+    }
+  }, [started]);
+
+  const updateElapsedTime = () => {
+    if (!card?.chug_start_start_delta_ms) {
       return;
     }
 
-    setRunning(true);
-    sounds.play("bubbi_fuve");
+    const gameStartDelta = Date.now() - game.gameStartTimestamp;
+    const duration = gameStartDelta - card.chug_start_start_delta_ms;
 
-    const startTime = Date.now();
+    setElapsedTime(duration);
+  };
 
-    const ref = setInterval(() => {
-      setElapsedTime(Date.now() - startTime);
-    }, 1);
+  const start = () => {
+    if (started) {
+      return;
+    }
 
-    setIntervalRef(ref);
+    game.StartChug();
   };
 
   const stop = () => {
-    if (intervalRef) {
-      clearInterval(intervalRef);
+    if (!started) {
+      return;
     }
 
-    sounds.stopAll();
-    setRunning(false);
+    game.StopChug();
 
     playFinishSound();
-
-    props.onClose?.({}, "backdropClick");
   };
 
   const reset = () => {
     setElapsedTime(0);
-    setRunning(false);
 
     setTimeout(() => {
       buttonRef.current?.focus();
@@ -116,6 +139,7 @@ const ChugDialog: FunctionComponent<ChugDialogProps> = (props) => {
             </Typography>
 
             <Typography fontSize={24} color="text.secondary">
+              {/* TODO: implement */}
               best {milisecondsToMMSSsss(199923)} from season 10
             </Typography>
           </Stack>
@@ -142,16 +166,16 @@ const ChugDialog: FunctionComponent<ChugDialogProps> = (props) => {
                 e.preventDefault();
                 e.stopPropagation();
 
-                running ? stop() : start();
+                started ? stop() : start();
               }
             }}
             onClick={(e) => {
               e.stopPropagation();
 
-              running ? stop() : start();
+              started ? stop() : start();
             }}
           >
-            {running ? "Stop" : "Start"}
+            {started ? "Stop" : "Start"}
           </Button>
         </DialogActions>
       </Dialog>

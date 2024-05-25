@@ -15,7 +15,10 @@ import Bubbles from "../../../components/Bubbles";
 import { Crown, Jester } from "../../../components/Hats";
 import { Player } from "../../../models/player";
 import useGame from "../../../stores/game";
-import { usePlayerMetricsByIndex } from "../../../stores/metrics";
+import {
+  useGameMetrics,
+  usePlayerMetricsByIndex,
+} from "../../../stores/metrics";
 import useSettings from "../../../stores/settings";
 import { toBase14 } from "../../../utilities/base14";
 import { secondsToHHMMSS } from "../../../utilities/time";
@@ -30,8 +33,10 @@ const PlayerItem: FunctionComponent<PlayerItemProps> = (props) => {
   const theme = useTheme();
 
   const sipsInABeer = useGame((state) => state.sipsInABeer);
-
   const metrics = usePlayerMetricsByIndex(props.index);
+
+  const gameMetrics = useGameMetrics();
+  const isFirstRound = gameMetrics.currentRound === 1;
 
   const settings = useSettings((state) => ({
     simpleCardsMode: state.simpleCardsMode,
@@ -98,7 +103,7 @@ const PlayerItem: FunctionComponent<PlayerItemProps> = (props) => {
             zIndex: 2,
           }}
         >
-          {metrics.isLeading && (
+          {metrics.isLeading && !isFirstRound && (
             <Grow in={true} timeout={500}>
               <Box>
                 <Crown
@@ -113,7 +118,7 @@ const PlayerItem: FunctionComponent<PlayerItemProps> = (props) => {
             </Grow>
           )}
 
-          {metrics.isLast && (
+          {metrics.isLast && !isFirstRound && (
             <Grow in={true} timeout={500}>
               <Box>
                 <Jester

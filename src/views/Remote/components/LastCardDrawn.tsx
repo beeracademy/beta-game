@@ -1,6 +1,6 @@
 import { FunctionComponent } from "react";
 import { getCardImageURI } from "../../../models/card";
-import useGame from "../../../stores/game";
+import { useGameMetrics } from "../../../stores/metrics";
 
 interface LastCardDrawnProps {
   width?: number;
@@ -8,13 +8,11 @@ interface LastCardDrawnProps {
 }
 
 const LastCardDrawn: FunctionComponent<LastCardDrawnProps> = (props) => {
-  const game = useGame((state) => ({
-    draws: state.draws,
-  }));
+  const metrics = useGameMetrics();
 
   return (
     <img
-      src={getCardImageURI(game.draws[game.draws.length - 1])}
+      src={getCardImageURI(metrics.latestCard)}
       width={props.width}
       height={props.height}
     />

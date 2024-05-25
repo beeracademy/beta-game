@@ -1,4 +1,5 @@
 import { create } from "zustand";
+import { Card } from "../models/card";
 import useGame from "./game";
 
 interface PlayerMetrics {
@@ -11,11 +12,14 @@ interface PlayerMetrics {
 
   numberOfBeers: number;
 
+  // Only updated in the beginning of a new round
   isLeading: boolean;
   isLast: boolean;
 }
 
 interface GameMetrics {
+  latestCard?: Card;
+
   numberOfCards: number;
   numberOfCardsDrawn: number;
   numberOfCardsRemaining: number;
@@ -27,6 +31,8 @@ interface GameMetrics {
   activePlayerIndex: number;
 
   done: boolean;
+
+  chugging: boolean;
 }
 
 interface MetricsState {
@@ -52,6 +58,8 @@ const initialState: MetricsState = {
     activePlayerIndex: 0,
 
     done: false,
+
+    chugging: false,
   },
 };
 
@@ -89,11 +97,16 @@ const MetricsStore = create<MetricsState & MetricsActions>()((set, get) => ({
 
     const done = numberOfCardsDrawn === numberOfCards;
 
+    const latestCard = draws[draws.length - 1];
+    const chugging =
+      latestCard?.value === 14 && !latestCard.chug_end_start_delta_ms;
+
     /*
       Calculate player metrics
     */
 
     const currentPlayerMetrics = get().players;
+    const firstTimeCalculating = currentPlayerMetrics.length === 0;
     const currentPlayerIndex = draws.length % game.players.length;
 
     const cumulativeSips = draws.reduce<number[][]>(
@@ -133,7 +146,7 @@ const MetricsStore = create<MetricsState & MetricsActions>()((set, get) => ({
       numberOfBeers: numberOfBeers[index],
 
       // Only updated in the beginning of a new round, or first time calculating metrics
-      ...((currentPlayerIndex === 0 || currentPlayerMetrics.length === 0) &&
+      ...((currentPlayerIndex === 0 || firstTimeCalculating) &&
         numberOfCardsDrawn !== 0 && {
           isLeading: index === leadingPlayerIndex && index !== lastPlayerIndex,
           isLast: index === lastPlayerIndex && index !== leadingPlayerIndex,
@@ -147,6 +160,8 @@ const MetricsStore = create<MetricsState & MetricsActions>()((set, get) => ({
     set({
       players: playerMetrics,
       game: {
+        latestCard: latestCard,
+
         numberOfCards: numberOfCards,
         numberOfCardsDrawn: numberOfCardsDrawn,
         numberOfCardsRemaining: numberOfCardsRemaining,
@@ -158,6 +173,8 @@ const MetricsStore = create<MetricsState & MetricsActions>()((set, get) => ({
         activePlayerIndex: activePlayerIndex,
 
         done: done,
+
+        chugging: chugging,
       },
     });
   },

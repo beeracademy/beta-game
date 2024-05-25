@@ -1,4 +1,4 @@
-import { createTheme, lighten, Shadows } from "@mui/material/styles";
+import { createTheme, Shadows } from "@mui/material/styles";
 const shadows = new Array(25).fill("none") as Shadows;
 
 const dark = createTheme({
