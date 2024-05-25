@@ -45,4 +45,4 @@ const mapToLocal = (state: IGameState): GameState => {
   };
 };
 
-export { mapToRemote, mapToLocal };
+export { mapToLocal, mapToRemote };

@@ -1,6 +1,7 @@
 import client from "../client";
+import { Game } from "../models/game";
 
-export interface IPostStartRequest {
+export interface PostStartRequest {
   tokens: string[];
   official: boolean;
 }
@@ -8,8 +9,8 @@ export interface IPostStartRequest {
 export async function postStart(
   tokens: string[],
   official: boolean,
-): Promise<IGameState> {
-  const data: IPostStartRequest = {
+): Promise<Game> {
+  const data: PostStartRequest = {
     tokens: tokens,
     official: official,
   };
@@ -17,49 +18,18 @@ export async function postStart(
   return (await client.post("/api/games/", data)).data;
 }
 
-export interface IGameState {
-  id: number;
-  start_datetime: string;
-  end_datetime?: string;
-  description: string;
-  official: boolean;
-  dnf: boolean;
-  shuffle_indices: number[];
-  cards: ICard[];
-  players: IPlayer[];
-  sips_per_beer: number;
-  has_ended: boolean;
-  description_html: string;
-  location: ILocation;
-  image?: string;
-  token: string;
-}
-
-export interface IPlayer {
-  id: number;
-  username: string;
-  is_superuser: boolean;
-  image_url: string;
-}
-
-export interface ILocation {
-  latitude: number;
-  longitude: number;
-  accuracy: number;
-}
-
-export interface ICard {
-  value: number;
-  suit: string;
-  start_delta_ms?: number;
-  chug_start_start_delta_ms?: number;
-  chug_end_start_delta_ms?: number;
-}
-
-export async function postUpdate(gameState: IGameState): Promise<void> {
+export async function postUpdate(
+  token: string,
+  gameState: Game,
+): Promise<void> {
   return await client.post(
     `/api/games/${gameState.id}/update_state/`,
     gameState,
+    {
+      headers: {
+        Authorization: `GameToken ${token}`,
+      },
+    },
   );
 }
 
@@ -78,7 +48,7 @@ export async function deletePhoto(gameId: number): Promise<void> {
   return await client.delete(`/api/games/${gameId}/delete_image/`);
 }
 
-export interface IResumableGame {
+export interface ResumableGame {
   id: number;
   start_datetime: string;
   players: {
@@ -90,8 +60,8 @@ export interface IResumableGame {
 
 export async function getResumableGames(
   token: string,
-): Promise<IResumableGame[]> {
-  const response = await client.get<IResumableGame[]>("/api/games/resumable/", {
+): Promise<ResumableGame[]> {
+  const response = await client.get<ResumableGame[]>("/api/games/resumable/", {
     headers: {
       Authorization: `Token ${token}`,
     },
@@ -103,7 +73,7 @@ export async function getResumableGames(
 export async function postResumeGame(
   token: string,
   gameId: number,
-): Promise<IGameState> {
+): Promise<Game> {
   const response = await client.post(
     `/api/games/${gameId}/resume/`,
     {},

@@ -7,6 +7,10 @@ type CardSuit = (typeof CardSuits)[number];
 interface Card {
   value: CardValue;
   suit: CardSuit;
+
+  start_delta_ms?: number;
+  chug_start_start_delta_ms?: number;
+  chug_end_start_delta_ms?: number;
 }
 
 const getCardASCIISymbol = (card: Card): string => {
@@ -71,11 +75,11 @@ const getCardImageURI = (card: Card): string => {
 };
 
 export {
-  getCardASCIISymbol,
-  getCardSuitColor,
-  getCardImageURI,
-  getCardSuitName,
-  CardValues,
   CardSuits,
+  CardValues,
+  getCardASCIISymbol,
+  getCardImageURI,
+  getCardSuitColor,
+  getCardSuitName,
 };
-export type { Card, CardValue, CardSuit };
+export type { Card, CardSuit, CardValue };

@@ -32,13 +32,17 @@ const PlayerItem: FunctionComponent<PlayerItemProps> = (props) => {
   const isOffline = newGame.offline;
 
   const login = async () => {
+    if (newGame.offline) {
+      return;
+    }
+
     if (!player.username || !player.password) {
       return;
     }
 
     const isPlayerWithSameUsernameLoggedIn = newGame.players.some(
       (p) =>
-        p.username.toLowerCase() === player.username.toLowerCase() && p.ready,
+        p.username?.toLowerCase() === player.username?.toLowerCase() && p.ready,
     );
 
     if (isPlayerWithSameUsernameLoggedIn) {
@@ -55,6 +59,7 @@ const PlayerItem: FunctionComponent<PlayerItemProps> = (props) => {
 
       newGame.setPlayer(props.index, {
         ...player,
+        id: resp.id,
         token: resp.token,
         avatar: resp.image,
         ready: true,
@@ -133,7 +138,7 @@ const PlayerItem: FunctionComponent<PlayerItemProps> = (props) => {
             onChange={(e) => updateUsername(e.target.value)}
             disabled={(player.ready && !isOffline) || disabled}
             onKeyDown={(e) => {
-              if (e.key === "Enter" && isOffline) {
+              if (e.key === "Enter") {
                 login();
               }
             }}

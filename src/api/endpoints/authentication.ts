@@ -1,11 +1,11 @@
 import client from "../client";
 
-export interface ILoginRequest {
+export interface LoginRequest {
   username: string;
   password: string;
 }
 
-export interface ILoginResponse {
+export interface LoginResponse {
   token: string;
   id: number;
   image: string;
@@ -14,13 +14,13 @@ export interface ILoginResponse {
 export async function login(
   username: string,
   password: string,
-): Promise<ILoginResponse> {
-  const data: ILoginRequest = {
+): Promise<LoginResponse> {
+  const data: LoginRequest = {
     username: username,
     password: password,
   };
 
-  const response = await client.post<ILoginResponse>("/api-token-auth/", data, {
+  const response = await client.post<LoginResponse>("/api-token-auth/", data, {
     headers: {
       Authorization: "", // Skip auth interceptor
     },
@@ -29,7 +29,7 @@ export async function login(
   return response.data;
 }
 
-export interface ICreateUserResponse {
+export interface CreateUserResponse {
   token: string;
   id: number;
   image: string;
@@ -38,13 +38,13 @@ export interface ICreateUserResponse {
 export async function createUser(
   username: string,
   password: string,
-): Promise<ICreateUserResponse> {
-  const data: ILoginRequest = {
+): Promise<CreateUserResponse> {
+  const data: LoginRequest = {
     username: username,
     password: password,
   };
 
-  const response = await client.post<ILoginResponse>("/api/users/", data, {
+  const response = await client.post<LoginResponse>("/api/users/", data, {
     headers: {
       Authorization: "", // Skip auth interceptor
     },

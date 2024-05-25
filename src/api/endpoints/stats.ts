@@ -1,6 +1,6 @@
 import client from "../client";
 
-export interface IRankedCardResponse {
+export interface RankedCardResponse {
   user_id: number;
   user_username: string;
   user_image: string;
@@ -8,13 +8,12 @@ export interface IRankedCardResponse {
   ranking_value: string;
 }
 
-export async function getRankedCards(): Promise<IRankedCardResponse[]> {
-  const response =
-    await client.get<IRankedCardResponse[]>("/api/ranked_cards/");
+export async function getRankedCards(): Promise<RankedCardResponse[]> {
+  const response = await client.get<RankedCardResponse[]>("/api/ranked_cards/");
   return response.data;
 }
 
-export interface IUserStatsResponse {
+export interface UserStatsResponse {
   season_number: number;
   total_games: number;
   total_time_played_seconds: number;
@@ -29,11 +28,7 @@ export interface IUserStatsResponse {
   average_chug_time_seconds: number;
 }
 
-export async function getUserStats(
-  userId: number,
-): Promise<IUserStatsResponse> {
-  const response = await client.get<IUserStatsResponse>(
-    `/api/stats/${userId}/`,
-  );
+export async function getUserStats(userId: number): Promise<UserStatsResponse> {
+  const response = await client.get<UserStatsResponse>(`/api/stats/${userId}/`);
   return response.data;
 }

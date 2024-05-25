@@ -2,7 +2,6 @@ import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import * as GameAPI from "../api/endpoints/game";
 import { Card, CardValues } from "../models/card";
-import { Chug } from "../models/chug";
 import { Player } from "../models/player";
 import {
   GenerateDeck,
@@ -33,7 +32,6 @@ interface GameState {
 
   players: Player[];
 
-  chugs: Chug[];
   draws: Card[];
 }
 
@@ -68,7 +66,6 @@ const initialState: GameState = {
 
   players: [],
 
-  chugs: [],
   draws: [],
 };
 
@@ -98,7 +95,7 @@ const useGame = create<GameState & GameActions>()(
 
         let id;
         let token;
-        let shuffleIndices;
+        let shuffleIndices: number[];
         let gameStartTimestamp = Date.now();
         let turnStartTimestamp = Date.now();
 
@@ -115,8 +112,6 @@ const useGame = create<GameState & GameActions>()(
           shuffleIndices = resp.shuffle_indices;
         }
 
-        const deck = GenerateDeck(shuffleIndices, players.length);
-
         set({
           id: id,
           offline: options.offline,
@@ -127,7 +122,6 @@ const useGame = create<GameState & GameActions>()(
           sipsInABeer: options.sipsInABeer,
           numberOfRounds: options.numberOfRounds,
           players: players,
-          chugs: [],
           draws: [],
         });
 
@@ -139,6 +133,7 @@ const useGame = create<GameState & GameActions>()(
 
         const state = useGame.getState();
 
+        // TODO: this can be optimized
         const deck = GenerateDeck(state.shuffleIndices, state.players.length);
 
         if (deck.length === 0) {
@@ -150,6 +145,8 @@ const useGame = create<GameState & GameActions>()(
           state.players.length,
           state.draws.length,
         );
+
+        card.start_delta_ms = Date.now() - state.gameStartTimestamp;
 
         const draws = [...state.draws, card];
         const turnStartTimestamp = Date.now();
@@ -168,6 +165,29 @@ const useGame = create<GameState & GameActions>()(
         }
 
         set(update);
+
+        if (state.offline) {
+          return card;
+        }
+
+        GameAPI.postUpdate(state.token as string, {
+          id: state.id as number,
+          token: state.token as string,
+          start_datetime: new Date(state.gameStartTimestamp).toISOString(),
+
+          player_names: state.players.map((player) => player.username),
+          player_ids: state.players.map((player) => player.id as number),
+
+          official: !state.offline,
+          shuffle_indices: state.shuffleIndices,
+          has_ended: done,
+
+          cards: [...state.draws, card],
+
+          // TODO: Implement
+          dnf_player_ids: [],
+          dnf: false,
+        });
 
         return card;
       },

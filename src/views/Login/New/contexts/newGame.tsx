@@ -7,6 +7,8 @@ import React, {
 } from "react";
 
 interface Player {
+  id?: number;
+
   username: string;
   ready: boolean;
 

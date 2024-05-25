@@ -30,9 +30,9 @@ const ContinueGameView: FunctionComponent = () => {
   }));
 
   const [player, setPlayer] = useState<Player | null>(null);
-  const [resumableGames, setResumableGames] = useState<
-    GameAPI.IResumableGame[]
-  >([]);
+  const [resumableGames, setResumableGames] = useState<GameAPI.ResumableGame[]>(
+    [],
+  );
   const [selectedGame, setSelectedGame] = useState<GameAPI.IGameState | null>(
     null,
   );
