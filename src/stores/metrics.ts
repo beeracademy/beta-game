@@ -67,21 +67,8 @@ const initialState: MetricsState = {
 
     chugging: false,
 
-    GetElapsedGameTime: () => {
-      const game = useGame.getState();
-
-      if (!game.gameEndTimestamp) {
-        return Date.now() - game.gameStartTimestamp;
-      } else {
-        return game.gameEndTimestamp - game.gameStartTimestamp;
-      }
-    },
-
-    GetElapsedTurnTime: () => {
-      const game = useGame.getState();
-
-      return Date.now() - game.turnStartTimestamp;
-    },
+    GetElapsedGameTime: () => 0,
+    GetElapsedTurnTime: () => 0,
   },
 };
 
@@ -270,6 +257,26 @@ const MetricsStore = create<MetricsState & MetricsActions>()((set, get) => ({
         chugging: chugging,
       },
     }));
+  },
+
+  game: {
+    ...initialState.game,
+
+    GetElapsedGameTime: () => {
+      const game = useGame.getState();
+
+      if (!game.gameEndTimestamp) {
+        return Date.now() - game.gameStartTimestamp;
+      } else {
+        return game.gameEndTimestamp - game.gameStartTimestamp;
+      }
+    },
+
+    GetElapsedTurnTime: () => {
+      const game = useGame.getState();
+
+      return Date.now() - game.turnStartTimestamp;
+    },
   },
 }));
 
