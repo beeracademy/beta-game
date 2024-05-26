@@ -10,6 +10,8 @@ import useGame from "./game";
 interface PlayerMetrics {
   totalTime: number;
 
+  cardsDrawn: number;
+
   totalSips: number;
   maxSips: number;
   minSips: number;
@@ -218,11 +220,16 @@ const MetricsStore = create<MetricsState & MetricsActions>()((set, get) => ({
     const playerMetrics: PlayerMetrics[] = game.players.map((_, index) => ({
       ...currentPlayerMetrics[index],
 
+      cardsDrawn: playerNumberOfCardsDrawn[index],
+
       totalSips: totalSips[index],
       cumulativeSips: cumulativeSips[index],
+
       maxSips: maxSips[index],
       minSips: minSips[index],
+
       totalTime: totalTime[index],
+
       numberOfBeers: numberOfBeers[index],
 
       // Only updated in the beginning of a new round, or first time calculating metrics

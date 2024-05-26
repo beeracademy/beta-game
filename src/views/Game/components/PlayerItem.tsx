@@ -58,17 +58,13 @@ const PlayerItem: FunctionComponent<PlayerItemProps> = (props) => {
   };
 
   useEffect(() => {
-    if (gameMetrics.activePlayerIndex === props.index) {
-      if (!intervalRef) {
-        clearInterval(intervalRef);
-      }
+    clearInterval(intervalRef);
+    setIntervalRef(undefined);
+    setElapsedTurnTime(0);
 
+    if (gameMetrics.activePlayerIndex === props.index) {
       const interval = setInterval(updateElapsedTime, 1);
       setIntervalRef(interval);
-    } else {
-      clearInterval(intervalRef);
-      setIntervalRef(undefined);
-      setElapsedTurnTime(0);
     }
   }, [gameMetrics.activePlayerIndex, props.index]);
 
