@@ -25,6 +25,7 @@ const ChugDialog: FunctionComponent<ChugDialogProps> = (props) => {
   const game = useGame();
   const metrics = useGameMetrics();
 
+  const player = game.players[metrics.activePlayerIndex];
   const card = metrics.latestCard;
   const started = metrics.chugging && card?.chug_start_start_delta_ms;
 
@@ -132,7 +133,7 @@ const ChugDialog: FunctionComponent<ChugDialogProps> = (props) => {
           }}
         >
           <Stack spacing={1}>
-            <Typography fontSize={36}>Player1 chug!</Typography>
+            <Typography fontSize={36}>{player.username} chug!</Typography>
 
             <Typography fontSize={100}>
               {milisecondsToMMSSsss(elapsedTime)}
