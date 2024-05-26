@@ -43,7 +43,7 @@ const activeSounds = new Map<SoundName, Howl[]>();
 
 SoundNames.forEach((soundName) => {
   new Howl({
-    src: [`/sounds/${soundName}.mp3`, `sounds/${soundName}.ogg`],
+    src: [`/sounds/${soundName}.mp3`, `/sounds/${soundName}.ogg`],
     preload: true,
   });
 });

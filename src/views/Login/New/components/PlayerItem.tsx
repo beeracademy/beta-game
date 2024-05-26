@@ -134,7 +134,7 @@ const PlayerItem: FunctionComponent<PlayerItemProps> = (props) => {
                 backgroundColor: theme.palette.background.default,
               },
             }}
-            value={player.username}
+            value={player.username || ""}
             onChange={(e) => updateUsername(e.target.value)}
             disabled={(player.ready && !isOffline) || disabled}
             onKeyDown={(e) => {
@@ -167,7 +167,7 @@ const PlayerItem: FunctionComponent<PlayerItemProps> = (props) => {
                     backgroundColor: theme.palette.background.default,
                   },
                 }}
-                value={player.password}
+                value={player.password || ""}
                 onChange={(e) => updatePassword(e.target.value)}
                 onBlur={login}
                 onKeyDown={(e) => {
@@ -206,7 +206,7 @@ const PlayerItem: FunctionComponent<PlayerItemProps> = (props) => {
         </Stack>
       </Box>
 
-      <Conditional value={(player.ready && !isOffline) || disabled}>
+      <Conditional value={player.ready && !isOffline}>
         <IconButton
           onClick={remove}
           sx={{
