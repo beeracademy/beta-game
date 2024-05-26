@@ -32,20 +32,20 @@ const getCardASCIISymbol = (card: Card): string => {
   }
 };
 
-const getCardSuitColor = (card: Card): string => {
+const getCardSuitColor = (card: Card, mode: "dark" | "light"): string => {
   switch (card.suit) {
     case "S":
-      return "#000";
+      return mode === "dark" ? "#a4a4a4" : "#000";
     case "C":
-      return "#000";
+      return mode === "dark" ? "#a4a4a4" : "#000";
     case "H":
-      return "#e74c3c";
+      return mode === "dark" ? "#962e31" : "#ac181c";
     case "D":
-      return "#e74c3c";
+      return mode === "dark" ? "#962e31" : "#ac181c";
     case "A":
-      return "#2ecc71";
+      return "#84be79";
     case "I":
-      return "#2ecc71";
+      return "#84be79";
     default:
       return "";
   }

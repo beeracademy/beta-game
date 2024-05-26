@@ -63,6 +63,7 @@ const Chart: FunctionComponent = () => {
             redrawOnParentResize: true,
             redrawOnWindowResize: true,
             fontFamily: "AUPassata",
+            background: "transparent",
           },
           grid: {
             borderColor: theme.palette.divider,

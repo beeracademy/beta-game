@@ -8,6 +8,7 @@ import {
   TableRow,
   Typography,
   alpha,
+  useTheme,
 } from "@mui/material";
 import { FunctionComponent } from "react";
 import { getCardASCIISymbol, getCardSuitColor } from "../../../models/card";
@@ -17,6 +18,8 @@ import { useGameMetrics } from "../../../stores/metrics";
 interface GameTableProps {}
 
 const GameTable: FunctionComponent<GameTableProps> = () => {
+  const theme = useTheme();
+
   const game = useGame((state) => ({
     players: state.players,
     numberOfRounds: state.numberOfRounds,
@@ -167,7 +170,7 @@ const GameTable: FunctionComponent<GameTableProps> = () => {
                       {card && (
                         <>
                           <Typography
-                            color={getCardSuitColor(card)}
+                            color={getCardSuitColor(card, theme.palette.mode)}
                             sx={{
                               width: 25,
                               textAlign: "left",
