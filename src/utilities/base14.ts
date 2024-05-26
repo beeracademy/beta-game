@@ -1,3 +1,3 @@
 export const toBase14 = (n: number): string => {
-  return n.toString(14).toUpperCase();
+  return n?.toString(14).toUpperCase();
 };

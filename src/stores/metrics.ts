@@ -1,5 +1,10 @@
 import { create } from "zustand";
 import { Card } from "../models/card";
+import {
+  GenerateDeck,
+  GetSumOfNHighestCards,
+  GetSumOfNLowestCards,
+} from "../utilities/deck";
 import useGame from "./game";
 
 interface PlayerMetrics {
@@ -22,10 +27,8 @@ interface GameMetrics {
 
   numberOfCards: number;
   numberOfCardsDrawn: number;
-  numberOfCardsRemaining: number;
 
   currentRound: number;
-  roundsRemaining: number;
 
   numberOfPlayers: number;
   activePlayerIndex: number;
@@ -35,9 +38,14 @@ interface GameMetrics {
   chugging: boolean;
 }
 
+interface GameMetricActions {
+  GetElapsedGameTime(): number;
+  GetElapsedTurnTime(): number;
+}
+
 interface MetricsState {
   players: PlayerMetrics[];
-  game: GameMetrics;
+  game: GameMetrics & GameMetricActions;
 }
 
 interface MetricsActions {
@@ -49,10 +57,8 @@ const initialState: MetricsState = {
   game: {
     numberOfCards: 0,
     numberOfCardsDrawn: 0,
-    numberOfCardsRemaining: 0,
 
     currentRound: 1,
-    roundsRemaining: 0,
 
     numberOfPlayers: 0,
     activePlayerIndex: 0,
@@ -60,6 +66,22 @@ const initialState: MetricsState = {
     done: false,
 
     chugging: false,
+
+    GetElapsedGameTime: () => {
+      const game = useGame.getState();
+
+      if (!game.gameEndTimestamp) {
+        return Date.now() - game.gameStartTimestamp;
+      } else {
+        return game.gameEndTimestamp - game.gameStartTimestamp;
+      }
+    },
+
+    GetElapsedTurnTime: () => {
+      const game = useGame.getState();
+
+      return Date.now() - game.turnStartTimestamp;
+    },
   },
 };
 
@@ -75,41 +97,44 @@ const MetricsStore = create<MetricsState & MetricsActions>()((set, get) => ({
       return;
     }
 
-    const draws = game.draws;
-
     /*
-      Calculate game metrics
+    Calculate game metrics
     */
 
-    const numberOfCards = game.players.length * game.numberOfRounds;
+    const deck = GenerateDeck(game.shuffleIndices, game.players.length);
+    const cardsDrawn = game.draws;
+    const cardsRemaining = deck.slice(cardsDrawn.length);
 
-    const numberOfCardsDrawn = draws.length;
-    const numberOfCardsRemaining = numberOfCards - numberOfCardsDrawn;
+    const latestCard = cardsDrawn[cardsDrawn.length - 1];
+    const chugging =
+      latestCard?.value === 14 && !latestCard.chug_end_start_delta_ms;
+
+    const numberOfCards = deck.length;
+    const numberOfCardsDrawn = cardsDrawn.length;
+
+    const done = numberOfCardsDrawn === numberOfCards;
 
     const currentRound = Math.min(
       Math.floor(numberOfCardsDrawn / game.players.length) + 1,
       13,
     );
-    const roundsRemaining = game.numberOfRounds - currentRound;
 
     const numberOfPlayers = game.players.length;
-    const activePlayerIndex = numberOfCardsDrawn % numberOfPlayers;
 
-    const done = numberOfCardsDrawn === numberOfCards;
-
-    const latestCard = draws[draws.length - 1];
-    const chugging =
-      latestCard?.value === 14 && !latestCard.chug_end_start_delta_ms;
+    const activePlayerIndex =
+      (chugging ? numberOfCardsDrawn - 1 : numberOfCardsDrawn) %
+      numberOfPlayers;
 
     /*
       Calculate player metrics
     */
 
     const currentPlayerMetrics = get().players;
-    const firstTimeCalculating = currentPlayerMetrics.length === 0;
-    const currentPlayerIndex = draws.length % game.players.length;
 
-    const cumulativeSips = draws.reduce<number[][]>(
+    const firstTimeCalculating = currentPlayerMetrics.length === 0;
+    const currentPlayerIndex = cardsDrawn.length % game.players.length;
+
+    const cumulativeSips = cardsDrawn.reduce<number[][]>(
       (acc, card, index) => {
         const playerIndex = index % game.players.length;
 
@@ -130,6 +155,74 @@ const MetricsStore = create<MetricsState & MetricsActions>()((set, get) => ({
       Math.floor(totalSips / game.sipsInABeer),
     );
 
+    const totalTime = game.players.map((_, index) => {
+      let duration = 0;
+
+      for (let i = 0; i < cardsDrawn.length; i++) {
+        if (i % game.players.length !== index) {
+          continue;
+        }
+
+        const card = cardsDrawn[i];
+        const previousCard = cardsDrawn[i - 1];
+
+        if (!card.start_delta_ms) {
+          continue;
+        }
+
+        if (i === 0) {
+          duration += card.start_delta_ms;
+          continue;
+        }
+
+        if (!previousCard.start_delta_ms) {
+          continue;
+        }
+
+        let start = previousCard.start_delta_ms;
+        let end = card.start_delta_ms;
+
+        if (card.value === 14) {
+          if (!card.chug_end_start_delta_ms) {
+            continue;
+          }
+
+          end = card.chug_end_start_delta_ms;
+        }
+
+        duration += end - start;
+      }
+
+      return duration;
+    });
+
+    const playerNumberOfCardsDrawn = cardsDrawn.reduce<number[]>(
+      (acc, _, index) => {
+        const playerIndex = index % game.players.length;
+
+        acc[playerIndex]++;
+
+        return acc;
+      },
+      Array.from({ length: game.players.length }, () => 0),
+    );
+
+    const playerNumberOfCardsLeft = playerNumberOfCardsDrawn.map(
+      (numberOfCardsDrawn) => 13 - numberOfCardsDrawn,
+    );
+
+    const maxSips = game.players.map(
+      (_, index) =>
+        GetSumOfNHighestCards(cardsRemaining, playerNumberOfCardsLeft[index]) +
+        totalSips[index],
+    );
+
+    const minSips = game.players.map(
+      (_, index) =>
+        GetSumOfNLowestCards(cardsRemaining, playerNumberOfCardsLeft[index]) +
+        totalSips[index],
+    );
+
     const leadingPlayerIndex = totalSips.indexOf(Math.max(...totalSips));
     const lastPlayerIndex = totalSips.indexOf(Math.min(...totalSips));
 
@@ -140,9 +233,9 @@ const MetricsStore = create<MetricsState & MetricsActions>()((set, get) => ({
 
       totalSips: totalSips[index],
       cumulativeSips: cumulativeSips[index],
-      maxSips: 0,
-      minSips: 0,
-      totalTime: 0,
+      maxSips: maxSips[index],
+      minSips: minSips[index],
+      totalTime: totalTime[index],
       numberOfBeers: numberOfBeers[index],
 
       // Only updated in the beginning of a new round, or first time calculating metrics
@@ -157,17 +250,17 @@ const MetricsStore = create<MetricsState & MetricsActions>()((set, get) => ({
       Update the metrics store state
     */
 
-    set({
+    set((state) => ({
       players: playerMetrics,
       game: {
+        ...state.game,
+
         latestCard: latestCard,
 
         numberOfCards: numberOfCards,
         numberOfCardsDrawn: numberOfCardsDrawn,
-        numberOfCardsRemaining: numberOfCardsRemaining,
 
         currentRound: currentRound,
-        roundsRemaining: roundsRemaining,
 
         numberOfPlayers: numberOfPlayers,
         activePlayerIndex: activePlayerIndex,
@@ -176,7 +269,7 @@ const MetricsStore = create<MetricsState & MetricsActions>()((set, get) => ({
 
         chugging: chugging,
       },
-    });
+    }));
   },
 }));
 

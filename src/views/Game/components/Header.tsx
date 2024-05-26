@@ -71,12 +71,12 @@ const Header: FunctionComponent = () => {
   const [elapsedTurnTime, setElapsedTurnTime] = useState(0);
 
   const updateTimes = () => {
+    setElapsedGameTime(gameMetrics.GetElapsedGameTime());
+
     if (gameMetrics.done) {
-      setElapsedGameTime(game.gameEndTimestamp - game.gameStartTimestamp);
       setElapsedTurnTime(0);
     } else {
-      setElapsedGameTime(Date.now() - game.gameStartTimestamp);
-      setElapsedTurnTime(Date.now() - game.turnStartTimestamp);
+      setElapsedTurnTime(gameMetrics.GetElapsedTurnTime());
     }
   };
 

@@ -9,7 +9,13 @@ import {
   Typography,
   useTheme,
 } from "@mui/material";
-import { FunctionComponent, memo, useCallback } from "react";
+import {
+  FunctionComponent,
+  memo,
+  useCallback,
+  useEffect,
+  useState,
+} from "react";
 import Bottle from "../../../components/Bottle";
 import Bubbles from "../../../components/Bubbles";
 import { Crown, Jester } from "../../../components/Hats";
@@ -33,15 +39,38 @@ const PlayerItem: FunctionComponent<PlayerItemProps> = (props) => {
   const theme = useTheme();
 
   const sipsInABeer = useGame((state) => state.sipsInABeer);
-  const metrics = usePlayerMetricsByIndex(props.index);
-
+  const playerMetrics = usePlayerMetricsByIndex(props.index);
   const gameMetrics = useGameMetrics();
+
   const isFirstRound = gameMetrics.currentRound === 1;
 
   const settings = useSettings((state) => ({
     simpleCardsMode: state.simpleCardsMode,
     SetSimpleCardsMode: state.SetSimpleCardsMode,
   }));
+
+  const [elapsedTurnTime, setElapsedTurnTime] = useState(0);
+  const [intervalRef, setIntervalRef] =
+    useState<ReturnType<typeof setInterval>>();
+
+  const updateElapsedTime = () => {
+    setElapsedTurnTime(gameMetrics.GetElapsedTurnTime());
+  };
+
+  useEffect(() => {
+    if (gameMetrics.activePlayerIndex === props.index) {
+      if (!intervalRef) {
+        clearInterval(intervalRef);
+      }
+
+      const interval = setInterval(updateElapsedTime, 1);
+      setIntervalRef(interval);
+    } else {
+      clearInterval(intervalRef);
+      setIntervalRef(undefined);
+      setElapsedTurnTime(0);
+    }
+  }, [gameMetrics.activePlayerIndex, props.index]);
 
   const color = useCallback(() => {
     if (props.index < Object.keys(theme.player).length && props.index > 0) {
@@ -52,10 +81,10 @@ const PlayerItem: FunctionComponent<PlayerItemProps> = (props) => {
   }, [props.index, theme]);
 
   const liquidHeightPercentage = useCallback(() => {
-    const sipsIntoBeer = metrics.totalSips % sipsInABeer;
+    const sipsIntoBeer = playerMetrics.totalSips % sipsInABeer;
     const percentage = (sipsIntoBeer / sipsInABeer) * 100;
     return percentage;
-  }, [metrics.totalSips, sipsInABeer]);
+  }, [playerMetrics.totalSips, sipsInABeer]);
 
   return (
     <Box
@@ -74,7 +103,7 @@ const PlayerItem: FunctionComponent<PlayerItemProps> = (props) => {
           height: 30,
         }}
       >
-        {new Array(metrics.numberOfBeers).fill(0).map((_, i) => (
+        {new Array(playerMetrics.numberOfBeers).fill(0).map((_, i) => (
           <Grow key={i} in={true} timeout={500}>
             <Box>
               <Bottle color={color()} />
@@ -103,7 +132,7 @@ const PlayerItem: FunctionComponent<PlayerItemProps> = (props) => {
             zIndex: 2,
           }}
         >
-          {metrics.isLeading && !isFirstRound && (
+          {playerMetrics.isLeading && !isFirstRound && (
             <Grow in={true} timeout={500}>
               <Box>
                 <Crown
@@ -118,7 +147,7 @@ const PlayerItem: FunctionComponent<PlayerItemProps> = (props) => {
             </Grow>
           )}
 
-          {metrics.isLast && !isFirstRound && (
+          {playerMetrics.isLast && !isFirstRound && (
             <Grow in={true} timeout={500}>
               <Box>
                 <Jester
@@ -187,7 +216,7 @@ const PlayerItem: FunctionComponent<PlayerItemProps> = (props) => {
                       textAlign: "right",
                     }}
                   >
-                    {toBase14(metrics.totalSips)}
+                    {toBase14(playerMetrics.totalSips)}
                     <sub>14</sub>
                   </ListItemText>
                 </ListItem>
@@ -205,7 +234,7 @@ const PlayerItem: FunctionComponent<PlayerItemProps> = (props) => {
                       textAlign: "right",
                     }}
                   >
-                    {toBase14(metrics.maxSips)}
+                    {toBase14(playerMetrics.maxSips)}
                     <sub>14</sub>
                   </ListItemText>
                 </ListItem>
@@ -222,7 +251,7 @@ const PlayerItem: FunctionComponent<PlayerItemProps> = (props) => {
                       textAlign: "right",
                     }}
                   >
-                    {toBase14(metrics.minSips)}
+                    {toBase14(playerMetrics.minSips)}
                     <sub>14</sub>
                   </ListItemText>
                 </ListItem>
@@ -239,7 +268,7 @@ const PlayerItem: FunctionComponent<PlayerItemProps> = (props) => {
                       textAlign: "right",
                     }}
                   >
-                    {secondsToHHMMSS(metrics.totalTime)}
+                    {secondsToHHMMSS(playerMetrics.totalTime + elapsedTurnTime)}
                   </ListItemText>
                 </ListItem>
               </List>
@@ -247,7 +276,7 @@ const PlayerItem: FunctionComponent<PlayerItemProps> = (props) => {
 
             {settings.simpleCardsMode && (
               <Typography fontSize={64} align="center">
-                {toBase14(metrics.totalSips)}
+                {toBase14(playerMetrics.totalSips)}
                 <sub>14</sub>
               </Typography>
             )}
