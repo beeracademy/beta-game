@@ -6,7 +6,7 @@ import {
   Tooltip,
   Typography,
 } from "@mui/material";
-import { FunctionComponent, createRef, useEffect } from "react";
+import { FunctionComponent } from "react";
 import { IoInformationCircleOutline, IoPlay } from "react-icons/io5";
 import { useSounds } from "../../../../hooks/sounds";
 import useGame from "../../../../stores/game";
@@ -27,15 +27,11 @@ const NewGameForm: FunctionComponent<NewGameFormProps> = () => {
   const StartGame = useGame((state) => state.Start);
   const newGame = useNewGame();
 
-  const startButtonRef = createRef<HTMLButtonElement>();
-
-  useEffect(() => {
-    if (newGame.ready) {
-      startButtonRef.current?.focus();
-    }
-  }, [newGame.ready]);
-
   const startGame = () => {
+    if (!newGame.ready) {
+      return;
+    }
+
     StartGame(newGame.players, {
       offline: newGame.offline,
       numberOfRounds: NUMBER_OF_ROUNDS,
@@ -110,8 +106,16 @@ const NewGameForm: FunctionComponent<NewGameFormProps> = () => {
         size="large"
         onClick={startGame}
         endIcon={<IoPlay size={24} />}
-        disabled={!newGame.ready}
-        ref={startButtonRef}
+        sx={{
+          ...(!newGame.ready && {
+            backgroundColor: "grey.300",
+            color: "grey.500",
+
+            "&:hover": {
+              backgroundColor: "grey.300",
+            },
+          }),
+        }}
       >
         Start game
       </Button>
