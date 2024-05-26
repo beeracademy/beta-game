@@ -5,6 +5,7 @@ import {
   Stack,
   Tooltip,
   Typography,
+  alpha,
 } from "@mui/material";
 import { FunctionComponent } from "react";
 import { IoInformationCircleOutline, IoPlay } from "react-icons/io5";
@@ -108,11 +109,17 @@ const NewGameForm: FunctionComponent<NewGameFormProps> = () => {
         endIcon={<IoPlay size={24} />}
         sx={{
           ...(!newGame.ready && {
-            backgroundColor: "grey.300",
+            backgroundColor: (t) =>
+              t.palette.mode === "light"
+                ? "grey.300"
+                : alpha(t.palette.grey[100], 0.15),
             color: "grey.500",
 
             "&:hover": {
-              backgroundColor: "grey.300",
+              backgroundColor: (t) =>
+                t.palette.mode === "light"
+                  ? "grey.300"
+                  : alpha(t.palette.grey[100], 0.15),
             },
           }),
         }}
