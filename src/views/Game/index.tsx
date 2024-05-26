@@ -10,7 +10,7 @@ import useSettings from "../../stores/settings";
 import CardInventory from "./components/CardInventory";
 import Chart from "./components/Chart";
 import ChugDialog from "./components/ChugDialog";
-import GameOverDialog from "./components/GameOverDialog";
+import GameFinishedDialog from "./components/GamFinishedDialog";
 import Header from "./components/Header";
 import PlayerList from "./components/PlayerList";
 import GameTable from "./components/Table";
@@ -195,7 +195,7 @@ const GameView: FunctionComponent = () => {
         </Box>
       </Box>
 
-      <GameOverDialog open={gameMetrics.done} />
+      <GameFinishedDialog open={gameMetrics.done} />
 
       <ChugDialog open={gameMetrics.chugging} />
 
