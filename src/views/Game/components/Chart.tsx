@@ -43,6 +43,7 @@ const Chart: FunctionComponent = () => {
     <Box
       sx={{
         flex: 1,
+        height: "100%",
       }}
     >
       <ApexChart
@@ -107,8 +108,8 @@ const Chart: FunctionComponent = () => {
         }}
         series={datasets()}
         type="line"
-        height="375px"
         width="100%"
+        height="100%"
       />
     </Box>
   );

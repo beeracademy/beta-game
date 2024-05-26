@@ -17,6 +17,9 @@ const PlayerList: FunctionComponent = () => {
       alignItems="center"
       justifyContent="center"
       spacing={2}
+      sx={{
+        marginTop: 5,
+      }}
     >
       {game.players.map((p, i) => (
         <PlayerItem

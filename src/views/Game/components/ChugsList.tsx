@@ -32,6 +32,7 @@ const ChugsList: FunctionComponent = () => {
       height={75}
       sx={{
         userSelect: "none",
+        flexShrink: 0,
       }}
     >
       {chugs.map((c, i) => {

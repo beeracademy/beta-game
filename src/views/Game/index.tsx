@@ -178,6 +178,8 @@ const GameView: FunctionComponent = () => {
             variant="outlined"
             sx={{
               margin: "auto 0",
+              height: "100%",
+              maxHeight: "600px",
             }}
           >
             <CardContent
@@ -185,8 +187,8 @@ const GameView: FunctionComponent = () => {
                 justifyContent: "center",
                 alignItems: "center",
                 display: "flex",
+                height: "100%",
                 gap: 2,
-                height: "375px",
               }}
             >
               <GameTable />

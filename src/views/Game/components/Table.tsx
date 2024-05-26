@@ -53,7 +53,7 @@ const GameTable: FunctionComponent<GameTableProps> = () => {
           <TableRow
             sx={{
               display: "flex",
-              height: "calc(375px/14)",
+              height: "calc(100%/14)",
             }}
           >
             <TableCell
@@ -113,7 +113,7 @@ const GameTable: FunctionComponent<GameTableProps> = () => {
           {new Array(game.numberOfRounds).fill(0).map((_, i) => (
             <TableRow
               key={i + 1}
-              sx={{ display: "flex", height: "calc(375px/14)" }}
+              sx={{ display: "flex", height: "calc(100%/14)" }}
             >
               <TableCell
                 key={0}
