@@ -10,6 +10,7 @@ import useSettings from "../../stores/settings";
 import CardInventory from "./components/CardInventory";
 import Chart from "./components/Chart";
 import ChugDialog from "./components/ChugDialog";
+import ChugsList from "./components/ChugsList";
 import GameFinishedDialog from "./components/GamFinishedDialog";
 import Header from "./components/Header";
 import PlayerList from "./components/PlayerList";
@@ -171,10 +172,12 @@ const GameView: FunctionComponent = () => {
 
           <CardInventory />
 
+          <ChugsList />
+
           <Card
             variant="outlined"
             sx={{
-              marginBottom: "auto",
+              margin: "auto 0",
             }}
           >
             <CardContent
@@ -183,7 +186,7 @@ const GameView: FunctionComponent = () => {
                 alignItems: "center",
                 display: "flex",
                 gap: 2,
-                height: "450px",
+                height: "375px",
               }}
             >
               <GameTable />

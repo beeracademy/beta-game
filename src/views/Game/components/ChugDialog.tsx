@@ -132,8 +132,24 @@ const ChugDialog: FunctionComponent<ChugDialogProps> = (props) => {
             textAlign: "center",
           }}
         >
-          <Stack spacing={1}>
-            <Typography fontSize={36}>{player.username} chug!</Typography>
+          <Stack
+            spacing={1}
+            alignItems={"center"}
+            sx={{
+              width: "100%",
+            }}
+          >
+            <Typography
+              fontSize={36}
+              sx={{
+                width: 400,
+                overflow: "hidden",
+                whiteSpace: "nowrap",
+                textOverflow: "ellipsis",
+              }}
+            >
+              {player.username}
+            </Typography>
 
             <Typography fontSize={100}>
               {milisecondsToMMSSsss(elapsedTime)}

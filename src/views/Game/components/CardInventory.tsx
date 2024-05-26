@@ -71,6 +71,7 @@ const CardInventoryCard: FunctionComponent<CardInventoryCardProps> = (
           textAlign: "center",
           position: "relative",
           userSelect: "none",
+          cursor: "pointer",
 
           ...(props.value <= 0 && {
             opacity: 0.5,

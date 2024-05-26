@@ -107,7 +107,7 @@ const Chart: FunctionComponent = () => {
         }}
         series={datasets()}
         type="line"
-        height="450px"
+        height="375px"
         width="100%"
       />
     </Box>
