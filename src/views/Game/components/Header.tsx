@@ -213,13 +213,12 @@ const Header: FunctionComponent = () => {
             },
           }}
         >
-          {/* <Tooltip title="Mark players as 'Did not finish'" placement="left">
+          {/* <Tooltip title="Mark players as 'Did not finish'" placement="bottom">
             <IconButton
               sx={{
                 fontSize: 12,
                 width: 42,
                 height: 42,
-                marginRight: 2,
                 color: "primary.contrastText",
               }}
               onClick={() => setDNFDialogOpen(true)}

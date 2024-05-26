@@ -180,6 +180,7 @@ const GameView: FunctionComponent = () => {
               margin: "auto 0",
               height: "100%",
               maxHeight: "600px",
+              minHeight: "350px",
             }}
           >
             <CardContent
