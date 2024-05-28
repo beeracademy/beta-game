@@ -45,6 +45,7 @@ const Header: FunctionComponent = () => {
     turnStartTimestamp: state.turnStartTimestamp,
     numberOfRounds: state.numberOfRounds,
     ExitGame: state.Exit,
+    offline: state.offline,
   }));
 
   const gameMetrics = useGameMetrics();
@@ -213,19 +214,24 @@ const Header: FunctionComponent = () => {
             },
           }}
         >
-          {/* <Tooltip title="Mark players as 'Did not finish'" placement="bottom">
-            <IconButton
-              sx={{
-                fontSize: 12,
-                width: 42,
-                height: 42,
-                color: "primary.contrastText",
-              }}
-              onClick={() => setDNFDialogOpen(true)}
+          {!game.offline && (
+            <Tooltip
+              title="Mark players as 'Did not finish'"
+              placement="bottom"
             >
-              DNF
-            </IconButton>
-          </Tooltip> */}
+              <IconButton
+                sx={{
+                  fontSize: 12,
+                  width: 42,
+                  height: 42,
+                  color: "primary.contrastText",
+                }}
+                onClick={() => setDNFDialogOpen(true)}
+              >
+                DNF
+              </IconButton>
+            </Tooltip>
+          )}
 
           <Tooltip
             title={isFullscreen ? "Exit fullscreen" : "Enter fullscreen"}

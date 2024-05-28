@@ -19,10 +19,8 @@ const mapToRemote = (state: GameState): Game => {
 
     cards: state.draws,
 
-    // TODO: Implement
-
-    dnf_player_ids: [],
-    dnf: false,
+    dnf_player_ids: state.dnf_player_ids,
+    dnf: false, // TODO: Implement
   };
 };
 
@@ -38,7 +36,7 @@ const mapToLocal = (game: Game): GameState => {
     gameStartDateString: game.start_datetime,
     gameStartTimestamp: Date.parse(game.start_datetime),
     turnStartTimestamp: 0, // TODO: Implement
-    gameEndTimestamp: 0,
+    gameEndTimestamp: 0, // TODO: Implement
 
     players: game.player_names.map((name, index) => ({
       id: game.player_ids[index],
@@ -48,6 +46,8 @@ const mapToLocal = (game: Game): GameState => {
     shuffleIndices: game.shuffle_indices,
 
     draws: game.cards,
+
+    dnf_player_ids: game.dnf_player_ids,
   };
 };
 

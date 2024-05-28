@@ -30,6 +30,8 @@ interface GameState {
 
   players: Player[];
 
+  dnf_player_ids: number[];
+
   draws: Card[];
 }
 
@@ -42,6 +44,8 @@ interface GameActions {
       offline: boolean;
     },
   ) => Promise<void>;
+
+  SetPlayerDNF: (playerId: number, dnf: boolean) => void;
 
   StartChug: () => number;
   StopChug: () => number;
@@ -70,6 +74,8 @@ const initialState: GameState = {
   turnStartTimestamp: 0,
 
   players: [],
+
+  dnf_player_ids: [],
 
   draws: [],
 };
@@ -144,6 +150,56 @@ const useGame = create<GameState & GameActions>()(
         // Update games played count
 
         useGamesPlayed.getState().incrementStarted();
+      },
+
+      SetPlayerDNF: (playerId: number, dnf: boolean) => {
+        const state = useGame.getState();
+
+        if (state.offline) {
+          throw new Error("Cannot set DNF in offline mode");
+        }
+
+        const player = state.players.find((player) => player.id === playerId);
+        if (!player) {
+          throw new Error("Player id not found");
+        }
+
+        if (dnf && state.dnf_player_ids.includes(playerId)) {
+          return;
+        }
+
+        let new_dnfs = [...state.dnf_player_ids];
+        if (dnf) {
+          if (state.dnf_player_ids.includes(playerId)) {
+            return;
+          }
+
+          new_dnfs.push(playerId);
+        }
+
+        if (!dnf) {
+          if (!state.dnf_player_ids.includes(playerId)) {
+            return;
+          }
+
+          new_dnfs = state.dnf_player_ids.filter((id) => id !== playerId);
+        }
+
+        set({
+          dnf_player_ids: new_dnfs,
+        });
+
+        try {
+          GameAPI.postUpdate(
+            state.token as string,
+            mapToRemote({
+              ...state,
+              dnf_player_ids: new_dnfs,
+            }),
+          );
+        } catch (error) {
+          console.error("[Game]", "Failed to update game state", error);
+        }
       },
 
       DrawCard: () => {

@@ -18,6 +18,7 @@ import {
 } from "react";
 import Bottle from "../../../components/Bottle";
 import Bubbles from "../../../components/Bubbles";
+import Conditional from "../../../components/Conditional";
 import { Crown, Jester } from "../../../components/Hats";
 import { Player } from "../../../models/player";
 import useGame from "../../../stores/game";
@@ -42,7 +43,13 @@ const PlayerItem: FunctionComponent<PlayerItemProps> = (props) => {
   const playerMetrics = usePlayerMetricsByIndex(props.index);
   const gameMetrics = useGameMetrics();
 
+  const game = useGame((state) => ({
+    dnf_player_ids: state.dnf_player_ids,
+  }));
+
   const isFirstRound = gameMetrics.currentRound === 1;
+
+  const isDNF = game.dnf_player_ids.includes(props.player.id || -1);
 
   const settings = useSettings((state) => ({
     simpleCardsMode: state.simpleCardsMode,
@@ -88,6 +95,9 @@ const PlayerItem: FunctionComponent<PlayerItemProps> = (props) => {
         transform: props.active ? "translateY(-32px)" : "none",
         transitionProperty: "transform",
         transitionDuration: "200ms",
+
+        filter: isDNF ? "grayscale(100%)" : "none",
+        opacity: isDNF ? 0.75 : 1,
       }}
     >
       <Stack
@@ -122,6 +132,22 @@ const PlayerItem: FunctionComponent<PlayerItemProps> = (props) => {
         }}
         onClick={() => settings.SetSimpleCardsMode(!settings.simpleCardsMode)}
       >
+        <Conditional value={isDNF}>
+          <Box
+            sx={{
+              position: "absolute",
+              background: "url(/skull.svg)",
+              backgroundSize: "40%",
+              backgroundPosition: "center",
+              backgroundRepeat: "no-repeat",
+              width: "100%",
+              height: "100%",
+              opacity: 0.5,
+              zIndex: 3,
+            }}
+          />
+        </Conditional>
+
         <Box
           sx={{
             position: "fixed",
