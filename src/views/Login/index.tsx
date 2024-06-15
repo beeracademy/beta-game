@@ -4,6 +4,7 @@ import { Outlet } from "react-router-dom";
 import ConfirmDialog from "../../components/ConfirmDialog";
 import BottomGamesCount from "./components/BottomGamesCount";
 import SoundMuteFab from "./components/SoundMuteFab";
+import ThemeModeFab from "./components/ThemeModeFab";
 
 const LoginView: FunctionComponent = () => {
   return (
@@ -29,7 +30,7 @@ const LoginView: FunctionComponent = () => {
           }}
         >
           <SoundMuteFab absolutePosition={false} />
-          {/* <ThemeModeFab absolutePosition={false} /> */}
+          <ThemeModeFab absolutePosition={false} />
         </Stack>
 
         <Wallpaper />

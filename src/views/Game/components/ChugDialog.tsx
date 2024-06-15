@@ -108,6 +108,9 @@ const ChugDialog: FunctionComponent<ChugDialogProps> = (props) => {
   useEffect(() => {
     if (props.open) {
       reset();
+    } else {
+      clearInterval(intervalRef);
+      setIntervalRef(undefined);
     }
   }, [props.open]);
 

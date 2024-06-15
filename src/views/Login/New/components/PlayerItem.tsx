@@ -118,7 +118,7 @@ const PlayerItem: FunctionComponent<PlayerItemProps> = (props) => {
             label={isOffline ? "display name" : "username"}
             fullWidth
             variant="filled"
-            data-lpignore="true" // Disable LastPass
+            autoComplete="new-password"
             InputProps={{
               disableUnderline: true,
             }}
@@ -152,6 +152,7 @@ const PlayerItem: FunctionComponent<PlayerItemProps> = (props) => {
                 fullWidth
                 variant="filled"
                 type="password"
+                autoComplete="new-password"
                 InputProps={{
                   disableUnderline: true,
                 }}

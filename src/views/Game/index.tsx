@@ -201,9 +201,9 @@ const GameView: FunctionComponent = () => {
         </Box>
       </Box>
 
-      <GameFinishedDialog open={gameMetrics.done} />
-
       <ChugDialog open={gameMetrics.chugging} />
+
+      <GameFinishedDialog open={gameMetrics.done} />
 
       <Terminal
         open={showTerminal}

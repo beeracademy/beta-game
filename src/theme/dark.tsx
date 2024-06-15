@@ -87,6 +87,18 @@ dark.components = {
       },
     },
   },
+  MuiInputBase: {
+    styleOverrides: {
+      root: {
+        "& input": {
+          "&:-webkit-autofill": {
+            // Hack to prevent autofill from changing the text color
+            transitionDelay: "9999999999999999s",
+          },
+        },
+      },
+    },
+  },
 };
 
 export { dark };
