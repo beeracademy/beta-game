@@ -203,7 +203,7 @@ const GameView: FunctionComponent = () => {
 
       <ChugDialog open={gameMetrics.chugging} />
 
-      <GameFinishedDialog open={gameMetrics.done} />
+      <GameFinishedDialog open={gameMetrics.done && !gameMetrics.chugging} />
 
       <Terminal
         open={showTerminal}
