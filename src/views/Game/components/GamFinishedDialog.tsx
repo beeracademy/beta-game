@@ -11,7 +11,7 @@ import {
   Stack,
   useTheme,
 } from "@mui/material";
-import { FunctionComponent, useEffect, useState } from "react";
+import { FunctionComponent, memo, useEffect, useState } from "react";
 import { BsCamera } from "react-icons/bs";
 import { PiCameraRotate } from "react-icons/pi";
 import { useVideoDevices } from "../../../hooks/camera";
@@ -107,7 +107,7 @@ const GameFinishedDialog: FunctionComponent<GameFinishedDialogProps> = (
   );
 };
 
-const Camera: FunctionComponent = () => {
+const Camera: FunctionComponent = memo(() => {
   const theme = useTheme();
 
   const { devices: cameraDevices, error: cameraError } = useVideoDevices();
@@ -227,6 +227,6 @@ const Camera: FunctionComponent = () => {
       </Stack>
     </Stack>
   );
-};
+});
 
 export default GameFinishedDialog;
