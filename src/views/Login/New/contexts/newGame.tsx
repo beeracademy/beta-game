@@ -13,7 +13,7 @@ interface Player {
   ready: boolean;
 
   password?: string;
-  avatar?: string;
+  image?: string;
   token?: string;
 }
 

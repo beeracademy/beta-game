@@ -40,7 +40,18 @@ const DNFDialog: FunctionComponent<DNFDialogProps> = (props) => {
   };
 
   return (
-    <Dialog {...props}>
+    <Dialog
+      {...props}
+      sx={{
+        width: "100%",
+      }}
+      PaperProps={{
+        sx: {
+          maxWidth: 800,
+          minWidth: 500,
+        },
+      }}
+    >
       <DialogTitle textAlign="center" variant="h4">
         Did not finish?
       </DialogTitle>
@@ -48,7 +59,6 @@ const DNFDialog: FunctionComponent<DNFDialogProps> = (props) => {
       <DialogContent
         sx={{
           textAlign: "center",
-          minWidth: 500,
         }}
       >
         <DialogContentText>
@@ -80,8 +90,8 @@ const DNFDialog: FunctionComponent<DNFDialogProps> = (props) => {
                 <Avatar
                   src={player.image}
                   sx={{
-                    width: 64,
-                    height: 64,
+                    width: 94,
+                    height: 94,
                   }}
                 />
 
@@ -92,6 +102,8 @@ const DNFDialog: FunctionComponent<DNFDialogProps> = (props) => {
                     maxWidth: 64,
                     overflow: "hidden",
                     textOverflow: "ellipsis",
+                    fontSize: "1rem",
+                    whiteSpace: "nowrap",
                   }}
                 >
                   {player.username}
@@ -128,12 +140,12 @@ const PlayerCross: FunctionComponent = () => {
 
   return (
     <svg
-      width="90"
-      height="90"
+      width="94"
+      height="94"
       viewBox="0 0 269 310"
       style={{
         position: "absolute",
-        top: -8,
+        top: 6,
       }}
       fill="none"
       xmlns="http://www.w3.org/2000/svg"

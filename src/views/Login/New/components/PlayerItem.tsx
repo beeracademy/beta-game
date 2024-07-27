@@ -61,7 +61,7 @@ const PlayerItem: FunctionComponent<PlayerItemProps> = (props) => {
         ...player,
         id: resp.id,
         token: resp.token,
-        avatar: resp.image,
+        image: resp.image,
         ready: true,
       });
     } catch (e) {
@@ -189,7 +189,7 @@ const PlayerItem: FunctionComponent<PlayerItemProps> = (props) => {
                   height: 56,
                   borderRadius: 0,
                 }}
-                src={player.avatar}
+                src={player.image}
               >
                 <CircularProgress color="inherit" size={24} />
               </Avatar>
@@ -200,7 +200,7 @@ const PlayerItem: FunctionComponent<PlayerItemProps> = (props) => {
                   height: 56,
                   borderRadius: 0,
                 }}
-                src={player.avatar}
+                src={player.image}
               />
             )}
           </Conditional>
