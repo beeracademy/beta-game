@@ -24,9 +24,18 @@ const GameFinishedDialog: FunctionComponent<GameFinishedDialogProps> = (
 ) => {
   const theme = useTheme();
 
+  const [description, setMessage] = useState("");
+
   const game = useGame((state) => ({
     Exit: state.Exit,
   }));
+
+  const saveAndExit = () => {
+    game.Exit({
+      dnf: false,
+      description,
+    });
+  };
 
   return (
     <>
@@ -39,7 +48,7 @@ const GameFinishedDialog: FunctionComponent<GameFinishedDialogProps> = (
         }}
       >
         <DialogTitle textAlign="center" variant="h4">
-          Game finished!
+          Game finished
         </DialogTitle>
 
         <DialogContent
@@ -73,6 +82,8 @@ const GameFinishedDialog: FunctionComponent<GameFinishedDialogProps> = (
               }}
               placeholder="Write a description"
               maxLength={1000}
+              value={description}
+              onChange={(e) => setMessage(e.target.value)}
             />
           </Stack>
         </DialogContent>
@@ -86,7 +97,7 @@ const GameFinishedDialog: FunctionComponent<GameFinishedDialogProps> = (
             fullWidth
             variant="contained"
             size="large"
-            onClick={() => game.Exit()}
+            onClick={saveAndExit}
           >
             Save and exit
           </Button>
@@ -147,10 +158,6 @@ const Camera: FunctionComponent = () => {
 
     setSelectedDevice(cameraDevices[nextIndex]);
   };
-
-  // if (!cameraDevices || cameraDevices.length === 0 || !!cameraError) {
-  //   return null;
-  // }
 
   return (
     <Stack spacing={1} alignItems={"center"}>

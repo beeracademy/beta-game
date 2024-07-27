@@ -1,8 +1,18 @@
 import { Game } from "../api/models/game";
-import { CardValues } from "../models/card";
 import { GameState } from "./game";
 
-const mapToRemote = (state: GameState): Game => {
+const mapToRemote = (
+  state: GameState,
+  options: {
+    dnf: boolean;
+    has_ended: boolean;
+    description?: string;
+  } = {
+    dnf: false,
+    has_ended: false,
+    description: undefined,
+  },
+): Game => {
   return {
     id: state.id as number,
     token: state.token as string,
@@ -14,13 +24,14 @@ const mapToRemote = (state: GameState): Game => {
 
     official: !state.offline,
     shuffle_indices: state.shuffleIndices,
-    has_ended:
-      state.draws.length === (CardValues.length - 1) * state.players.length,
+    has_ended: options.has_ended,
 
     cards: state.draws,
 
     dnf_player_ids: playerIndexesToIds(state, state.dnf_player_indexes),
-    dnf: false, // TODO: Implement
+    dnf: options.dnf,
+
+    description: state.description,
   };
 };
 

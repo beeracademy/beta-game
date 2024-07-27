@@ -63,8 +63,11 @@ const Header: FunctionComponent = () => {
     setExitGameDialogOpen(false);
 
     if (e.ok) {
-      game.ExitGame(true); // DNF
-      navigate("/login"); // Should be handled by protected route
+      game.ExitGame({
+        dnf: true,
+      });
+
+      navigate("/login");
     }
   };
 

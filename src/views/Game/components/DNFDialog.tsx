@@ -32,10 +32,6 @@ const DNFDialog: FunctionComponent<DNFDialogProps> = (props) => {
 
     const isDNF = dnf_player_indexes.includes(index);
 
-    const player = players[index];
-
-    console.log("Setting DNF for player", player.id, !isDNF);
-
     SetPlayerDNF(index, !isDNF);
   };
 

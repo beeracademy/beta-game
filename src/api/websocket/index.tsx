@@ -34,7 +34,6 @@ const useWebSocket = () => {
 
   const send = (data: any) => {
     if (socket) {
-      console.log("sending", data);
       socket.send(JSON.stringify(data));
     }
   };

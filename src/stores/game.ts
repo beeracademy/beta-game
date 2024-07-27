@@ -33,6 +33,9 @@ interface GameState {
   dnf_player_indexes: number[];
 
   draws: Card[];
+
+  imageBlob?: Blob;
+  description?: string;
 }
 
 interface GameActions {
@@ -47,12 +50,15 @@ interface GameActions {
 
   SetPlayerDNF: (playerId: number, dnf: boolean) => void;
 
+  SetImageBlob: (blob: Blob | undefined) => void;
+  SetDescription: (description: string | undefined) => void;
+
   StartChug: () => number;
   StopChug: () => number;
 
   DrawCard: () => Card;
 
-  Exit: (dnf?: boolean) => void;
+  Exit: (options?: { dnf: boolean; description?: string }) => void;
 
   Resume: (state: GameState) => void;
 }
@@ -78,6 +84,9 @@ const initialState: GameState = {
   dnf_player_indexes: [],
 
   draws: [],
+
+  description: undefined,
+  imageBlob: undefined,
 };
 
 const useGame = create<GameState & GameActions>()(
@@ -153,6 +162,8 @@ const useGame = create<GameState & GameActions>()(
       },
 
       SetPlayerDNF: (playerIndex: number, dnf: boolean) => {
+        console.debug("[Game]", `Setting player ${playerIndex} DNF to ${dnf}`);
+
         const state = useGame.getState();
 
         let player;
@@ -202,6 +213,22 @@ const useGame = create<GameState & GameActions>()(
         }
       },
 
+      SetImageBlob: (blob: Blob | undefined) => {
+        console.debug("[Game]", "Setting image blob");
+
+        set({
+          imageBlob: blob,
+        });
+      },
+
+      SetDescription: (description: string | undefined) => {
+        console.debug("[Game]", "Setting game description");
+
+        set({
+          description: description,
+        });
+      },
+
       DrawCard: () => {
         console.debug("[Game]", "Drawing card");
 
@@ -231,15 +258,15 @@ const useGame = create<GameState & GameActions>()(
 
         const draws = [...state.draws, card];
 
-        const done =
-          draws.length === (CardValues.length - 1) * state.players.length;
+        const done = draws.length === CardValues.length * state.players.length;
 
         const update: Partial<GameState> = {
           draws: draws,
         };
 
         if (done) {
-          useGamesPlayed.getState().incrementCompleted();
+          console.debug("[Game]", "Last card drawn");
+
           update.gameEndTimestamp = Date.now();
         }
 
@@ -360,10 +387,35 @@ const useGame = create<GameState & GameActions>()(
         }
       },
 
-      Exit: (dnf = false) => {
+      Exit: (
+        options: {
+          dnf: boolean;
+          description?: string;
+        } = {
+          dnf: false,
+          description: undefined,
+        },
+      ) => {
         console.debug("[Game]", "Exiting game");
 
-        // TODO: Update game state on server
+        const state = useGame.getState();
+
+        if (!state.offline) {
+          try {
+            GameAPI.postUpdate(
+              state.token as string,
+              mapToRemote(state, {
+                dnf: options.dnf,
+                has_ended: true,
+                description: options.description,
+              }),
+            );
+          } catch (error) {
+            console.error("[Game]", "Failed to update game state", error);
+          }
+        }
+
+        useGamesPlayed.getState().incrementCompleted();
 
         set(initialState);
       },

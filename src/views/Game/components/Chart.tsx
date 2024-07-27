@@ -36,8 +36,6 @@ const Chart: FunctionComponent = () => {
       d.data.push(...Array(maxLength - d.data.length).fill(null));
     });
 
-    console.log(data);
-
     return data;
   }, [playerMetrics, settings.themeMode]);
 
