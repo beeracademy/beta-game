@@ -103,7 +103,8 @@ const GameFinishedDialog: FunctionComponent<GameFinishedDialogProps> = (
             padding: 0,
           }}
         >
-          <Camera />
+          {/* TODO: implement */}
+          {/* <Camera /> */}
 
           <Stack
             sx={{
@@ -114,7 +115,7 @@ const GameFinishedDialog: FunctionComponent<GameFinishedDialogProps> = (
           >
             <textarea
               style={{
-                height: 50,
+                height: 150,
                 resize: "none",
                 border: "none",
                 outline: "none",
@@ -126,6 +127,7 @@ const GameFinishedDialog: FunctionComponent<GameFinishedDialogProps> = (
                 borderWidth: "1px",
                 marginTop: theme.spacing(2),
                 padding: theme.spacing(1),
+                fontSize: theme.typography.body1.fontSize,
               }}
               placeholder="Write a description"
               maxLength={1000}
