@@ -297,10 +297,16 @@ const PlayerItem: FunctionComponent<PlayerItemProps> = (props) => {
             )}
 
             {settings.simpleCardsMode && (
-              <Typography fontSize={64} align="center">
-                {toBase14(playerMetrics.totalSips)}
-                <sub>14</sub>
-              </Typography>
+              <Stack>
+                <Typography fontSize={64} align="center">
+                  {toBase14(playerMetrics.totalSips)}
+                  <sub>14</sub>
+                </Typography>
+
+                <Typography fontSize={18} align="center">
+                  {secondsToHHMMSS(playerMetrics.totalTime + elapsedTurnTime)}
+                </Typography>
+              </Stack>
             )}
           </Stack>
         </Box>
