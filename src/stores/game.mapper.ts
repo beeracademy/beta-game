@@ -31,7 +31,7 @@ const mapToRemote = (
     dnf_player_ids: playerIndexesToIds(state, state.dnf_player_indexes),
     dnf: options.dnf,
 
-    description: state.description,
+    description: options.description,
   };
 };
 

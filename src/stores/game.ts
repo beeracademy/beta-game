@@ -33,9 +33,6 @@ interface GameState {
   dnf_player_indexes: number[];
 
   draws: Card[];
-
-  imageBlob?: Blob;
-  description?: string;
 }
 
 interface GameActions {
@@ -49,9 +46,6 @@ interface GameActions {
   ) => Promise<void>;
 
   SetPlayerDNF: (playerId: number, dnf: boolean) => void;
-
-  SetImageBlob: (blob: Blob | undefined) => void;
-  SetDescription: (description: string | undefined) => void;
 
   StartChug: () => number;
   StopChug: () => number;
@@ -84,9 +78,6 @@ const initialState: GameState = {
   dnf_player_indexes: [],
 
   draws: [],
-
-  description: undefined,
-  imageBlob: undefined,
 };
 
 const useGame = create<GameState & GameActions>()(
@@ -211,22 +202,6 @@ const useGame = create<GameState & GameActions>()(
         } catch (error) {
           console.error("[Game]", "Failed to update game state", error);
         }
-      },
-
-      SetImageBlob: (blob: Blob | undefined) => {
-        console.debug("[Game]", "Setting image blob");
-
-        set({
-          imageBlob: blob,
-        });
-      },
-
-      SetDescription: (description: string | undefined) => {
-        console.debug("[Game]", "Setting game description");
-
-        set({
-          description: description,
-        });
       },
 
       DrawCard: () => {

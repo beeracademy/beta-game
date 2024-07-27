@@ -50,35 +50,37 @@ const GameFinishedDialog: FunctionComponent<GameFinishedDialogProps> = (
 
   return (
     <>
-      <Fireworks
-        ref={ref}
-        options={{
-          acceleration: 1,
-          autoresize: true,
-          intensity: 20,
-          lineWidth: {
-            explosion: {
-              min: 1,
-              max: 8,
+      {props.open && (
+        <Fireworks
+          ref={ref}
+          options={{
+            acceleration: 1,
+            autoresize: true,
+            intensity: 20,
+            lineWidth: {
+              explosion: {
+                min: 1,
+                max: 8,
+              },
+              trace: {
+                min: 0.1,
+                max: 5,
+              },
             },
-            trace: {
-              min: 0.1,
-              max: 5,
+            rocketsPoint: {
+              min: 0,
+              max: 100,
             },
-          },
-          rocketsPoint: {
-            min: 0,
-            max: 100,
-          },
-        }}
-        style={{
-          top: 0,
-          left: 0,
-          width: "100%",
-          height: "100%",
-          position: "fixed",
-        }}
-      />
+          }}
+          style={{
+            top: 0,
+            left: 0,
+            width: "100%",
+            height: "100%",
+            position: "fixed",
+          }}
+        />
+      )}
 
       <Dialog
         {...props}
