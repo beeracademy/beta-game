@@ -8,7 +8,8 @@
     "build": "tsc && vite build",
     "format": "prettier --write .",
     "test": "vitest",
-    "test:ui": "vitest --ui"
+    "test:ui": "vitest --ui",
+    "sound:generate": "./scripts/generate_sounds.sh"
   },
   "dependencies": {
     "@emotion/react": "^11.11.4",

@@ -71,6 +71,10 @@ const GameFinishedDialog: FunctionComponent<GameFinishedDialogProps> = (
               min: 0,
               max: 100,
             },
+            sound: {
+              enabled: true,
+              files: ["sounds/firework.mp3"],
+            },
           }}
           style={{
             top: 0,
