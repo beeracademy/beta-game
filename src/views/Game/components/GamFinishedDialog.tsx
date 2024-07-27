@@ -30,15 +30,32 @@ const GameFinishedDialog: FunctionComponent<GameFinishedDialogProps> = (
 
   return (
     <>
-      <Dialog {...props}>
+      <Dialog
+        {...props}
+        PaperProps={{
+          sx: {
+            minWidth: 500,
+          },
+        }}
+      >
         <DialogTitle textAlign="center" variant="h4">
           Game finished!
         </DialogTitle>
 
-        <DialogContent sx={{}}>
-          <Stack>
-            {/* <Camera /> */}
+        <DialogContent
+          sx={{
+            padding: 0,
+          }}
+        >
+          <Camera />
 
+          <Stack
+            sx={{
+              padding: 2,
+              paddingBottom: 0,
+              paddingTop: 0,
+            }}
+          >
             <textarea
               style={{
                 height: 50,
@@ -71,7 +88,7 @@ const GameFinishedDialog: FunctionComponent<GameFinishedDialogProps> = (
             size="large"
             onClick={() => game.Exit()}
           >
-            Submit and exit
+            Save and exit
           </Button>
         </DialogActions>
       </Dialog>
@@ -114,8 +131,6 @@ const Camera: FunctionComponent = () => {
       if (!blob) {
         return;
       }
-
-      // TODO
     });
   };
 
@@ -133,33 +148,45 @@ const Camera: FunctionComponent = () => {
     setSelectedDevice(cameraDevices[nextIndex]);
   };
 
-  if (!cameraDevices || cameraDevices.length === 0 || !!cameraError) {
-    return null;
-  }
+  // if (!cameraDevices || cameraDevices.length === 0 || !!cameraError) {
+  //   return null;
+  // }
 
   return (
-    <Stack spacing={1} alignItems={"center"} sx={{ flex: 1 }}>
-      <video
-        id="video"
-        autoPlay
-        playsInline
-        style={{
-          borderRadius: theme.shape.borderRadius + "px",
+    <Stack spacing={1} alignItems={"center"}>
+      <Box
+        sx={{
+          height: "400px",
+          width: "500px",
+          maxWidth: "500px",
+          overflow: "hidden",
         }}
-        ref={(video) => {
-          if (video && selectedDevice) {
-            navigator.mediaDevices
-              .getUserMedia({
-                video: {
-                  deviceId: selectedDevice.deviceId,
-                },
-              })
-              .then((stream) => {
-                video.srcObject = stream;
-              });
-          }
-        }}
-      />
+      >
+        <video
+          id="video"
+          autoPlay
+          playsInline
+          style={{
+            width: "calc(100% + 2px)",
+            height: "100%",
+            marginRight: "-1px",
+            marginLeft: "-1px",
+          }}
+          ref={(video) => {
+            if (video && selectedDevice) {
+              navigator.mediaDevices
+                .getUserMedia({
+                  video: {
+                    deviceId: selectedDevice.deviceId,
+                  },
+                })
+                .then((stream) => {
+                  video.srcObject = stream;
+                });
+            }
+          }}
+        />
+      </Box>
 
       <Stack
         spacing={1}
@@ -170,7 +197,12 @@ const Camera: FunctionComponent = () => {
         <Box sx={{ width: "30%", textAlign: "left" }} />
 
         <Box sx={{ width: "40%" }}>
-          <Fab onClick={takePicture} size="large" color="primary">
+          <Fab
+            onClick={takePicture}
+            size="large"
+            color="primary"
+            disabled={!selectedDevice}
+          >
             <BsCamera size={32} />
           </Fab>
         </Box>
