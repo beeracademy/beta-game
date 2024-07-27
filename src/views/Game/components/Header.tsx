@@ -214,24 +214,19 @@ const Header: FunctionComponent = () => {
             },
           }}
         >
-          {!game.offline && (
-            <Tooltip
-              title="Mark players as 'Did not finish'"
-              placement="bottom"
+          <Tooltip title="Mark players as 'Did not finish'" placement="bottom">
+            <IconButton
+              sx={{
+                fontSize: 12,
+                width: 42,
+                height: 42,
+                color: "primary.contrastText",
+              }}
+              onClick={() => setDNFDialogOpen(true)}
             >
-              <IconButton
-                sx={{
-                  fontSize: 12,
-                  width: 42,
-                  height: 42,
-                  color: "primary.contrastText",
-                }}
-                onClick={() => setDNFDialogOpen(true)}
-              >
-                DNF
-              </IconButton>
-            </Tooltip>
-          )}
+              DNF
+            </IconButton>
+          </Tooltip>
 
           <Tooltip
             title={isFullscreen ? "Exit fullscreen" : "Enter fullscreen"}

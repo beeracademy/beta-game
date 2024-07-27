@@ -77,8 +77,9 @@ export const NewGameProvider: React.FC<NewGameProviderProps> = ({
 
     if (offline) {
       setPlayers([
-        ...players.map((player) => {
+        ...players.map((player, i) => {
           return {
+            id: i,
             username: player.username,
             ready: !!player.username,
           };

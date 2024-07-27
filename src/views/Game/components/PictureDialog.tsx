@@ -25,7 +25,7 @@ const PictureDialog: FunctionComponent<PictureDialogProps> = ({
 }) => {
   const theme = useTheme();
 
-  const devices = useVideoDevices();
+  const { devices } = useVideoDevices();
   const [selectedDevice, setSelectedDevice] = useState<MediaDeviceInfo | null>(
     null,
   );

@@ -19,9 +19,9 @@ import useGame from "../../../stores/game";
 interface DNFDialogProps extends DialogProps {}
 
 const DNFDialog: FunctionComponent<DNFDialogProps> = (props) => {
-  const { players, dnf_player_ids, SetPlayerDNF } = useGame((state) => ({
+  const { players, dnf_player_indexes, SetPlayerDNF } = useGame((state) => ({
     players: state.players,
-    dnf_player_ids: state.dnf_player_ids,
+    dnf_player_indexes: state.dnf_player_indexes,
     SetPlayerDNF: state.SetPlayerDNF,
   }));
 
@@ -30,17 +30,13 @@ const DNFDialog: FunctionComponent<DNFDialogProps> = (props) => {
   const toggle = (index: number) => {
     sound.play("click");
 
+    const isDNF = dnf_player_indexes.includes(index);
+
     const player = players[index];
-
-    if (player.id === undefined) {
-      return;
-    }
-
-    const isDNF = dnf_player_ids.includes(player.id);
 
     console.log("Setting DNF for player", player.id, !isDNF);
 
-    SetPlayerDNF(player.id, !isDNF);
+    SetPlayerDNF(index, !isDNF);
   };
 
   return (
@@ -101,7 +97,7 @@ const DNFDialog: FunctionComponent<DNFDialogProps> = (props) => {
                   {player.username}
                 </Typography>
 
-                {dnf_player_ids.includes(player.id || 0) && <PlayerCross />}
+                {dnf_player_indexes.includes(index || 0) && <PlayerCross />}
               </Box>
             );
           })}

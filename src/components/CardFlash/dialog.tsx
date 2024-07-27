@@ -7,22 +7,33 @@ interface CardFlashDialogProps {
   card: Card;
 }
 
-const CardFlashDialog: FunctionComponent<CardFlashDialogProps> = (props) => {
+const CardFlashDialog: FunctionComponent<CardFlashDialogProps> = ({
+  open,
+  card,
+}) => {
   const [cardImageURI, setCardImageURI] = useState<string | undefined>(
     undefined,
   );
 
   useEffect(() => {
-    setCardImageURI(getCardImageURI(props.card));
+    setCardImageURI(getCardImageURI(card));
 
     return () => {
       setCardImageURI(undefined);
     };
-  }, [props.card]);
+  }, [card]);
 
   return (
-    <Dialog open={props.open} hideBackdrop>
-      {cardImageURI && <img src={cardImageURI} height={300} />}
+    <Dialog open={open}>
+      {cardImageURI && (
+        <img
+          src={cardImageURI}
+          height={350}
+          style={{
+            backgroundColor: "#000",
+          }}
+        />
+      )}
     </Dialog>
   );
 };

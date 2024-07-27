@@ -30,7 +30,7 @@ interface GameState {
 
   players: Player[];
 
-  dnf_player_ids: number[];
+  dnf_player_indexes: number[];
 
   draws: Card[];
 }
@@ -75,7 +75,7 @@ const initialState: GameState = {
 
   players: [],
 
-  dnf_player_ids: [],
+  dnf_player_indexes: [],
 
   draws: [],
 };
@@ -152,41 +152,41 @@ const useGame = create<GameState & GameActions>()(
         useGamesPlayed.getState().incrementStarted();
       },
 
-      SetPlayerDNF: (playerId: number, dnf: boolean) => {
+      SetPlayerDNF: (playerIndex: number, dnf: boolean) => {
         const state = useGame.getState();
 
-        if (state.offline) {
-          throw new Error("Cannot set DNF in offline mode");
+        let player;
+        try {
+          player = state.players[playerIndex];
+        } catch (error) {
+          throw new Error("Player not found");
         }
 
-        const player = state.players.find((player) => player.id === playerId);
-        if (!player) {
-          throw new Error("Player id not found");
-        }
-
-        if (dnf && state.dnf_player_ids.includes(playerId)) {
+        if (dnf && state.dnf_player_indexes.includes(playerIndex)) {
           return;
         }
 
-        let new_dnfs = [...state.dnf_player_ids];
+        let new_dnfs = [...state.dnf_player_indexes];
         if (dnf) {
-          if (state.dnf_player_ids.includes(playerId)) {
+          if (state.dnf_player_indexes.includes(playerIndex)) {
             return;
           }
 
-          new_dnfs.push(playerId);
+          new_dnfs.push(playerIndex);
         }
 
         if (!dnf) {
-          if (!state.dnf_player_ids.includes(playerId)) {
+          if (!state.dnf_player_indexes.includes(playerIndex)) {
             return;
           }
 
-          new_dnfs = state.dnf_player_ids.filter((id) => id !== playerId);
+          new_dnfs = state.dnf_player_indexes.filter(
+            (index) => index !== playerIndex,
+          );
         }
 
         set({
-          dnf_player_ids: new_dnfs,
+          dnf_player_indexes: new_dnfs,
         });
 
         try {
@@ -194,7 +194,7 @@ const useGame = create<GameState & GameActions>()(
             state.token as string,
             mapToRemote({
               ...state,
-              dnf_player_ids: new_dnfs,
+              dnf_player_indexes: new_dnfs,
             }),
           );
         } catch (error) {

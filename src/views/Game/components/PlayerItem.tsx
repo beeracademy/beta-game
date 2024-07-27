@@ -44,12 +44,12 @@ const PlayerItem: FunctionComponent<PlayerItemProps> = (props) => {
   const gameMetrics = useGameMetrics();
 
   const game = useGame((state) => ({
-    dnf_player_ids: state.dnf_player_ids,
+    dnf_player_indexes: state.dnf_player_indexes,
   }));
 
   const isFirstRound = gameMetrics.currentRound === 1;
 
-  const isDNF = game.dnf_player_ids.includes(props.player.id || -1);
+  const isDNF = game.dnf_player_indexes.includes(props.index);
 
   const settings = useSettings((state) => ({
     simpleCardsMode: state.simpleCardsMode,

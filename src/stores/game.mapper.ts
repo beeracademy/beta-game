@@ -19,9 +19,13 @@ const mapToRemote = (state: GameState): Game => {
 
     cards: state.draws,
 
-    dnf_player_ids: state.dnf_player_ids,
+    dnf_player_ids: playerIndexesToIds(state, state.dnf_player_indexes),
     dnf: false, // TODO: Implement
   };
+};
+
+const playerIndexesToIds = (state: GameState, indexes: number[]): number[] => {
+  return indexes.map((index) => state.players[index].id as number);
 };
 
 const mapToLocal = (game: Game): GameState => {
@@ -47,8 +51,12 @@ const mapToLocal = (game: Game): GameState => {
 
     draws: game.cards,
 
-    dnf_player_ids: game.dnf_player_ids,
+    dnf_player_indexes: playerIdsToIndexes(game, game.dnf_player_ids),
   };
+};
+
+const playerIdsToIndexes = (game: Game, ids: number[]): number[] => {
+  return ids.map((id) => game.player_ids.indexOf(id));
 };
 
 export { mapToLocal, mapToRemote };
