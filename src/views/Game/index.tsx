@@ -158,6 +158,7 @@ const GameView: FunctionComponent = () => {
           backgroundColor: "background.default",
           padding: 1,
           gap: 2,
+          overflow: "auto",
         }}
       >
         <Box
