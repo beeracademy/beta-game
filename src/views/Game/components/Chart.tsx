@@ -36,6 +36,8 @@ const Chart: FunctionComponent = () => {
       d.data.push(...Array(maxLength - d.data.length).fill(null));
     });
 
+    console.log(data);
+
     return data;
   }, [playerMetrics, settings.themeMode]);
 
@@ -91,11 +93,17 @@ const Chart: FunctionComponent = () => {
             },
           },
           xaxis: {
-            min: 0,
-            max: game.numberOfRounds,
+            title: {
+              text: "Round",
+            },
+            min: 1,
+            max: game.numberOfRounds + 1,
             labels: {
               style: {
                 colors: theme.palette.text.primary,
+              },
+              formatter: (val: string) => {
+                return `${parseInt(val) - 1}`;
               },
             },
             axisBorder: {
