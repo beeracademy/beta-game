@@ -1,8 +1,8 @@
 import { ThemeProvider as MuiThemeProvider } from "@mui/material";
 import { FunctionComponent, ReactNode } from "react";
 import useSettings from "../stores/settings";
-import { light } from "./light";
 import { dark } from "./dark";
+import { light } from "./light";
 
 interface ThemeProviderProps {
   children: ReactNode | ReactNode[];

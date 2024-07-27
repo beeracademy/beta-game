@@ -13,6 +13,7 @@
   "dependencies": {
     "@emotion/react": "^11.11.4",
     "@emotion/styled": "^11.11.5",
+    "@fireworks-js/react": "^2.10.8",
     "@fontsource/inter": "^5.0.18",
     "@fontsource/noto-sans-symbols-2": "^5.0.20",
     "@mui/material": "^5.15.18",

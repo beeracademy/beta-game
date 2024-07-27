@@ -158,10 +158,10 @@ const ChugDialog: FunctionComponent<ChugDialogProps> = (props) => {
               {milisecondsToMMSSsss(elapsedTime)}
             </Typography>
 
-            <Typography fontSize={24} color="text.secondary">
-              {/* TODO: implement */}
+            {/* TODO: implement */}
+            {/* <Typography fontSize={24} color="text.secondary">
               best {milisecondsToMMSSsss(199923)} from season 10
-            </Typography>
+            </Typography> */}
           </Stack>
         </DialogContent>
 

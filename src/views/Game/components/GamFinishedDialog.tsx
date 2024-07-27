@@ -1,3 +1,4 @@
+import { Fireworks, type FireworksHandlers } from "@fireworks-js/react";
 import {
   Box,
   Button,
@@ -11,10 +12,11 @@ import {
   Stack,
   useTheme,
 } from "@mui/material";
-import { FunctionComponent, memo, useEffect, useState } from "react";
+import { FunctionComponent, memo, useEffect, useRef, useState } from "react";
 import { BsCamera } from "react-icons/bs";
 import { PiCameraRotate } from "react-icons/pi";
 import { useVideoDevices } from "../../../hooks/camera";
+import { useSounds } from "../../../hooks/sounds";
 import useGame from "../../../stores/game";
 
 interface GameFinishedDialogProps extends DialogProps {}
@@ -22,13 +24,22 @@ interface GameFinishedDialogProps extends DialogProps {}
 const GameFinishedDialog: FunctionComponent<GameFinishedDialogProps> = (
   props,
 ) => {
+  const ref = useRef<FireworksHandlers>(null);
+
   const theme = useTheme();
+  const sounds = useSounds();
 
   const [description, setMessage] = useState("");
 
   const game = useGame((state) => ({
     Exit: state.Exit,
   }));
+
+  useEffect(() => {
+    if (props.open) {
+      sounds.play("cheering");
+    }
+  }, [props.open]);
 
   const saveAndExit = () => {
     game.Exit({
@@ -39,6 +50,36 @@ const GameFinishedDialog: FunctionComponent<GameFinishedDialogProps> = (
 
   return (
     <>
+      <Fireworks
+        ref={ref}
+        options={{
+          acceleration: 1,
+          autoresize: true,
+          intensity: 20,
+          lineWidth: {
+            explosion: {
+              min: 1,
+              max: 8,
+            },
+            trace: {
+              min: 0.1,
+              max: 5,
+            },
+          },
+          rocketsPoint: {
+            min: 0,
+            max: 100,
+          },
+        }}
+        style={{
+          top: 0,
+          left: 0,
+          width: "100%",
+          height: "100%",
+          position: "fixed",
+        }}
+      />
+
       <Dialog
         {...props}
         PaperProps={{
@@ -108,8 +149,6 @@ const GameFinishedDialog: FunctionComponent<GameFinishedDialogProps> = (
 };
 
 const Camera: FunctionComponent = memo(() => {
-  const theme = useTheme();
-
   const { devices: cameraDevices, error: cameraError } = useVideoDevices();
   const [selectedDevice, setSelectedDevice] = useState<MediaDeviceInfo | null>(
     null,
