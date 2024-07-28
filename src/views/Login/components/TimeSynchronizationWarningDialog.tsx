@@ -42,7 +42,9 @@ const TimeSynchronizationWarningDialog: FunctionComponent<
         <Stack alignItems="center" textAlign="center" spacing={2}>
           <TbClockX size={96} color={theme.palette.error.dark} />
 
-          <p>Your local time is not synchronized with the server time.</p>
+          <p>
+            Your local system time is not synchronized with the server time.
+          </p>
 
           <p>
             Your are {timeDifference && timeDifference > 0 ? "ahead" : "behind"}{" "}
@@ -50,7 +52,7 @@ const TimeSynchronizationWarningDialog: FunctionComponent<
           </p>
 
           <p>
-            Please make sure your system clock is synchronized to avoid any
+            Please make sure your system time is synchronized to avoid any
             problems.
           </p>
         </Stack>
