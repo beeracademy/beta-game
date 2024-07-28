@@ -356,8 +356,6 @@ const Camera: FunctionComponent = memo(() => {
           />
         )}
 
-        {selectedDeviceSettings?.facingMode + ""}
-
         {selectedDeviceInfo && (
           <Video info={selectedDeviceInfo} settings={selectedDeviceSettings} />
         )}
