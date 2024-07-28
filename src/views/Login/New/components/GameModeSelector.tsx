@@ -20,7 +20,7 @@ const GameModeSelector: FunctionComponent<GameModeSelectorProps> = (props) => {
       }}
       size="small"
     >
-      <ToggleButton value={false}>Normal</ToggleButton>
+      <ToggleButton value={false}>Online</ToggleButton>
       <ToggleButton value={true}>Offline</ToggleButton>
     </ToggleButtonGroup>
   );
