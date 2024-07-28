@@ -1,5 +1,6 @@
 import { Box, Card, darken, Stack, Typography } from "@mui/material";
 import { FunctionComponent, memo } from "react";
+import { useCardFlash } from "../../../components/CardFlash";
 import useGame from "../../../stores/game";
 import { useGameMetrics } from "../../../stores/metrics";
 
@@ -12,6 +13,8 @@ const CardInventory: FunctionComponent<CardInventoryProps> = () => {
     DrawCard: state.DrawCard,
   }));
 
+  const cardFlasher = useCardFlash();
+
   const gameMetrics = useGameMetrics();
 
   const cardsLeftOfValue = (value: number) => {
@@ -19,6 +22,24 @@ const CardInventory: FunctionComponent<CardInventoryProps> = () => {
       gameMetrics.numberOfPlayers -
       game.draws.filter((card) => card.value === value).length
     );
+  };
+
+  const drawCard = () => {
+    const [card, cardsLeft] = game.DrawCard();
+
+    // If chug card, don't flash it
+    if (card.value === 14) {
+      cardFlasher.hide();
+      return;
+    }
+
+    // If last card, don't flash it
+    if (cardsLeft === 0) {
+      cardFlasher.hide();
+      return;
+    }
+
+    cardFlasher.flash(card);
   };
 
   return (
@@ -37,7 +58,7 @@ const CardInventory: FunctionComponent<CardInventoryProps> = () => {
             key={i}
             kind={valueToSymbol(i + 2)}
             value={empty ? 0 : cardsLeftOfValue(i + 2)}
-            onClick={game.DrawCard}
+            onClick={drawCard}
           />
         );
       })}

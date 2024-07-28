@@ -50,7 +50,7 @@ interface GameActions {
   StartChug: () => number;
   StopChug: () => number;
 
-  DrawCard: () => Card;
+  DrawCard: () => [Card, number];
 
   Exit: (options?: { dnf: boolean; description?: string }) => void;
 
@@ -218,7 +218,8 @@ const useGame = create<GameState & GameActions>()(
           throw new Error("Cannot draw a new card while chugging");
         }
 
-        const cardsLeft = (CardValues.length - 1) * state.players.length;
+        const cardsLeft: number =
+          CardValues.length * state.players.length - state.draws.length;
         if (cardsLeft <= 0) {
           throw new Error("Cannot draw from an empty deck!");
         }
@@ -254,7 +255,7 @@ const useGame = create<GameState & GameActions>()(
         set(update);
 
         if (state.offline) {
-          return card;
+          return [card, cardsLeft - 1];
         }
 
         try {
@@ -268,7 +269,7 @@ const useGame = create<GameState & GameActions>()(
         } catch (error) {
           console.error("[Game]", "Failed to update game state", error);
         } finally {
-          return card;
+          return [card, cardsLeft - 1];
         }
       },
 

@@ -10,11 +10,12 @@ import { CardFlashDialog } from "./dialog";
 
 const CardFlashContext = createContext({
   show: false,
-  flashCard: (card: Card, options?: flashCardOptions) => {},
+  flash: (card: Card, options?: flashCardOptions) => {},
+  hide: () => {},
 });
 
 export const useCardFlash = () => {
-  return useContext(CardFlashContext).flashCard;
+  return useContext(CardFlashContext);
 };
 
 export interface CardFlashProviderProps {
@@ -34,13 +35,8 @@ export const CardFlashProvider: FunctionComponent<CardFlashProviderProps> = ({
   const [card, setCard] = useState<Card>();
   const [_, setTimeoutRef] = useState<ReturnType<typeof setInterval>>();
 
-  const flashCard = (card: Card, options?: flashCardOptions) => {
+  const flash = (card: Card, options?: flashCardOptions) => {
     setCard(card);
-
-    if (card.value === 14) {
-      setShow(false);
-      return;
-    }
 
     setTimeoutRef((prev) => {
       prev && clearTimeout(prev);
@@ -52,11 +48,16 @@ export const CardFlashProvider: FunctionComponent<CardFlashProviderProps> = ({
     setShow(true);
   };
 
+  const hide = () => {
+    setShow(false);
+  };
+
   return (
     <CardFlashContext.Provider
       value={{
         show,
-        flashCard,
+        flash,
+        hide,
       }}
     >
       {card && <CardFlashDialog open={show} card={card} />}

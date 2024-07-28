@@ -19,7 +19,7 @@ import GameTable from "./components/Table";
 const GameView: FunctionComponent = () => {
   const [showTerminal, setShowTerminal] = useState<boolean>(false);
 
-  const flashCard = useCardFlash();
+  const cardFlasher = useCardFlash();
 
   const game = useGame((state) => ({
     DrawCard: state.DrawCard,
@@ -139,9 +139,21 @@ const GameView: FunctionComponent = () => {
   };
 
   const drawCard = () => {
-    const card = game.DrawCard();
+    const [card, cardsLeft] = game.DrawCard();
 
-    flashCard(card);
+    // If chug card, don't flash it
+    if (card.value === 14) {
+      cardFlasher.hide();
+      return;
+    }
+
+    // If last card, don't flash it
+    if (cardsLeft === 0) {
+      cardFlasher.hide();
+      return;
+    }
+
+    cardFlasher.flash(card);
   };
 
   return (
