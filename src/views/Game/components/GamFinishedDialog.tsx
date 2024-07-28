@@ -436,6 +436,7 @@ const Video: FunctionComponent<VideoProps> = memo(({ device }) => {
       style={{
         width: "100%",
         height: "100%",
+        transform: "scaleX(-1)",
       }}
       ref={(video) => {
         if (video && device) {
