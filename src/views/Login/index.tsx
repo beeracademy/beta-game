@@ -5,6 +5,7 @@ import ConfirmDialog from "../../components/ConfirmDialog";
 import BottomGamesCount from "./components/BottomGamesCount";
 import SoundMuteFab from "./components/SoundMuteFab";
 import ThemeModeFab from "./components/ThemeModeFab";
+import TimeSynchronizationWarningDialog from "./components/TimeSynchronizationWarningDialog";
 
 const LoginView: FunctionComponent = () => {
   return (
@@ -43,6 +44,8 @@ const LoginView: FunctionComponent = () => {
           onConfirm={() => {}}
         />
       </Container>
+
+      <TimeSynchronizationWarningDialog />
     </>
   );
 };
