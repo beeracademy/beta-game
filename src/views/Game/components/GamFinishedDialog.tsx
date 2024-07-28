@@ -164,10 +164,10 @@ const Camera: FunctionComponent = memo(() => {
 
   const { devices: cameraDevices, error: cameraError } = useVideoDevices();
 
-  const [selectedDevice, setSelectedDevice] = useState<MediaDeviceInfo | null>(
-    null,
-  );
-
+  const [selectedDeviceInfo, setSelectedDeviceInfo] =
+    useState<MediaDeviceInfo | null>(null);
+  const [selectedDeviceSettings, setSelectedDeviceSettings] =
+    useState<MediaTrackSettings | null>(null);
   const [selectedDeviceSize, setSelectedDeviceSize] = useState<{
     width: number;
     height: number;
@@ -193,7 +193,7 @@ const Camera: FunctionComponent = memo(() => {
       return;
     }
 
-    if (selectedDevice) {
+    if (selectedDeviceInfo) {
       return;
     }
 
@@ -201,14 +201,15 @@ const Camera: FunctionComponent = memo(() => {
   }, [cameraDevices]);
 
   const selectDevice = async (device: MediaDeviceInfo) => {
-    const meta = await getDeviceCapabilities(device.deviceId);
+    const meta = await getDeviceSettings(device.deviceId);
     const size = getScaledViewSize(meta.width, meta.height);
 
     setSelectedDeviceSize(size);
-    setSelectedDevice(device);
+    setSelectedDeviceSettings(meta);
+    setSelectedDeviceInfo(device);
   };
 
-  const getDeviceCapabilities = async (id: string) => {
+  const getDeviceSettings = async (id: string) => {
     const stream = await navigator.mediaDevices.getUserMedia({
       video: {
         deviceId: id,
@@ -222,7 +223,7 @@ const Camera: FunctionComponent = memo(() => {
 
   let countDownInterval: number;
   const takePicture = () => {
-    if (!selectedDevice || isCountingDown) {
+    if (!selectedDeviceInfo || isCountingDown) {
       return;
     }
 
@@ -279,7 +280,7 @@ const Camera: FunctionComponent = memo(() => {
     }
 
     const currentIndex = cameraDevices.findIndex(
-      (d) => d.deviceId === selectedDevice?.deviceId,
+      (d) => d.deviceId === selectedDeviceInfo?.deviceId,
     );
 
     const nextIndex = (currentIndex + 1) % cameraDevices.length;
@@ -355,9 +356,13 @@ const Camera: FunctionComponent = memo(() => {
           />
         )}
 
-        {selectedDevice && <Video device={selectedDevice} />}
+        {selectedDeviceSettings?.facingMode + ""}
 
-        {!selectedDevice && (
+        {selectedDeviceInfo && (
+          <Video info={selectedDeviceInfo} settings={selectedDeviceSettings} />
+        )}
+
+        {!selectedDeviceInfo && (
           <Box
             sx={{
               position: "absolute",
@@ -395,7 +400,7 @@ const Camera: FunctionComponent = memo(() => {
             onClick={image ? removePicture : takePicture}
             size="large"
             color={image ? "default" : "primary"}
-            disabled={!selectedDevice || isCountingDown}
+            disabled={!selectedDeviceInfo || isCountingDown}
           >
             {image ? <AiOutlineDelete size={32} /> : <BsCamera size={32} />}
           </Fab>
@@ -424,10 +429,13 @@ const Camera: FunctionComponent = memo(() => {
 });
 
 interface VideoProps {
-  device: MediaDeviceInfo | null;
+  info: MediaDeviceInfo | null;
+  settings: MediaTrackSettings | null;
 }
 
-const Video: FunctionComponent<VideoProps> = memo(({ device }) => {
+const Video: FunctionComponent<VideoProps> = memo(({ info, settings }) => {
+  const flip = !settings?.facingMode || settings.facingMode === "user";
+
   return (
     <video
       id="video"
@@ -436,14 +444,14 @@ const Video: FunctionComponent<VideoProps> = memo(({ device }) => {
       style={{
         width: "100%",
         height: "100%",
-        transform: "scaleX(-1)",
+        transform: flip ? "scaleX(-1)" : "none",
       }}
       ref={(video) => {
-        if (video && device) {
+        if (video && info) {
           navigator.mediaDevices
             .getUserMedia({
               video: {
-                deviceId: device.deviceId,
+                deviceId: info.deviceId,
               },
             })
             .then((stream) => {
