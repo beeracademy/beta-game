@@ -24,6 +24,7 @@ const GameView: FunctionComponent = () => {
   const game = useGame((state) => ({
     DrawCard: state.DrawCard,
     cards: state.draws,
+    offline: state.offline,
   }));
 
   const settings = useSettings((state) => ({
@@ -216,7 +217,9 @@ const GameView: FunctionComponent = () => {
 
       <ChugDialog open={gameMetrics.chugging} />
 
-      <GameFinishedDialog open={gameMetrics.done && !gameMetrics.chugging} />
+      <GameFinishedDialog
+        open={!game.offline && gameMetrics.done && !gameMetrics.chugging}
+      />
 
       <Terminal
         open={showTerminal}

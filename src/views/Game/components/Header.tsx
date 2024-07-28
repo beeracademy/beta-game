@@ -59,6 +59,18 @@ const Header: FunctionComponent = () => {
   const [exitGameDialogOpen, setExitGameDialogOpen] = useState(false);
   const [dnfDialogOpen, setDNFDialogOpen] = useState(false);
 
+  const showExitGameDialog = () => {
+    if (game.offline && gameMetrics.done) {
+      game.ExitGame({
+        dnf: false,
+      });
+
+      return;
+    }
+
+    setExitGameDialogOpen(true);
+  };
+
   const closeExitGameDialog = (e: { ok: boolean }) => {
     setExitGameDialogOpen(false);
 
@@ -254,7 +266,7 @@ const Header: FunctionComponent = () => {
               sx={{
                 color: "primary.contrastText",
               }}
-              onClick={() => setExitGameDialogOpen(true)}
+              onClick={showExitGameDialog}
             >
               <IoExitOutline />
             </IconButton>
