@@ -1,4 +1,5 @@
-import { Box, Card, darken, Stack, Typography } from "@mui/material";
+import { Box, Card, darken, Stack, Typography, useTheme } from "@mui/material";
+import { AnimatePresence, motion } from "framer-motion";
 import { FunctionComponent, memo } from "react";
 import { useCardFlash } from "../../../components/CardFlash";
 import useGame from "../../../stores/game";
@@ -75,70 +76,90 @@ interface CardInventoryCardProps {
 const CardInventoryCard: FunctionComponent<CardInventoryCardProps> = (
   props,
 ) => {
+  const theme = useTheme();
+
   return (
     <Box
       sx={{
         position: "relative",
       }}
     >
-      <Card
-        variant="outlined"
-        onClick={props.onClick}
-        sx={{
-          zIndex: 1,
-          width: 78,
-          height: 106,
-          flexShrink: 0,
-          textAlign: "center",
-          position: "relative",
-          userSelect: "none",
-          cursor: "pointer",
+      <AnimatePresence initial={false}>
+        <Card
+          variant="outlined"
+          onClick={props.onClick}
+          sx={{
+            zIndex: 1,
+            width: 78,
+            height: 106,
+            flexShrink: 0,
+            textAlign: "center",
+            position: "relative",
+            userSelect: "none",
+            cursor: "pointer",
 
-          ...(props.value <= 0 && {
-            opacity: 0.5,
-            background: (t) =>
-              t.palette.mode === "dark"
-                ? "url('/whiteheart.svg')"
-                : "url('/blackheart.svg')",
-            backgroundSize: "36px",
-            backgroundRepeat: "no-repeat",
-            backgroundPosition: "center",
-          }),
-        }}
-      >
-        {props.value > 0 && (
-          <>
-            <Typography
-              fontSize={14}
-              fontWeight={800}
-              textAlign="left"
-              paddingLeft="8px"
-              paddingTop="8px"
-              zIndex={989}
-            >
-              {props.kind}
-            </Typography>
+            ...(props.value <= 0 && {
+              opacity: 0.5,
+              background: (t) =>
+                t.palette.mode === "dark"
+                  ? "url('/whiteheart.svg')"
+                  : "url('/blackheart.svg')",
+              backgroundSize: "36px",
+              backgroundRepeat: "no-repeat",
+              backgroundPosition: "center",
+            }),
+          }}
+        >
+          {props.value > 0 && (
+            <>
+              <Typography
+                fontSize={14}
+                fontWeight={800}
+                textAlign="left"
+                paddingLeft="8px"
+                paddingTop="8px"
+                zIndex={989}
+              >
+                {props.kind}
+              </Typography>
 
-            <Typography fontSize={32}>{props.value}</Typography>
+              <motion.div
+                animate={{
+                  scale: [1, 1.5, 1],
+                  color: [
+                    theme.palette.text.primary,
+                    theme.palette.primary.light,
+                    theme.palette.text.primary,
+                  ],
+                }}
+                key={props.value}
+                transition={{
+                  duration: 0.5,
+                  ease: "easeInOut",
+                }}
+              >
+                <Typography fontSize={32}>{props.value}</Typography>
+              </motion.div>
 
-            <Typography
-              fontSize={14}
-              fontWeight={800}
-              textAlign="left"
-              paddingLeft="8px"
-              paddingTop="8px"
-              sx={{
-                transform: "rotate(180deg)",
-                color: "primary.main",
-              }}
-            >
-              {props.kind}
-            </Typography>
-          </>
-        )}
-      </Card>
+              <Typography
+                fontSize={14}
+                fontWeight={800}
+                textAlign="left"
+                paddingLeft="8px"
+                paddingTop="8px"
+                sx={{
+                  transform: "rotate(180deg)",
+                  color: "primary.main",
+                }}
+              >
+                {props.kind}
+              </Typography>
+            </>
+          )}
+        </Card>
 
-      <CardStack size={props.value} />
+        <CardStack size={props.value} />
+      </AnimatePresence>
     </Box>
   );
 };

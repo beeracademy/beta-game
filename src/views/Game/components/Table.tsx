@@ -1,4 +1,6 @@
 import {
+  Box,
+  Grow,
   Stack,
   Table,
   TableBody,
@@ -168,26 +170,26 @@ const GameTable: FunctionComponent<GameTableProps> = () => {
                       }}
                     >
                       {card && (
-                        <>
-                          <Typography
-                            color={getCardSuitColor(card, theme.palette.mode)}
-                            sx={{
-                              width: 25,
-                              textAlign: "left",
-                            }}
-                          >
-                            {getCardASCIISymbol(card)}
-                          </Typography>
+                        <Grow in={true}>
+                          <Box sx={{ display: "flex" }}>
+                            <Typography
+                              color={getCardSuitColor(card, theme.palette.mode)}
+                              sx={{
+                                width: 25,
+                              }}
+                            >
+                              {getCardASCIISymbol(card)}
+                            </Typography>
 
-                          <Typography
-                            sx={{
-                              width: 25,
-                              textAlign: "right",
-                            }}
-                          >
-                            {card?.value}
-                          </Typography>
-                        </>
+                            <Typography
+                              sx={{
+                                width: 25,
+                              }}
+                            >
+                              {card?.value}
+                            </Typography>
+                          </Box>
+                        </Grow>
                       )}
                     </Stack>
                   </TableCell>

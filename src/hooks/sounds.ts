@@ -37,6 +37,7 @@ const SoundNames = [
   "wicked",
   "firework",
   "camera_shutter",
+  "wilhelm_scream",
 ] as const;
 
 type SoundName = (typeof SoundNames)[number];

@@ -28,11 +28,13 @@ const DNFDialog: FunctionComponent<DNFDialogProps> = (props) => {
   const sound = useSounds();
 
   const toggle = (index: number) => {
-    sound.play("click");
+    const isDNF = !dnf_player_indexes.includes(index);
 
-    const isDNF = dnf_player_indexes.includes(index);
+    if (isDNF) {
+      sound.play("wilhelm_scream");
+    }
 
-    SetPlayerDNF(index, !isDNF);
+    SetPlayerDNF(index, isDNF);
   };
 
   return (
