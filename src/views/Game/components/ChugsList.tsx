@@ -105,6 +105,7 @@ const ChugsList: FunctionComponent = () => {
             display: "flex",
             justifyContent: "center",
             alignItems: "center",
+            fontWeight: "bold",
           }}
           variant="outlined"
           key={i}

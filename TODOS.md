@@ -1,8 +1,8 @@
 # TODOS
 
-- [ ] Game image in finish dialog
-- [ ] Show player personal best in chug dialog
+- [ ] Add sound when chug is drawn
 - [ ] Shuffle players at game start
+- [ ] Show player personal best in chug dialog
 - [ ] Location support
 - [ ] Better independent sound handling
 - [ ] Assets preloading

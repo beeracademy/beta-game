@@ -5,6 +5,7 @@ import {
   List,
   ListItem,
   ListItemText,
+  Slide,
   Stack,
   Typography,
   useTheme,
@@ -107,14 +108,15 @@ const PlayerItem: FunctionComponent<PlayerItemProps> = (props) => {
           paddingRight: 1,
           paddingLeft: 1,
           height: 30,
+          overflow: "hidden",
         }}
       >
         {new Array(playerMetrics.numberOfBeers).fill(0).map((_, i) => (
-          <Grow key={i} in={true} timeout={500}>
+          <Slide direction="up" key={i} in={true} timeout={500}>
             <Box>
               <Bottle color={color()} />
             </Box>
-          </Grow>
+          </Slide>
         ))}
       </Stack>
 
