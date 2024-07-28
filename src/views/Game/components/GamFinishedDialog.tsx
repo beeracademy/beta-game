@@ -2,6 +2,7 @@ import { Fireworks, type FireworksHandlers } from "@fireworks-js/react";
 import {
   Box,
   Button,
+  CircularProgress,
   Dialog,
   DialogActions,
   DialogContent,
@@ -13,8 +14,10 @@ import {
   useTheme,
 } from "@mui/material";
 import { FunctionComponent, memo, useEffect, useRef, useState } from "react";
+import { AiOutlineDelete } from "react-icons/ai";
 import { BsCamera } from "react-icons/bs";
-import { PiCameraRotate } from "react-icons/pi";
+import { FaArrowsRotate } from "react-icons/fa6";
+import { addPhoto } from "../../../api/endpoints/game";
 import { useVideoDevices } from "../../../hooks/camera";
 import { useSounds } from "../../../hooks/sounds";
 import useGame from "../../../stores/game";
@@ -90,7 +93,7 @@ const GameFinishedDialog: FunctionComponent<GameFinishedDialogProps> = (
         {...props}
         PaperProps={{
           sx: {
-            minWidth: 500,
+            minWidth: 600,
           },
         }}
       >
@@ -103,8 +106,7 @@ const GameFinishedDialog: FunctionComponent<GameFinishedDialogProps> = (
             padding: 0,
           }}
         >
-          {/* TODO: implement */}
-          {/* <Camera /> */}
+          <Camera />
 
           <Stack
             sx={{
@@ -157,42 +159,121 @@ const GameFinishedDialog: FunctionComponent<GameFinishedDialogProps> = (
 };
 
 const Camera: FunctionComponent = memo(() => {
+  const MaxWidth = 600;
+  const MaxHeight = 500;
+
   const { devices: cameraDevices, error: cameraError } = useVideoDevices();
+
   const [selectedDevice, setSelectedDevice] = useState<MediaDeviceInfo | null>(
     null,
   );
 
+  const [selectedDeviceSize, setSelectedDeviceSize] = useState<{
+    width: number;
+    height: number;
+  } | null>(null);
+
   const hasNoDevices = cameraDevices && cameraDevices.length === 0;
   const hasMultipleDevices = cameraDevices && cameraDevices.length > 1;
 
-  useEffect(() => {
-    if (cameraDevices) {
-      setSelectedDevice(cameraDevices[0]);
-    }
-  }, [cameraDevices]);
+  const [image, setImage] = useState<Blob | null>(null);
+  const [countDown, setCountDown] = useState<number | undefined>();
 
-  const takePicture = async () => {
-    if (!selectedDevice) {
+  const isCountingDown = countDown !== undefined;
+
+  const game = useGame((state) => ({
+    gameToken: state.token,
+    gameId: state.id,
+  }));
+
+  const sounds = useSounds();
+
+  useEffect(() => {
+    if (!cameraDevices || cameraDevices.length === 0) {
       return;
     }
 
-    const video = document.querySelector("video") as HTMLVideoElement;
+    if (selectedDevice) {
+      return;
+    }
 
-    const canvas = document.createElement("canvas");
-    canvas.width = video.videoWidth;
-    canvas.height = video.videoHeight;
+    selectDevice(cameraDevices[0]);
+  }, [cameraDevices]);
 
-    const context = canvas.getContext("2d");
-    context?.drawImage(video, 0, 0, canvas.width, canvas.height);
+  const selectDevice = async (device: MediaDeviceInfo) => {
+    const meta = await getDeviceCapabilities(device.deviceId);
+    const size = getScaledViewSize(meta.width, meta.height);
 
-    canvas.toBlob((blob) => {
-      if (!blob) {
-        return;
-      }
-    });
+    setSelectedDeviceSize(size);
+    setSelectedDevice(device);
   };
 
-  const changeCamera = () => {
+  const getDeviceCapabilities = async (id: string) => {
+    const stream = await navigator.mediaDevices.getUserMedia({
+      video: {
+        deviceId: id,
+      },
+    });
+
+    const track = stream.getVideoTracks()[0];
+
+    return track.getSettings();
+  };
+
+  let countDownInterval: number;
+  const takePicture = () => {
+    if (!selectedDevice || isCountingDown) {
+      return;
+    }
+
+    setCountDown(3);
+    countDownInterval = setInterval(() => {
+      setCountDown((prev) => {
+        if (prev === undefined) {
+          return undefined;
+        }
+
+        if (prev === 1) {
+          setCountDown(undefined);
+          clearInterval(countDownInterval);
+          capture();
+
+          return undefined;
+        }
+
+        return prev - 1;
+      });
+    }, 1000);
+
+    const capture = async () => {
+      sounds.play("camera_shutter");
+
+      const video = document.querySelector("video") as HTMLVideoElement;
+
+      const canvas = document.createElement("canvas");
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+
+      const context = canvas.getContext("2d");
+      context?.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+      canvas.toBlob(async (blob) => {
+        if (!blob || !game.gameToken || !game.gameId) {
+          return;
+        }
+
+        setImage(blob);
+
+        await addPhoto(game.gameToken, game.gameId, blob);
+      });
+    };
+  };
+
+  const removePicture = () => {
+    setImage(null);
+  };
+
+  const changeCamera = async () => {
     if (!cameraDevices) {
       return;
     }
@@ -203,76 +284,173 @@ const Camera: FunctionComponent = memo(() => {
 
     const nextIndex = (currentIndex + 1) % cameraDevices.length;
 
-    setSelectedDevice(cameraDevices[nextIndex]);
+    const device = cameraDevices[nextIndex];
+
+    selectDevice(device);
   };
+
+  const getScaledViewSize = (width?: number, height?: number) => {
+    if (!width || !height) {
+      return {
+        width: 0,
+        height: 0,
+      };
+    }
+
+    const ratio = Math.min(MaxWidth / width, MaxHeight / height);
+
+    return {
+      width: width * ratio,
+      height: height * ratio,
+    };
+  };
+
+  if (!!cameraError) {
+    return null;
+  }
 
   return (
     <Stack spacing={1} alignItems={"center"}>
       <Box
         sx={{
-          height: "400px",
-          width: "500px",
-          maxWidth: "500px",
+          height: selectedDeviceSize?.height || 400,
+          width: selectedDeviceSize?.width || 500,
           overflow: "hidden",
+          position: "relative",
         }}
       >
-        <video
-          id="video"
-          autoPlay
-          playsInline
-          style={{
-            width: "calc(100% + 2px)",
+        <Box
+          sx={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            zIndex: 1,
+            width: "100%",
             height: "100%",
-            marginRight: "-1px",
-            marginLeft: "-1px",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            fontSize: 140,
+            fontWeight: "bold",
+            color: "white",
+            WebkitTextStrokeWidth: "2px",
+            WebkitTextStrokeColor: "black",
+            MozTextStrokeWidth: "2px",
+            MozTextStrokeColor: "black",
           }}
-          ref={(video) => {
-            if (video && selectedDevice) {
-              navigator.mediaDevices
-                .getUserMedia({
-                  video: {
-                    deviceId: selectedDevice.deviceId,
-                  },
-                })
-                .then((stream) => {
-                  video.srcObject = stream;
-                });
-            }
-          }}
-        />
+        >
+          {countDown}
+        </Box>
+
+        {image && (
+          <Box
+            sx={{
+              position: "relative",
+              width: "100%",
+              height: "100%",
+              background: `url(${URL.createObjectURL(image)})`,
+              backgroundSize: "cover",
+              backgroundPosition: "center",
+            }}
+          />
+        )}
+
+        {selectedDevice && <Video device={selectedDevice} />}
+
+        {!selectedDevice && (
+          <Box
+            sx={{
+              position: "absolute",
+              bottom: 0,
+              right: 0,
+              width: "100%",
+              height: "100%",
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              opacity: 0.5,
+            }}
+          >
+            <CircularProgress color="secondary" />
+          </Box>
+        )}
       </Box>
 
       <Stack
         spacing={1}
         direction="row"
-        justifyContent="space-between"
-        alignItems="center"
+        sx={{
+          width: "100%",
+          alignItems: "center",
+        }}
       >
-        <Box sx={{ width: "30%", textAlign: "left" }} />
+        <Box
+          sx={{
+            flex: 1,
+          }}
+        />
 
-        <Box sx={{ width: "40%" }}>
+        <Box sx={{ flex: 0 }}>
           <Fab
-            onClick={takePicture}
+            onClick={image ? removePicture : takePicture}
             size="large"
-            color="primary"
-            disabled={!selectedDevice}
+            color={image ? "default" : "primary"}
+            disabled={!selectedDevice || isCountingDown}
           >
-            <BsCamera size={32} />
+            {image ? <AiOutlineDelete size={32} /> : <BsCamera size={32} />}
           </Fab>
         </Box>
 
-        <Box sx={{ width: "30%" }}>
+        <Box
+          sx={{
+            flex: 1,
+            display: "flex",
+          }}
+        >
           <IconButton
             onClick={changeCamera}
             sx={{
+              height: 48,
+              width: 48,
               display: hasNoDevices || !hasMultipleDevices ? "none" : undefined,
             }}
           >
-            <PiCameraRotate size={32} />
+            <FaArrowsRotate size={24} />
           </IconButton>
         </Box>
       </Stack>
     </Stack>
+  );
+});
+
+interface VideoProps {
+  device: MediaDeviceInfo | null;
+}
+
+const Video: FunctionComponent<VideoProps> = memo(({ device }) => {
+  return (
+    <video
+      id="video"
+      autoPlay
+      playsInline
+      style={{
+        width: "100%",
+        height: "100%",
+      }}
+      ref={(video) => {
+        if (video && device) {
+          navigator.mediaDevices
+            .getUserMedia({
+              video: {
+                deviceId: device.deviceId,
+              },
+            })
+            .then((stream) => {
+              video.srcObject = stream;
+            });
+        }
+      }}
+    />
   );
 });
 
