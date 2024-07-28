@@ -12,7 +12,10 @@ import { FunctionComponent, useEffect, useRef, useState } from "react";
 import ReactConfetti from "react-confetti";
 import { useSounds } from "../../../hooks/sounds";
 import { default as useGame } from "../../../stores/game";
-import { useGameMetrics } from "../../../stores/metrics";
+import {
+  useGameMetrics,
+  usePlayerMetricsByIndex,
+} from "../../../stores/metrics";
 import { milisecondsToMMSSsss } from "../../../utilities/time";
 
 const browser = detect();
@@ -24,8 +27,10 @@ const ChugDialog: FunctionComponent<ChugDialogProps> = (props) => {
 
   const game = useGame();
   const metrics = useGameMetrics();
+  const playerMetrics = usePlayerMetricsByIndex(metrics.activePlayerIndex);
 
   const player = game.players[metrics.activePlayerIndex];
+
   const card = metrics.latestCard;
   const started = metrics.chugging && card?.chug_start_start_delta_ms;
 
@@ -35,6 +40,14 @@ const ChugDialog: FunctionComponent<ChugDialogProps> = (props) => {
 
   const [intervalRef, setIntervalRef] =
     useState<ReturnType<typeof setInterval>>();
+
+  useEffect(() => {
+    if (!props.open) {
+      return;
+    }
+
+    playOpenSound();
+  }, [props.open]);
 
   useEffect(() => {
     if (!started) {
@@ -89,6 +102,31 @@ const ChugDialog: FunctionComponent<ChugDialogProps> = (props) => {
     setTimeout(() => {
       buttonRef.current?.focus();
     }, 0);
+  };
+
+  const playOpenSound = () => {
+    switch (playerMetrics.numberOfChugs) {
+      case 1:
+        sounds.play("mkd_finishim");
+        break;
+      case 2:
+        sounds.play("doublekill");
+        break;
+      case 3:
+        sounds.play("triplekill");
+        break;
+      case 4:
+        sounds.play("ultrakill");
+        break;
+      case 5:
+        sounds.play("megakill");
+        break;
+      case 6:
+        sounds.play("monsterkill");
+        break;
+      default:
+        break;
+    }
   };
 
   const playFinishSound = () => {

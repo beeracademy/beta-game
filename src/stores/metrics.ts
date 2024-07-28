@@ -18,6 +18,7 @@ interface PlayerMetrics {
   cumulativeSips: number[];
 
   numberOfBeers: number;
+  numberOfChugs: number;
 
   // Only updated in the beginning of a new round
   isLeading: boolean;
@@ -144,6 +145,19 @@ const MetricsStore = create<MetricsState & MetricsActions>()((set, get) => ({
       Math.floor(totalSips / game.sipsInABeer),
     );
 
+    const numberOfChugs = cardsDrawn.reduce<number[]>(
+      (acc, card, index) => {
+        const playerIndex = index % game.players.length;
+
+        if (card.value === 14) {
+          acc[playerIndex]++;
+        }
+
+        return acc;
+      },
+      Array.from({ length: game.players.length }, () => 0),
+    );
+
     const totalTime = game.players.map((_, index) => {
       let duration = 0;
 
@@ -231,6 +245,7 @@ const MetricsStore = create<MetricsState & MetricsActions>()((set, get) => ({
       totalTime: totalTime[index],
 
       numberOfBeers: numberOfBeers[index],
+      numberOfChugs: numberOfChugs[index],
 
       // Only updated in the beginning of a new round, or first time calculating metrics
       ...((currentPlayerIndex === 0 || firstTimeCalculating) &&
