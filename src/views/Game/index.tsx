@@ -147,6 +147,8 @@ const GameView: FunctionComponent = () => {
   };
 
   const drawCard = () => {
+    setShowSleepyMeme(false);
+
     const [card, cardsLeft] = game.DrawCard();
 
     // If chug card, don't flash it
