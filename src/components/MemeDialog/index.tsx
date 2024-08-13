@@ -5,12 +5,19 @@ import { GetRandomMemeByTag } from "../../utilities/memes";
 interface MemeDialogProps {
   open: boolean;
   tag?: string;
+  onClose?: () => void;
 }
 
 const MemeDialog: FunctionComponent<MemeDialogProps> = (props) => {
   const [url, setUrl] = useState<string>("");
 
   useEffect(() => {
+    if (!props.open) {
+      setUrl("");
+
+      return;
+    }
+
     (async () => {
       let paramTag = props.tag;
       if (!paramTag) {
@@ -20,10 +27,10 @@ const MemeDialog: FunctionComponent<MemeDialogProps> = (props) => {
       const memeURL = await GetRandomMemeByTag(paramTag);
       setUrl(memeURL);
     })();
-  }, [props.tag]);
+  }, [props.tag, props.open]);
 
   return (
-    <Dialog open={props.open}>
+    <Dialog open={props.open} onClose={props.onClose} onClick={props.onClose}>
       <img src={url} width={500} />
     </Dialog>
   );

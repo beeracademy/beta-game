@@ -3,7 +3,9 @@ import { FunctionComponent, useEffect, useState } from "react";
 import { Helmet } from "react-helmet";
 import useWebSocket from "../../api/websocket";
 import { useCardFlash } from "../../components/CardFlash";
+import MemeDialog from "../../components/MemeDialog";
 import Terminal from "../../components/Terminal";
+import { useSounds } from "../../hooks/sounds";
 import useGame from "../../stores/game";
 import { MetricsStore, useGameMetrics } from "../../stores/metrics";
 import useSettings from "../../stores/settings";
@@ -17,7 +19,8 @@ import PlayerList from "./components/PlayerList";
 import GameTable from "./components/Table";
 
 const GameView: FunctionComponent = () => {
-  const [showTerminal, setShowTerminal] = useState<boolean>(false);
+  const [showTerminal, setShowTerminal] = useState(false);
+  const [showSleepyMeme, setShowSleepyMeme] = useState(false);
 
   const cardFlasher = useCardFlash();
 
@@ -34,6 +37,8 @@ const GameView: FunctionComponent = () => {
 
   const gameMetrics = useGameMetrics();
 
+  const sounds = useSounds();
+
   let spacePressed = false;
 
   const ws = useWebSocket();
@@ -45,6 +50,8 @@ const GameView: FunctionComponent = () => {
 
     window.addEventListener("keydown", handleKeyDown);
     window.addEventListener("keyup", handleKeyUp);
+
+    scheduleReminderSound();
 
     return () => {
       window.removeEventListener("keydown", handleKeyDown);
@@ -155,6 +162,21 @@ const GameView: FunctionComponent = () => {
     }
 
     cardFlasher.flash(card);
+
+    scheduleReminderSound();
+  };
+
+  let reminderTimerRef: number;
+  const reminderIntervalMs = 1000 * 60 * 15; // 15 minutes
+
+  const scheduleReminderSound = () => {
+    clearTimeout(reminderTimerRef);
+
+    reminderTimerRef = setTimeout(() => {
+      setShowSleepyMeme(true);
+      sounds.play("tryk_paa_den_lange_tast");
+      scheduleReminderSound();
+    }, reminderIntervalMs);
   };
 
   return (
@@ -184,7 +206,7 @@ const GameView: FunctionComponent = () => {
         >
           <Header />
 
-          <CardInventory />
+          <CardInventory onCardClick={drawCard} />
 
           <ChugsList />
 
@@ -228,7 +250,13 @@ const GameView: FunctionComponent = () => {
         }}
       />
 
-      {/* <MemeDialog open={true} tag="bowling meme"/> */}
+      <MemeDialog
+        open={showSleepyMeme}
+        onClose={() => {
+          setShowSleepyMeme(false);
+        }}
+        tag="sleepy boring snoring"
+      />
     </>
   );
 };

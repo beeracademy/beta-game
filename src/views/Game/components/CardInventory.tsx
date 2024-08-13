@@ -5,9 +5,13 @@ import { useCardFlash } from "../../../components/CardFlash";
 import useGame from "../../../stores/game";
 import { useGameMetrics } from "../../../stores/metrics";
 
-interface CardInventoryProps {}
+interface CardInventoryProps {
+  onCardClick?: () => void;
+}
 
-const CardInventory: FunctionComponent<CardInventoryProps> = () => {
+const CardInventory: FunctionComponent<CardInventoryProps> = ({
+  onCardClick,
+}) => {
   const game = useGame((state) => ({
     players: state.players,
     draws: state.draws,
@@ -23,24 +27,6 @@ const CardInventory: FunctionComponent<CardInventoryProps> = () => {
       gameMetrics.numberOfPlayers -
       game.draws.filter((card) => card.value === value).length
     );
-  };
-
-  const drawCard = () => {
-    const [card, cardsLeft] = game.DrawCard();
-
-    // If chug card, don't flash it
-    if (card.value === 14) {
-      cardFlasher.hide();
-      return;
-    }
-
-    // If last card, don't flash it
-    if (cardsLeft === 0) {
-      cardFlasher.hide();
-      return;
-    }
-
-    cardFlasher.flash(card);
   };
 
   return (
@@ -59,7 +45,7 @@ const CardInventory: FunctionComponent<CardInventoryProps> = () => {
             key={i}
             kind={valueToSymbol(i + 2)}
             value={empty ? 0 : cardsLeftOfValue(i + 2)}
-            onClick={drawCard}
+            onClick={onCardClick}
           />
         );
       })}
