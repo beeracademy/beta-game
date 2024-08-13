@@ -183,6 +183,7 @@ const Header: FunctionComponent = () => {
             Round {gameMetrics.currentRound.toString().padStart(2, "0")}/
             {game.numberOfRounds}
           </Typography>
+
           <Stack
             sx={{
               textAlign: "center",
@@ -198,10 +199,11 @@ const Header: FunctionComponent = () => {
                 lineHeight: 1,
               }}
             >
-              {secondsToHHMMSS(elapsedGameTime)}
+              {secondsToHHMMSSsss(elapsedTurnTime)}
             </Typography>
-            <Typography>{secondsToHHMMSSsss(elapsedTurnTime)}</Typography>
+            <Typography>{secondsToHHMMSS(elapsedGameTime)}</Typography>
           </Stack>
+
           <Typography
             variant="h5"
             sx={{
