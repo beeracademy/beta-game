@@ -42,6 +42,7 @@ export const CardFlashProvider: FunctionComponent<CardFlashProviderProps> = ({
       prev && clearTimeout(prev);
       return setTimeout(() => {
         setShow(false);
+        setCard(undefined);
       }, options?.duration || duration);
     });
 
@@ -50,6 +51,7 @@ export const CardFlashProvider: FunctionComponent<CardFlashProviderProps> = ({
 
   const hide = () => {
     setShow(false);
+    setCard(undefined);
   };
 
   return (
