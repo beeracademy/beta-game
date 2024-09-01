@@ -5,6 +5,7 @@ import {
   Route,
   Routes as RouterRoutes,
 } from "react-router-dom";
+import { useAssetsPreloader } from "../hooks/preloader";
 import GameView from "../views/Game";
 import LoginView from "../views/Login";
 import ContinueGameView from "../views/Login/Continue";
@@ -13,6 +14,8 @@ import RemoteView from "../views/Remote";
 import { GameGuard } from "./guard";
 
 const Routes: FunctionComponent = () => {
+  useAssetsPreloader();
+
   return (
     <Suspense>
       <RouterRoutes>
