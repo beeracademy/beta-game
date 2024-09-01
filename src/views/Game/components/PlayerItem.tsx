@@ -99,6 +99,8 @@ const PlayerItem: FunctionComponent<PlayerItemProps> = (props) => {
 
         filter: isDNF ? "grayscale(100%)" : "none",
         opacity: isDNF ? 0.75 : 1,
+
+        position: "relative",
       }}
     >
       <Stack
@@ -119,6 +121,44 @@ const PlayerItem: FunctionComponent<PlayerItemProps> = (props) => {
           </Slide>
         ))}
       </Stack>
+
+      <Box
+        sx={{
+          zIndex: 2,
+          position: "absolute",
+        }}
+      >
+        {playerMetrics.isLeading && !isFirstRound && (
+          <Grow in={true} timeout={500}>
+            <Box>
+              <Crown
+                style={{
+                  height: 64,
+                  marginTop: -43,
+                  marginLeft: -33,
+                  position: "absolute",
+                  transform: "rotate(-30deg)",
+                }}
+              />
+            </Box>
+          </Grow>
+        )}
+
+        {playerMetrics.isLast && !isFirstRound && (
+          <Grow in={true} timeout={500}>
+            <Box>
+              <Jester
+                style={{
+                  height: 60,
+                  marginTop: -42,
+                  marginLeft: -36,
+                  transform: "rotate(-30deg)",
+                }}
+              />
+            </Box>
+          </Grow>
+        )}
+      </Box>
 
       <Card
         variant="outlined"
@@ -149,43 +189,6 @@ const PlayerItem: FunctionComponent<PlayerItemProps> = (props) => {
             }}
           />
         </Conditional>
-
-        <Box
-          sx={{
-            position: "fixed",
-            zIndex: 2,
-          }}
-        >
-          {playerMetrics.isLeading && !isFirstRound && (
-            <Grow in={true} timeout={500}>
-              <Box>
-                <Crown
-                  style={{
-                    marginTop: -43,
-                    marginLeft: -33,
-                    height: 64,
-                    transform: "rotate(-30deg)",
-                  }}
-                />
-              </Box>
-            </Grow>
-          )}
-
-          {playerMetrics.isLast && !isFirstRound && (
-            <Grow in={true} timeout={500}>
-              <Box>
-                <Jester
-                  style={{
-                    marginTop: -42,
-                    marginLeft: -36,
-                    height: 60,
-                    transform: "rotate(-30deg)",
-                  }}
-                />
-              </Box>
-            </Grow>
-          )}
-        </Box>
 
         <Box
           sx={{
