@@ -1,5 +1,5 @@
-import { Box, Card, darken, Stack, Typography, useTheme } from "@mui/material";
 import type { SxProps, Theme } from "@mui/material";
+import { Box, Card, darken, Stack, Typography, useTheme } from "@mui/material";
 import { AnimatePresence, motion } from "framer-motion";
 import { type FunctionComponent, memo } from "react";
 import { useShallow } from "zustand/react/shallow";

@@ -858,7 +858,7 @@ const Camera: FunctionComponent = memo(() => {
             </Box>
 
             {/* Center action button */}
-            <Box sx={{ flex: 0 }}>
+            <Box sx={{ flex: "0 0 auto" }}>
               {imageUrl ? (
                 <Button
                   variant="outlined"
@@ -874,6 +874,7 @@ const Camera: FunctionComponent = memo(() => {
                     fontSize: "0.875rem",
                     fontWeight: 600,
                     boxShadow: "none",
+                    whiteSpace: "nowrap",
                     "&:hover": {
                       borderColor: "error.main",
                       color: "error.main",
