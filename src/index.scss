@@ -29,6 +29,12 @@
   font-weight: bold;
 }
 
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
 html,
 body,
 #root {

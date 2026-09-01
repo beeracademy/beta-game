@@ -16,6 +16,7 @@ import {
 import { FunctionComponent, memo, useEffect, useRef, useState } from "react";
 import { AiOutlineDelete } from "react-icons/ai";
 import { BsCamera, BsCameraVideoOff, BsTrophy } from "react-icons/bs";
+import { IoClose, IoExitOutline } from "react-icons/io5";
 import { MdRefresh } from "react-icons/md";
 import { PiCameraRotate } from "react-icons/pi";
 import { addPhoto } from "../../../api/endpoints/game";
@@ -24,7 +25,9 @@ import { useSounds } from "../../../hooks/sounds";
 import useGame from "../../../stores/game";
 import { useShallow } from "zustand/react/shallow";
 
-interface GameFinishedDialogProps extends DialogProps {}
+interface GameFinishedDialogProps extends DialogProps {
+  onClose?: () => void;
+}
 
 const GameFinishedDialog: FunctionComponent<GameFinishedDialogProps> = (
   props,
@@ -33,15 +36,41 @@ const GameFinishedDialog: FunctionComponent<GameFinishedDialogProps> = (
 
   const sounds = useSounds();
 
-  const { savedDescription, setDescription, Exit } = useGame(
+  const {
+    savedDescription,
+    setDescription,
+    Exit,
+    Submit,
+    PlayAgain,
+    offline,
+    submitted,
+  } = useGame(
     useShallow((state) => ({
       savedDescription: state.description,
       setDescription: state.SetDescription,
       Exit: state.Exit,
+      Submit: state.Submit,
+      PlayAgain: state.PlayAgain,
+      offline: state.offline,
+      submitted: state.submitted,
     })),
   );
 
   const [description, setMessage] = useState(savedDescription || "");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isRestarting, setIsRestarting] = useState(false);
+
+  // If offline or already submitted, directly show choices step
+  const isDirectToChoices = offline || Boolean(submitted);
+  const [step, setStep] = useState<"summary" | "choices">(() =>
+    isDirectToChoices ? "choices" : "summary",
+  );
+
+  useEffect(() => {
+    if (isDirectToChoices) {
+      setStep("choices");
+    }
+  }, [isDirectToChoices]);
 
   useEffect(() => {
     if (savedDescription !== undefined && savedDescription !== description) {
@@ -54,17 +83,52 @@ const GameFinishedDialog: FunctionComponent<GameFinishedDialogProps> = (
     setDescription(value);
   };
 
+  const cheeredRef = useRef(false);
   useEffect(() => {
-    if (props.open) {
+    if (props.open && !cheeredRef.current) {
+      cheeredRef.current = true;
       sounds.play("cheering");
     }
   }, [props.open]);
 
-  const saveAndExit = () => {
+  const handleSubmit = async () => {
+    setIsSubmitting(true);
+    try {
+      sounds.play("click");
+      await Submit({ description: description.trim() || undefined });
+      setStep("choices");
+    } catch (error) {
+      console.error("[GameFinishedDialog] Failed to submit:", error);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handlePlayAgain = async () => {
+    setIsRestarting(true);
+    try {
+      sounds.stopAll();
+      sounds.play("baladada");
+      await PlayAgain();
+      props.onClose?.();
+    } catch (error) {
+      console.error("[GameFinishedDialog] Failed to play again:", error);
+      setIsRestarting(false);
+    }
+  };
+
+  const handleExit = () => {
+    sounds.play("click");
     Exit({
       dnf: false,
-      description,
+      description: description.trim() || undefined,
     });
+    props.onClose?.();
+  };
+
+  const handleClose = () => {
+    sounds.play("click");
+    props.onClose?.();
   };
 
   return (
@@ -109,23 +173,36 @@ const GameFinishedDialog: FunctionComponent<GameFinishedDialogProps> = (
 
       <Dialog
         {...props}
+        onClose={handleClose}
         maxWidth="sm"
         fullWidth
         slotProps={{
           paper: {
             sx: {
-              width: "100%",
+              position: "relative",
               maxWidth: 520,
-              m: { xs: 1.5, sm: 2 },
-              borderRadius: 3.5,
-              border: "1px solid",
-              borderColor: "divider",
-              boxShadow: "0 24px 48px -12px rgba(0, 0, 0, 0.5)",
               overflow: "hidden",
             },
           },
         }}
       >
+        <IconButton
+          aria-label="Close"
+          onClick={handleClose}
+          sx={{
+            position: "absolute",
+            right: 12,
+            top: 12,
+            color: "text.secondary",
+            zIndex: 10,
+            "&:hover": {
+              color: "text.primary",
+            },
+          }}
+        >
+          <IoClose size={22} />
+        </IconButton>
+
         <Stack spacing={0.5} sx={{ alignItems: "center", pt: 3, pb: 1, px: 3 }}>
           <Box
             sx={{
@@ -160,92 +237,139 @@ const GameFinishedDialog: FunctionComponent<GameFinishedDialogProps> = (
               letterSpacing: -0.5,
             }}
           >
-            Victory Celebration
+            {step === "choices" ? "Game Finished!" : "Victory Celebration"}
           </Typography>
           <Typography
             variant="body2"
             color="text.secondary"
             sx={{ textAlign: "center" }}
           >
-            Capture the moment to commemorate the game
+            {step === "choices"
+              ? "What would you like to do next?"
+              : "Capture the moment to commemorate the game"}
           </Typography>
         </Stack>
 
-        <DialogContent
-          sx={{
-            padding: 0,
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-          }}
-        >
-          <Camera />
-
-          <Box
-            sx={{
-              width: "100%",
-              maxWidth: 480,
-              px: { xs: 2, sm: 3 },
-              pb: 0,
-              pt: 1.5,
-              boxSizing: "border-box",
-            }}
-          >
-            <TextField
-              fullWidth
-              multiline
-              rows={2}
-              placeholder="Add game notes or victory message... (optional)"
-              value={description}
-              onChange={(e) => handleDescriptionChange(e.target.value)}
-              variant="outlined"
-              size="small"
+        {step === "summary" ? (
+          <>
+            <DialogContent
               sx={{
-                "& .MuiOutlinedInput-root": {
-                  borderRadius: 2,
-                  backgroundColor: (t) =>
-                    t.palette.mode === "dark"
-                      ? "rgba(255, 255, 255, 0.03)"
-                      : "rgba(0, 0, 0, 0.02)",
-                  "& fieldset": {
-                    borderColor: "divider",
-                  },
-                  "&:hover fieldset": {
-                    borderColor: "text.secondary",
-                  },
-                  "&.Mui-focused fieldset": {
-                    borderColor: "primary.main",
-                  },
-                },
+                padding: 0,
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
               }}
-            />
-          </Box>
-        </DialogContent>
+            >
+              <Camera />
 
-        <DialogActions
-          sx={{
-            px: { xs: 2, sm: 3 },
-            pb: 2.5,
-            pt: 1.5,
-          }}
-        >
-          <Button
-            fullWidth
-            variant="contained"
-            size="large"
-            onClick={saveAndExit}
+              <Box
+                sx={{
+                  width: "100%",
+                  maxWidth: 480,
+                  px: { xs: 2, sm: 3 },
+                  pb: 0,
+                  pt: 1.5,
+                  boxSizing: "border-box",
+                }}
+              >
+                <TextField
+                  fullWidth
+                  multiline
+                  rows={2}
+                  placeholder="Add game notes or victory message... (optional)"
+                  value={description}
+                  onChange={(e) => handleDescriptionChange(e.target.value)}
+                  variant="outlined"
+                  size="small"
+                  sx={{
+                    "& .MuiOutlinedInput-root": {
+                      borderRadius: 2,
+                      backgroundColor: (t) =>
+                        t.palette.mode === "dark"
+                          ? "rgba(255, 255, 255, 0.03)"
+                          : "rgba(0, 0, 0, 0.02)",
+                      "& fieldset": {
+                        borderColor: "divider",
+                      },
+                      "&:hover fieldset": {
+                        borderColor: "text.secondary",
+                      },
+                      "&.Mui-focused fieldset": {
+                        borderColor: "primary.main",
+                      },
+                    },
+                  }}
+                />
+              </Box>
+            </DialogContent>
+
+            <DialogActions
+              sx={{
+                px: { xs: 2, sm: 3 },
+                pb: 2.5,
+                pt: 1.5,
+              }}
+            >
+              <Button
+                fullWidth
+                variant="contained"
+                size="large"
+                disabled={isSubmitting}
+                onClick={handleSubmit}
+              >
+                {isSubmitting ? (
+                  <CircularProgress size={22} color="inherit" />
+                ) : (
+                  "Submit"
+                )}
+              </Button>
+            </DialogActions>
+          </>
+        ) : (
+          <DialogContent
             sx={{
-              py: 1.3,
-              borderRadius: 2,
-              fontWeight: 700,
-              fontSize: "0.95rem",
-              textTransform: "none",
-              letterSpacing: 0.2,
+              px: { xs: 2, sm: 4 },
+              pt: 2,
+              pb: 3.5,
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
             }}
           >
-            Save and Exit
-          </Button>
-        </DialogActions>
+            <Stack spacing={2} sx={{ width: "100%", maxWidth: 440 }}>
+              <Button
+                fullWidth
+                variant="contained"
+                color="primary"
+                size="large"
+                disabled={isRestarting}
+                startIcon={
+                  isRestarting ? (
+                    <CircularProgress size={20} color="inherit" />
+                  ) : (
+                    <MdRefresh size={22} />
+                  )
+                }
+                onClick={handlePlayAgain}
+              >
+                {isRestarting
+                  ? "Starting new game..."
+                  : "Play again with the same people!"}
+              </Button>
+
+              <Button
+                fullWidth
+                variant="outlined"
+                color="inherit"
+                size="large"
+                startIcon={<IoExitOutline size={20} />}
+                onClick={handleExit}
+              >
+                Exit Game
+              </Button>
+            </Stack>
+          </DialogContent>
+        )}
       </Dialog>
     </>
   );
@@ -660,7 +784,7 @@ const Camera: FunctionComponent = memo(() => {
                   justifyContent: "center",
                   alignItems: "center",
                   color: "text.secondary",
-                  boxShadow: "0 8px 24px rgba(0, 0, 0, 0.3)",
+                  boxShadow: "none",
                 }}
               >
                 <BsCameraVideoOff size={32} />
@@ -696,6 +820,10 @@ const Camera: FunctionComponent = memo(() => {
                   fontSize: "0.8rem",
                   py: 0.5,
                   px: 2,
+                  boxShadow: "none",
+                  "&:hover": {
+                    boxShadow: "none",
+                  },
                 }}
               >
                 Try Again
@@ -737,10 +865,12 @@ const Camera: FunctionComponent = memo(() => {
                     borderColor: "divider",
                     fontSize: "0.875rem",
                     fontWeight: 600,
+                    boxShadow: "none",
                     "&:hover": {
                       borderColor: "error.main",
                       color: "error.main",
                       backgroundColor: "rgba(234, 118, 99, 0.08)",
+                      boxShadow: "none",
                     },
                   }}
                 >

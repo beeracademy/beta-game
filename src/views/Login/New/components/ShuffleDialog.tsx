@@ -14,26 +14,12 @@ interface ShuffleDialogProps extends DialogProps {}
 
 const ShuffleDialog: FunctionComponent<ShuffleDialogProps> = (props) => {
   return (
-    <Dialog
-      {...props}
-      maxWidth="lg"
-      slotProps={{
-        paper: {
-          sx: {
-            padding: 2,
-          },
-        },
-      }}
-    >
+    <Dialog {...props} maxWidth="lg" fullWidth>
       <DialogTitle sx={{ textAlign: "center", fontSize: 24 }}>
         Shuffle player order before starting?
       </DialogTitle>
 
-      <DialogContent
-        sx={{
-          padding: 4,
-        }}
-      >
+      <DialogContent>
         <Stack spacing={2} direction="row" sx={{ justifyContent: "center" }}>
           {new Array(6).fill(0).map((_, i) => (
             <Avatar
@@ -52,15 +38,11 @@ const ShuffleDialog: FunctionComponent<ShuffleDialogProps> = (props) => {
         </Stack>
       </DialogContent>
 
-      <DialogActions
-        sx={{
-          justifyContent: "center",
-        }}
-      >
-        <Button variant="contained" color="primary" size="large">
+      <DialogActions>
+        <Button variant="contained" color="primary" size="large" fullWidth>
           Shuffle em!
         </Button>
-        <Button variant="outlined" color="primary" size="large">
+        <Button variant="outlined" color="inherit" size="large" fullWidth>
           Keep order
         </Button>
       </DialogActions>

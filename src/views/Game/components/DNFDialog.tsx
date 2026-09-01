@@ -43,19 +43,10 @@ const DNFDialog: FunctionComponent<DNFDialogProps> = (props) => {
   return (
     <Dialog
       {...props}
-      sx={{
-        width: "100%",
-      }}
-      slotProps={{
-        paper: {
-          sx: {
-            maxWidth: 800,
-            minWidth: 500,
-          },
-        },
-      }}
+      fullWidth
+      sx={{ width: "100%" }}
     >
-      <DialogTitle variant="h4" sx={{ textAlign: "center" }}>
+      <DialogTitle>
         Did not finish?
       </DialogTitle>
 
@@ -119,11 +110,7 @@ const DNFDialog: FunctionComponent<DNFDialogProps> = (props) => {
         </Stack>
       </DialogContent>
 
-      <DialogActions
-        sx={{
-          padding: 2,
-        }}
-      >
+      <DialogActions>
         <Button
           variant="contained"
           color="primary"

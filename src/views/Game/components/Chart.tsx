@@ -43,6 +43,7 @@ const Chart: FunctionComponent = () => {
       sx={{
         flex: 1,
         height: "100%",
+        minWidth: 0,
       }}
     >
       <ApexChart
@@ -105,6 +106,14 @@ const Chart: FunctionComponent = () => {
             },
             axisBorder: {
               show: false,
+            },
+          },
+          legend: {
+            show: true,
+            position: "bottom",
+            horizontalAlign: "center",
+            labels: {
+              colors: theme.palette.text.primary,
             },
           },
           theme: {

@@ -24,13 +24,25 @@ const CardFlashDialog: FunctionComponent<CardFlashDialogProps> = ({
   }, [card]);
 
   return (
-    <Dialog open={open}>
+    <Dialog
+      open={open}
+      slotProps={{
+        paper: {
+          sx: {
+            borderRadius: "12px",
+            border: "none",
+            overflow: "hidden",
+          },
+        },
+      }}
+    >
       {cardImageURI && (
         <img
           src={cardImageURI}
           height={350}
           style={{
             backgroundColor: "#000",
+            display: "block",
           }}
         />
       )}

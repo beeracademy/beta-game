@@ -36,6 +36,8 @@ interface GameState {
 
   description?: string;
   image?: string;
+
+  submitted?: boolean;
 }
 
 interface GameActions {
@@ -58,12 +60,15 @@ interface GameActions {
   SetDescription: (description: string) => void;
   SetImage: (image: string | null) => void;
 
+  Submit: (options?: { description?: string }) => Promise<void>;
+  PlayAgain: () => Promise<void>;
+
   Exit: (options?: { dnf: boolean; description?: string }) => void;
 
   Resume: (state: GameState) => void;
 }
 
-const initialState: GameState = {
+const createInitialGameState = (): GameState => ({
   id: undefined,
 
   offline: false,
@@ -87,40 +92,66 @@ const initialState: GameState = {
 
   description: undefined,
   image: undefined,
+
+  submitted: false,
+});
+
+const initialState: GameState = createInitialGameState();
+
+const syncRemoteUpdate = (
+  state: GameState,
+  options?: { dnf?: boolean; has_ended?: boolean; description?: string },
+) => {
+  if (!state.offline && state.token) {
+    GameAPI.postUpdate(
+      state.token,
+      mapToRemote(state, {
+        dnf: options?.dnf ?? false,
+        has_ended: options?.has_ended ?? false,
+        description: options?.description ?? state.description,
+      }),
+    ).catch((error) => {
+      console.error("[Game]", "Failed to update game state", error);
+    });
+  }
 };
 
 const useGame = create<GameState & GameActions>()(
   persist(
     (set) => ({
-      ...initialState,
+      ...createInitialGameState(),
 
       Start: async (
         players: Player[],
-        options = {
-          sipsInABeer: 14,
-          numberOfRounds: 13,
-          offline: false,
+        options?: {
+          sipsInABeer?: number;
+          numberOfRounds?: number;
+          offline?: boolean;
         },
       ) => {
         console.debug("[Game]", "Starting game");
 
-        // Disable remote control if it is enabled
+        const {
+          sipsInABeer = 14,
+          numberOfRounds = 13,
+          offline = false,
+        } = options ?? {};
 
+        // Disable remote control if it is enabled
         useSettings.setState({
           remoteControl: false,
           remoteToken: undefined,
         });
 
         // Set up game state
-
-        let id;
-        let token;
+        let id: number | undefined;
+        let token: string | undefined;
         let shuffleIndices: number[];
         let gameStartDateString = "";
         let gameStartTimestamp = Date.now();
-        let turnStartTimestamp = Date.now();
+        let turnStartTimestamp = gameStartTimestamp;
 
-        if (options.offline) {
+        if (offline) {
           shuffleIndices = GenerateShuffleIndices(players.length);
         } else {
           try {
@@ -134,7 +165,9 @@ const useGame = create<GameState & GameActions>()(
             token = resp.token;
 
             gameStartDateString = resp.start_datetime;
-            gameStartTimestamp = Date.parse(resp.start_datetime);
+            gameStartTimestamp =
+              Date.parse(resp.start_datetime) || Date.now();
+            turnStartTimestamp = gameStartTimestamp;
 
             shuffleIndices = resp.shuffle_indices;
           } catch (error) {
@@ -144,20 +177,21 @@ const useGame = create<GameState & GameActions>()(
         }
 
         set({
-          id: id,
-          offline: options.offline,
-          token: token,
-          shuffleIndices: shuffleIndices,
-          gameStartDateString: gameStartDateString,
-          gameStartTimestamp: gameStartTimestamp,
-          turnStartTimestamp: turnStartTimestamp,
-          sipsInABeer: options.sipsInABeer,
-          numberOfRounds: options.numberOfRounds,
-          players: players,
+          ...createInitialGameState(),
+          id,
+          offline,
+          token,
+          shuffleIndices,
+          gameStartDateString,
+          gameStartTimestamp,
+          turnStartTimestamp,
+          sipsInABeer,
+          numberOfRounds,
+          players,
+          submitted: false,
         });
 
         // Update games played count
-
         useGamesPlayed.getState().incrementStarted();
       },
 
@@ -165,52 +199,28 @@ const useGame = create<GameState & GameActions>()(
         console.debug("[Game]", `Setting player ${playerIndex} DNF to ${dnf}`);
 
         const state = useGame.getState();
-
-        let player;
-        try {
-          player = state.players[playerIndex];
-        } catch (error) {
-          throw new Error("Player not found");
-        }
-
-        if (dnf && state.dnf_player_indexes.includes(playerIndex)) {
+        if (!state.players[playerIndex]) {
+          console.error("[Game]", "Player not found at index", playerIndex);
           return;
         }
 
-        let new_dnfs = [...state.dnf_player_indexes];
-        if (dnf) {
-          if (state.dnf_player_indexes.includes(playerIndex)) {
-            return;
-          }
-
-          new_dnfs.push(playerIndex);
+        const isCurrentlyDNF = state.dnf_player_indexes.includes(playerIndex);
+        if (dnf === isCurrentlyDNF) {
+          return;
         }
 
-        if (!dnf) {
-          if (!state.dnf_player_indexes.includes(playerIndex)) {
-            return;
-          }
-
-          new_dnfs = state.dnf_player_indexes.filter(
-            (index) => index !== playerIndex,
-          );
-        }
+        const new_dnfs = dnf
+          ? [...state.dnf_player_indexes, playerIndex]
+          : state.dnf_player_indexes.filter((index) => index !== playerIndex);
 
         set({
           dnf_player_indexes: new_dnfs,
         });
 
-        try {
-          GameAPI.postUpdate(
-            state.token as string,
-            mapToRemote({
-              ...state,
-              dnf_player_indexes: new_dnfs,
-            }),
-          );
-        } catch (error) {
-          console.error("[Game]", "Failed to update game state", error);
-        }
+        syncRemoteUpdate({
+          ...state,
+          dnf_player_indexes: new_dnfs,
+        });
       },
 
       DrawCard: () => {
@@ -233,53 +243,43 @@ const useGame = create<GameState & GameActions>()(
           throw new Error("Cannot draw from an empty deck!");
         }
 
-        const card = GetCardN(
+        const cardFromDeck = GetCardN(
           state.shuffleIndices,
           state.players.length,
           state.draws.length,
         );
 
-        card.start_delta_ms = Date.now() - state.gameStartTimestamp;
+        // Treat card immutably rather than mutating cached deck object
+        const card: Card = {
+          ...cardFromDeck,
+          start_delta_ms: Math.max(0, Date.now() - state.gameStartTimestamp),
+        };
 
         const draws = [...state.draws, card];
-
         const done = draws.length === CardValues.length * state.players.length;
 
         const update: Partial<GameState> = {
-          draws: draws,
+          draws,
         };
 
         if (done) {
           console.debug("[Game]", "Last card drawn");
-
           update.gameEndTimestamp = Date.now();
         }
 
-        // Don't update turn start timestamp if
-        // A chug has been drawn
+        // Don't update turn start timestamp if a chug has been drawn
         if (card.value !== 14) {
           update.turnStartTimestamp = Date.now();
         }
 
         set(update);
 
-        if (state.offline) {
-          return [card, cardsLeft - 1];
-        }
+        syncRemoteUpdate({
+          ...state,
+          ...update,
+        });
 
-        try {
-          GameAPI.postUpdate(
-            state.token as string,
-            mapToRemote({
-              ...state,
-              ...update,
-            }),
-          );
-        } catch (error) {
-          console.error("[Game]", "Failed to update game state", error);
-        } finally {
-          return [card, cardsLeft - 1];
-        }
+        return [card, cardsLeft - 1];
       },
 
       StartChug: () => {
@@ -291,39 +291,33 @@ const useGame = create<GameState & GameActions>()(
         const latestCard = state.draws[state.draws.length - 1];
 
         // check if latest card is an Ace
-        if (latestCard.value !== 14) {
+        if (!latestCard || latestCard.value !== 14) {
           throw new Error("Last card is not an Ace");
         }
 
         // check if chug has already started
-        if (latestCard.chug_start_start_delta_ms) {
+        if (latestCard.chug_start_start_delta_ms !== undefined) {
           throw new Error("Chug has already started");
         }
 
-        // set chug start timestamp
-        latestCard.chug_start_start_delta_ms = now - state.gameStartTimestamp;
-
-        const update = {
-          draws: [...state.draws.slice(0, -1), latestCard],
+        const updatedCard: Card = {
+          ...latestCard,
+          chug_start_start_delta_ms: Math.max(
+            0,
+            now - state.gameStartTimestamp,
+          ),
         };
 
-        set({
-          draws: [...state.draws.slice(0, -1), latestCard],
+        const draws = [...state.draws.slice(0, -1), updatedCard];
+
+        set({ draws });
+
+        syncRemoteUpdate({
+          ...state,
+          draws,
         });
 
-        try {
-          GameAPI.postUpdate(
-            state.token as string,
-            mapToRemote({
-              ...state,
-              ...update,
-            }),
-          );
-        } catch (error) {
-          console.error("[Game]", "Failed to update game state", error);
-        } finally {
-          return now;
-        }
+        return now;
       },
 
       StopChug: () => {
@@ -332,44 +326,49 @@ const useGame = create<GameState & GameActions>()(
         const now = Date.now();
         const state = useGame.getState();
 
-        // get latest card
         const latestCard = state.draws[state.draws.length - 1];
 
         // check if latest card is an Ace
-        if (latestCard.value !== 14) {
+        if (!latestCard || latestCard.value !== 14) {
           throw new Error("Last card is not an Ace");
         }
 
         // check if chug has already started
-        if (!latestCard.chug_start_start_delta_ms) {
+        if (latestCard.chug_start_start_delta_ms === undefined) {
           throw new Error("Chug has not started yet");
         }
 
-        // set chug end timestamp
-        latestCard.chug_end_start_delta_ms = now - state.gameStartTimestamp;
+        // check if chug has already ended
+        if (latestCard.chug_end_start_delta_ms !== undefined) {
+          throw new Error("Chug has already ended");
+        }
 
-        const update = {
-          draws: [...state.draws.slice(0, -1), latestCard],
+        const updatedCard: Card = {
+          ...latestCard,
+          chug_end_start_delta_ms: Math.max(
+            0,
+            now - state.gameStartTimestamp,
+          ),
         };
 
-        set({
-          draws: [...state.draws.slice(0, -1), latestCard],
-          turnStartTimestamp: Date.now(),
+        const draws = [...state.draws.slice(0, -1), updatedCard];
+        const isLastCard =
+          draws.length === CardValues.length * state.players.length;
+
+        const update: Partial<GameState> = {
+          draws,
+          turnStartTimestamp: now,
+          ...(isLastCard ? { gameEndTimestamp: now } : {}),
+        };
+
+        set(update);
+
+        syncRemoteUpdate({
+          ...state,
+          ...update,
         });
 
-        try {
-          GameAPI.postUpdate(
-            state.token as string,
-            mapToRemote({
-              ...state,
-              ...update,
-            }),
-          );
-        } catch (error) {
-          console.error("[Game]", "Failed to update game state", error);
-        } finally {
-          return now;
-        }
+        return now;
       },
 
       SetDescription: (description: string) => {
@@ -380,37 +379,65 @@ const useGame = create<GameState & GameActions>()(
         set({ image: image ?? undefined });
       },
 
-      Exit: (
-        options: {
-          dnf: boolean;
-          description?: string;
-        } = {
-          dnf: false,
-          description: undefined,
-        },
-      ) => {
-        console.debug("[Game]", "Exiting game");
-
+      Submit: async (options?: { description?: string }) => {
+        console.debug("[Game]", "Submitting game");
         const state = useGame.getState();
+        const desc = options?.description ?? state.description;
+        if (options?.description !== undefined) {
+          set({ description: options.description });
+        }
 
-        if (!state.offline) {
+        if (!state.offline && state.token && state.id) {
           try {
-            GameAPI.postUpdate(
-              state.token as string,
+            await GameAPI.postUpdate(
+              state.token,
               mapToRemote(state, {
-                dnf: options.dnf,
+                dnf: false,
                 has_ended: true,
-                description: options.description ?? state.description,
+                description: desc,
               }),
             );
           } catch (error) {
-            console.error("[Game]", "Failed to update game state", error);
+            console.error("[Game]", "Failed to update game state on submit", error);
           }
+        }
+
+        set({ submitted: true });
+      },
+
+      PlayAgain: async () => {
+        console.debug("[Game]", "Playing again with same players");
+        const state = useGame.getState();
+        await state.Start(state.players, {
+          sipsInABeer: state.sipsInABeer,
+          numberOfRounds: state.numberOfRounds,
+          offline: state.offline,
+        });
+      },
+
+      Exit: (options?: { dnf?: boolean; description?: string }) => {
+        console.debug("[Game]", "Exiting game");
+
+        const state = useGame.getState();
+        const dnf = options?.dnf ?? false;
+        const description = options?.description ?? state.description;
+
+        if (!state.offline && !state.submitted && state.token) {
+          GameAPI.postUpdate(
+            state.token,
+            mapToRemote(state, {
+              dnf,
+              has_ended: true,
+              description,
+            }),
+          ).catch((error) => {
+            console.error("[Game]", "Failed to update game state", error);
+          });
         }
 
         useGamesPlayed.getState().incrementCompleted();
 
-        set(initialState);
+        set(createInitialGameState());
       },
 
       Resume: (state: GameState) => {
@@ -426,5 +453,5 @@ const useGame = create<GameState & GameActions>()(
 );
 
 export default useGame;
-export { initialState };
+export { createInitialGameState, initialState };
 export type { GameActions, GameState };

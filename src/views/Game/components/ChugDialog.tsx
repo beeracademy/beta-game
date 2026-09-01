@@ -12,6 +12,7 @@ import {
 import { detect } from "detect-browser";
 import { FunctionComponent, useEffect, useRef, useState } from "react";
 import ReactConfetti from "react-confetti";
+import { useWindowSize } from "react-use";
 import { useSounds } from "../../../hooks/sounds";
 import { default as useGame } from "../../../stores/game";
 import {
@@ -27,6 +28,7 @@ interface ChugDialogProps extends DialogProps {}
 const ChugDialog: FunctionComponent<ChugDialogProps> = (props) => {
   const theme = useTheme();
   const sounds = useSounds();
+  const { width, height } = useWindowSize();
 
   const game = useGame();
   const metrics = useGameMetrics();
@@ -37,8 +39,8 @@ const ChugDialog: FunctionComponent<ChugDialogProps> = (props) => {
   const card = metrics.latestCard;
   const started = Boolean(
     metrics.chugging &&
-      card?.chug_start_start_delta_ms !== undefined &&
-      card?.chug_end_start_delta_ms === undefined,
+    card?.chug_start_start_delta_ms !== undefined &&
+    card?.chug_end_start_delta_ms === undefined,
   );
 
   const buttonRef = useRef<HTMLButtonElement>(null);
@@ -195,12 +197,14 @@ const ChugDialog: FunctionComponent<ChugDialogProps> = (props) => {
             },
           }}
         >
-          <ReactConfetti />
+          <ReactConfetti width={width} height={height} />
         </Box>
       )}
 
       <Dialog
         {...props}
+        fullWidth
+        maxWidth="xs"
         onClose={() => {
           buttonRef.current?.focus();
         }}
@@ -225,11 +229,9 @@ const ChugDialog: FunctionComponent<ChugDialogProps> = (props) => {
                 overflow: "hidden",
                 whiteSpace: "nowrap",
                 textOverflow: "ellipsis",
-
-                fontSize: 36,
-
+                fontSize: 26,
                 [theme.breakpoints.down("sm")]: {
-                  fontSize: 24,
+                  fontSize: 18,
                 },
               }}
             >
@@ -238,28 +240,18 @@ const ChugDialog: FunctionComponent<ChugDialogProps> = (props) => {
 
             <Typography
               sx={{
-                fontSize: 100,
-
+                fontSize: 72,
                 [theme.breakpoints.down("sm")]: {
-                  fontSize: 64,
+                  fontSize: 48,
                 },
               }}
             >
               {milisecondsToMMSSsss(elapsedTime)}
             </Typography>
-
-            {/* TODO: implement */}
-            {/* <Typography fontSize={24} color="text.secondary">
-              best {milisecondsToMMSSsss(199923)} from season 10
-            </Typography> */}
           </Stack>
         </DialogContent>
 
-        <DialogActions
-          sx={{
-            padding: 2,
-          }}
-        >
+        <DialogActions>
           <Button
             disableRipple
             ref={buttonRef}
@@ -267,8 +259,8 @@ const ChugDialog: FunctionComponent<ChugDialogProps> = (props) => {
             color="primary"
             fullWidth
             sx={{
-              height: 64,
-              fontSize: 32,
+              height: 52,
+              fontSize: 24,
               fontWeight: "bold",
             }}
             onKeyDownCapture={(e) => {

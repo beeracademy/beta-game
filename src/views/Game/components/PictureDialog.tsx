@@ -101,11 +101,10 @@ const PictureDialog: FunctionComponent<PictureDialogProps> = ({
   };
 
   return (
-    <Dialog open={open} onClose={onClose}>
+    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
       <DialogContent
         sx={{
           textAlign: "center",
-          width: 500,
         }}
       >
         <Stack spacing={1} sx={{ alignItems: "center" }}>
@@ -148,7 +147,20 @@ const PictureDialog: FunctionComponent<PictureDialogProps> = ({
             </Box>
 
             <Box sx={{ width: "40%" }}>
-              <Fab onClick={takePicture} size="large" color="primary">
+              <Fab
+                onClick={takePicture}
+                size="large"
+                color="primary"
+                sx={{
+                  boxShadow: "none",
+                  "&:hover": {
+                    boxShadow: "none",
+                  },
+                  "&:active": {
+                    boxShadow: "none",
+                  },
+                }}
+              >
                 <BsCamera size={32} />
               </Fab>
             </Box>

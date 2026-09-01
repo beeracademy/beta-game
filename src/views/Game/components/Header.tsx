@@ -65,7 +65,7 @@ const Header: FunctionComponent = () => {
   const [dnfDialogOpen, setDNFDialogOpen] = useState(false);
 
   const showExitGameDialog = () => {
-    if (game.offline && gameMetrics.done) {
+    if (gameMetrics.done) {
       game.ExitGame({
         dnf: false,
       });

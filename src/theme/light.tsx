@@ -54,6 +54,67 @@ const light = createTheme({
 });
 
 light.components = {
+  MuiButton: {
+    styleOverrides: {
+      root: {
+        borderRadius: 50,
+        textTransform: "none",
+      },
+      outlined: {
+        borderColor: "rgba(0, 0, 0, 0.15)",
+        "&:hover": {
+          borderColor: "rgba(0, 0, 0, 0.3)",
+        },
+      },
+    },
+  },
+  MuiDialog: {
+    styleOverrides: {
+      paper: {
+        borderRadius: 28,
+        border: `1px solid ${light.palette.divider}`,
+        boxShadow: "none",
+        margin: 12,
+      },
+    },
+  },
+  MuiDialogTitle: {
+    styleOverrides: {
+      root: {
+        fontWeight: 700,
+        fontSize: "1.35rem",
+        textAlign: "center",
+        paddingTop: 28,
+        paddingBottom: 4,
+        paddingLeft: 24,
+        paddingRight: 24,
+      },
+    },
+  },
+  MuiDialogContent: {
+    styleOverrides: {
+      root: {
+        paddingLeft: 24,
+        paddingRight: 24,
+        paddingTop: 8,
+      },
+    },
+  },
+  MuiDialogActions: {
+    styleOverrides: {
+      root: {
+        flexDirection: "column",
+        gap: 8,
+        paddingLeft: 24,
+        paddingRight: 24,
+        paddingBottom: 24,
+        paddingTop: 12,
+        "& > :not(:first-of-type)": {
+          marginLeft: 0,
+        },
+      },
+    },
+  },
   MuiSwitch: {
     styleOverrides: {
       thumb: {

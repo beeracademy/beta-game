@@ -264,5 +264,53 @@ describe("Game state derivation & refresh resilience", () => {
       const rehydratedMetrics = MetricsStore.getState().game;
       expect(rehydratedMetrics.done && !rehydratedMetrics.chugging).toBe(true);
     });
+
+    it("Submit marks game as submitted and updates description", async () => {
+      useGame.setState({
+        offline: true,
+        description: undefined,
+        submitted: false,
+      });
+
+      await useGame.getState().Submit({ description: "Awesome victory!" });
+
+      expect(useGame.getState().description).toBe("Awesome victory!");
+      expect(useGame.getState().submitted).toBe(true);
+    });
+
+    it("PlayAgain resets draws, description, submitted state and restarts game with same players", async () => {
+      const totalCards = samplePlayers.length * 13;
+      const draws: Card[] = Array.from({ length: totalCards }, (_, i) => ({
+        value: 2 as const,
+        suit: "S" as const,
+        start_delta_ms: (i + 1) * 2000,
+      }));
+
+      useGame.setState({
+        offline: true,
+        players: samplePlayers,
+        shuffleIndices: GenerateShuffleIndices(samplePlayers.length),
+        draws,
+        description: "Old victory message",
+        submitted: true,
+      });
+
+      MetricsStore.getState().Update();
+      expect(MetricsStore.getState().game.done).toBe(true);
+
+      // Trigger PlayAgain
+      await useGame.getState().PlayAgain();
+
+      // State should be freshly initialized for the same players
+      const state = useGame.getState();
+      expect(state.players).toEqual(samplePlayers);
+      expect(state.draws).toEqual([]);
+      expect(state.description).toBeUndefined();
+      expect(state.submitted).toBe(false);
+      expect(state.offline).toBe(true);
+
+      MetricsStore.getState().Update();
+      expect(MetricsStore.getState().game.done).toBe(false);
+    });
   });
 });

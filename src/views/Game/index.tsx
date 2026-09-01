@@ -11,7 +11,7 @@ import {
   SwipeableDrawer,
   useTheme,
 } from "@mui/material";
-import { FunctionComponent, useEffect, useRef, useState } from "react";
+import { FunctionComponent, useEffect, useState } from "react";
 import { Helmet } from "react-helmet-async";
 import { BsMoonStarsFill } from "react-icons/bs";
 import { FaChevronUp } from "react-icons/fa6";
@@ -21,6 +21,7 @@ import useWebSocket from "../../api/websocket";
 import { useCardFlash } from "../../components/CardFlash";
 import MemeDialog from "../../components/MemeDialog";
 import Terminal from "../../components/Terminal";
+import useIdleTimer from "../../hooks/idleTimer";
 import { useSounds } from "../../hooks/sounds";
 import useGame from "../../stores/game";
 import { MetricsStore, useGameMetrics } from "../../stores/metrics";
@@ -64,6 +65,14 @@ const GameView: FunctionComponent = () => {
   );
 
   const gameMetrics = useGameMetrics();
+  const isGameDone = gameMetrics.done && !gameMetrics.chugging;
+  const [finishedDialogOpen, setFinishedDialogOpen] = useState(true);
+
+  useEffect(() => {
+    if (!isGameDone) {
+      setFinishedDialogOpen(true);
+    }
+  }, [isGameDone]);
 
   const sounds = useSounds();
 
@@ -79,14 +88,9 @@ const GameView: FunctionComponent = () => {
     window.addEventListener("keydown", handleKeyDown);
     window.addEventListener("keyup", handleKeyUp);
 
-    scheduleReminderSound();
-
     return () => {
       window.removeEventListener("keydown", handleKeyDown);
       window.removeEventListener("keyup", handleKeyUp);
-      if (reminderTimerRef.current) {
-        clearTimeout(reminderTimerRef.current);
-      }
     };
   }, []);
 
@@ -184,6 +188,7 @@ const GameView: FunctionComponent = () => {
 
   const drawCard = () => {
     setShowSleepyMeme(false);
+    resetIdleTimer();
 
     const [card, cardsLeft] = game.DrawCard();
 
@@ -200,25 +205,15 @@ const GameView: FunctionComponent = () => {
     }
 
     cardFlasher.flash(card);
-
-    scheduleReminderSound();
   };
 
-  const reminderTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const reminderIntervalMs = 1000 * 60 * 15; // 15 minutes
-
-  const scheduleReminderSound = () => {
-    if (reminderTimerRef.current) {
-      clearTimeout(reminderTimerRef.current);
-      reminderTimerRef.current = null;
+  const resetIdleTimer = useIdleTimer(() => {
+    if (gameMetrics.chugging) {
+      return;
     }
-
-    reminderTimerRef.current = setTimeout(() => {
-      setShowSleepyMeme(true);
-      sounds.play("tryk_paa_den_lange_tast");
-      scheduleReminderSound();
-    }, reminderIntervalMs);
-  };
+    setShowSleepyMeme(true);
+    sounds.play("tryk_paa_den_lange_tast");
+  }, 1000 * 60 * 15 /* 15 minutes */);
 
   return (
     <>
@@ -263,16 +258,24 @@ const GameView: FunctionComponent = () => {
               margin: "auto 0",
               height: "100%",
               maxHeight: "600px",
-              minHeight: "350px",
+              minHeight: "400px",
+              display: "flex",
+              flexDirection: "column",
             }}
           >
             <CardContent
               sx={{
+                boxSizing: "border-box",
                 justifyContent: "center",
                 alignItems: "center",
                 display: "flex",
                 height: "100%",
+                flex: 1,
                 gap: 2,
+                p: 2,
+                "&:last-child": {
+                  pb: 2,
+                },
               }}
             >
               <GameTable />
@@ -394,7 +397,8 @@ const GameView: FunctionComponent = () => {
       <ChugDialog open={gameMetrics.chugging} />
 
       <GameFinishedDialog
-        open={gameMetrics.done && !gameMetrics.chugging}
+        open={isGameDone && finishedDialogOpen}
+        onClose={() => setFinishedDialogOpen(false)}
       />
     </>
   );
