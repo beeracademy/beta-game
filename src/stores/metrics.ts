@@ -111,9 +111,14 @@ const MetricsStore = create<MetricsState & MetricsActions>()((set, get) => ({
 
     const numberOfPlayers = game.players.length;
 
+    const rawActiveIndex = chugging
+      ? numberOfCardsDrawn - 1
+      : numberOfCardsDrawn;
     const activePlayerIndex =
-      (chugging ? numberOfCardsDrawn - 1 : numberOfCardsDrawn) %
-      numberOfPlayers;
+      numberOfPlayers > 0
+        ? ((rawActiveIndex % numberOfPlayers) + numberOfPlayers) %
+          numberOfPlayers
+        : 0;
 
     /*
       Calculate player metrics
@@ -287,17 +292,30 @@ const MetricsStore = create<MetricsState & MetricsActions>()((set, get) => ({
     GetElapsedGameTime: () => {
       const game = useGame.getState();
 
+      if (!game.gameStartTimestamp) {
+        return 0;
+      }
+
       if (!game.gameEndTimestamp) {
-        return Date.now() - game.gameStartTimestamp;
+        return Math.max(0, Date.now() - game.gameStartTimestamp);
       } else {
-        return game.gameEndTimestamp - game.gameStartTimestamp;
+        return Math.max(0, game.gameEndTimestamp - game.gameStartTimestamp);
       }
     },
 
     GetElapsedTurnTime: () => {
       const game = useGame.getState();
+      const metrics = MetricsStore.getState();
 
-      return Date.now() - game.turnStartTimestamp;
+      if (metrics.game.done) {
+        return 0;
+      }
+
+      if (!game.turnStartTimestamp) {
+        return 0;
+      }
+
+      return Math.max(0, Date.now() - game.turnStartTimestamp);
     },
   },
 }));

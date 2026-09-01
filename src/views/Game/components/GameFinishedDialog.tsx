@@ -33,9 +33,26 @@ const GameFinishedDialog: FunctionComponent<GameFinishedDialogProps> = (
 
   const sounds = useSounds();
 
-  const [description, setMessage] = useState("");
+  const { savedDescription, setDescription, Exit } = useGame(
+    useShallow((state) => ({
+      savedDescription: state.description,
+      setDescription: state.SetDescription,
+      Exit: state.Exit,
+    })),
+  );
 
-  const Exit = useGame((state) => state.Exit);
+  const [description, setMessage] = useState(savedDescription || "");
+
+  useEffect(() => {
+    if (savedDescription !== undefined && savedDescription !== description) {
+      setMessage(savedDescription);
+    }
+  }, [savedDescription]);
+
+  const handleDescriptionChange = (value: string) => {
+    setMessage(value);
+    setDescription(value);
+  };
 
   useEffect(() => {
     if (props.open) {
@@ -180,7 +197,7 @@ const GameFinishedDialog: FunctionComponent<GameFinishedDialogProps> = (
               rows={2}
               placeholder="Add game notes or victory message... (optional)"
               value={description}
-              onChange={(e) => setMessage(e.target.value)}
+              onChange={(e) => handleDescriptionChange(e.target.value)}
               variant="outlined"
               size="small"
               sx={{
@@ -243,8 +260,22 @@ const Camera: FunctionComponent = memo(() => {
   const [cameraLoading, setCameraLoading] = useState<boolean>(true);
   const [cameraError, setCameraError] = useState<string | null>(null);
 
+  const game = useGame(
+    useShallow((state) => ({
+      gameToken: state.token,
+      gameId: state.id,
+      offline: state.offline,
+      savedImage: state.image,
+      setImage: state.SetImage,
+    })),
+  );
+
+  const sounds = useSounds();
+
   const [image, setImage] = useState<Blob | null>(null);
-  const [imageUrl, setImageUrl] = useState<string | null>(null);
+  const [imageUrl, setImageUrl] = useState<string | null>(
+    game.savedImage || null,
+  );
   const [countDown, setCountDown] = useState<number | undefined>();
   const [isFlashing, setIsFlashing] = useState<boolean>(false);
 
@@ -257,20 +288,18 @@ const Camera: FunctionComponent = memo(() => {
   const isCountingDown = countDown !== undefined;
   const hasMultipleCameras = Boolean(cameraDevices && cameraDevices.length > 1);
 
-  const game = useGame(
-    useShallow((state) => ({
-      gameToken: state.token,
-      gameId: state.id,
-      offline: state.offline,
-    })),
-  );
-
-  const sounds = useSounds();
+  useEffect(() => {
+    if (game.savedImage && !imageUrl) {
+      setImageUrl(game.savedImage);
+    }
+  }, [game.savedImage]);
 
   // Create preview URL for captured blob and revoke when updated/unmounted
   useEffect(() => {
     if (!image) {
-      setImageUrl(null);
+      if (!game.savedImage) {
+        setImageUrl(null);
+      }
       return;
     }
 
@@ -280,7 +309,7 @@ const Camera: FunctionComponent = memo(() => {
     return () => {
       URL.revokeObjectURL(url);
     };
-  }, [image]);
+  }, [image, game.savedImage]);
 
   // Clean up countdown interval on unmount
   useEffect(() => {
@@ -346,7 +375,7 @@ const Camera: FunctionComponent = memo(() => {
 
   // Manage camera stream lifecycle
   useEffect(() => {
-    if (image) {
+    if (imageUrl) {
       if (streamRef.current) {
         streamRef.current.getTracks().forEach((track) => track.stop());
         streamRef.current = null;
@@ -362,7 +391,7 @@ const Camera: FunctionComponent = memo(() => {
         streamRef.current = null;
       }
     };
-  }, [facingMode, selectedDeviceIndex, cameraDevices, image]);
+  }, [facingMode, selectedDeviceIndex, cameraDevices, imageUrl]);
 
   const capture = async () => {
     sounds.play("camera_shutter");
@@ -389,6 +418,14 @@ const Camera: FunctionComponent = memo(() => {
         context.scale(-1, 1);
       }
       context.drawImage(video, 0, 0, canvas.width, canvas.height);
+    }
+
+    try {
+      const dataUrl = canvas.toDataURL("image/jpeg", 0.85);
+      setImageUrl(dataUrl);
+      game.setImage(dataUrl);
+    } catch (e) {
+      console.error("[Camera] Failed to generate data URL:", e);
     }
 
     canvas.toBlob(async (blob) => {
@@ -438,6 +475,8 @@ const Camera: FunctionComponent = memo(() => {
 
   const removePicture = () => {
     setImage(null);
+    setImageUrl(null);
+    game.setImage(null);
   };
 
   const changeCamera = () => {

@@ -11,6 +11,11 @@ interface ContinueGameDialogProps extends DialogProps {
 const ContinueGameDialog: FunctionComponent<ContinueGameDialogProps> = (
   props,
 ) => {
+  const playerNames =
+    (props.game as any).players && Array.isArray((props.game as any).players)
+      ? (props.game as any).players.map((p: any) => p.username)
+      : props.game.player_names || [];
+
   return (
     <ConfirmDialog
       {...props}
@@ -19,7 +24,7 @@ const ContinueGameDialog: FunctionComponent<ContinueGameDialogProps> = (
         props.game.id
       } started at ${datetimeToddmmHHMMSS(
         props.game.start_datetime,
-      )} with ${props.game.player_names.join(", ")}?`}
+      )} with ${playerNames.join(", ")}?`}
       onCancel={() =>
         props.onClose?.(
           {

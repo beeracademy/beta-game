@@ -11,7 +11,7 @@ import {
   SwipeableDrawer,
   useTheme,
 } from "@mui/material";
-import { FunctionComponent, useEffect, useState } from "react";
+import { FunctionComponent, useEffect, useRef, useState } from "react";
 import { Helmet } from "react-helmet-async";
 import { BsMoonStarsFill } from "react-icons/bs";
 import { FaChevronUp } from "react-icons/fa6";
@@ -84,6 +84,9 @@ const GameView: FunctionComponent = () => {
     return () => {
       window.removeEventListener("keydown", handleKeyDown);
       window.removeEventListener("keyup", handleKeyUp);
+      if (reminderTimerRef.current) {
+        clearTimeout(reminderTimerRef.current);
+      }
     };
   }, []);
 
@@ -162,6 +165,11 @@ const GameView: FunctionComponent = () => {
 
       spacePressed = true;
 
+      // When chugging is in progress, Space is reserved for ChugDialog start/stop
+      if (MetricsStore.getState().game.chugging) {
+        return;
+      }
+
       try {
         drawCard();
       } catch (error) {
@@ -196,13 +204,16 @@ const GameView: FunctionComponent = () => {
     scheduleReminderSound();
   };
 
-  let reminderTimerRef: number;
+  const reminderTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const reminderIntervalMs = 1000 * 60 * 15; // 15 minutes
 
   const scheduleReminderSound = () => {
-    clearTimeout(reminderTimerRef);
+    if (reminderTimerRef.current) {
+      clearTimeout(reminderTimerRef.current);
+      reminderTimerRef.current = null;
+    }
 
-    reminderTimerRef = setTimeout(() => {
+    reminderTimerRef.current = setTimeout(() => {
       setShowSleepyMeme(true);
       sounds.play("tryk_paa_den_lange_tast");
       scheduleReminderSound();

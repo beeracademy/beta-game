@@ -17,7 +17,10 @@ const ChugsList: FunctionComponent = () => {
 
   const chugs = game.draws
     .map((d, i) => ({
-      username: game.players[i % game.players.length].username,
+      username:
+        game.players.length > 0
+          ? game.players[i % game.players.length]?.username || ""
+          : "",
       duration:
         (d.chug_end_start_delta_ms || 0) - (d.chug_start_start_delta_ms || 0),
       suit: d.suit,

@@ -35,51 +35,73 @@ const ChugDialog: FunctionComponent<ChugDialogProps> = (props) => {
   const player = game.players[metrics.activePlayerIndex];
 
   const card = metrics.latestCard;
-  const started = metrics.chugging && card?.chug_start_start_delta_ms;
+  const started = Boolean(
+    metrics.chugging &&
+      card?.chug_start_start_delta_ms !== undefined &&
+      card?.chug_end_start_delta_ms === undefined,
+  );
 
   const buttonRef = useRef<HTMLButtonElement>(null);
+  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const openedRef = useRef(false);
 
-  const [elapsedTime, setElapsedTime] = useState(0);
-
-  const [intervalRef, setIntervalRef] =
-    useState<ReturnType<typeof setInterval>>();
-
-  useEffect(() => {
-    if (!props.open) {
-      return;
-    }
-
-    playOpenSound();
-  }, [props.open]);
-
-  useEffect(() => {
-    if (!started) {
-      clearInterval(intervalRef);
-      setIntervalRef(undefined);
-
-      sounds.stop("bubbi_fuve");
-    } else {
-      if (!intervalRef) {
-        clearInterval(intervalRef);
-      }
-
-      const interval = setInterval(updateElapsedTime, 1);
-      setIntervalRef(interval);
-
-      sounds.play("bubbi_fuve");
-    }
-  }, [started]);
-
-  const updateElapsedTime = () => {
-    if (!card?.chug_start_start_delta_ms) {
-      return;
+  const calculateCurrentElapsedTime = () => {
+    if (
+      card?.chug_start_start_delta_ms === undefined ||
+      !game.gameStartTimestamp
+    ) {
+      return 0;
     }
 
     const gameStartDelta = Date.now() - game.gameStartTimestamp;
-    const duration = gameStartDelta - card.chug_start_start_delta_ms;
-
-    setElapsedTime(duration);
+    return Math.max(0, gameStartDelta - card.chug_start_start_delta_ms);
   };
+
+  const [elapsedTime, setElapsedTime] = useState<number>(() =>
+    calculateCurrentElapsedTime(),
+  );
+
+  useEffect(() => {
+    if (!props.open) {
+      openedRef.current = false;
+      return;
+    }
+
+    if (!openedRef.current) {
+      openedRef.current = true;
+      // Only play open announcement if the chug hasn't already started
+      if (!card?.chug_start_start_delta_ms) {
+        playOpenSound();
+      }
+    }
+  }, [props.open]);
+
+  const updateElapsedTime = () => {
+    setElapsedTime(calculateCurrentElapsedTime());
+  };
+
+  useEffect(() => {
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+      intervalRef.current = null;
+    }
+
+    if (!started) {
+      sounds.stop("bubbi_fuve");
+    } else {
+      updateElapsedTime();
+      intervalRef.current = setInterval(updateElapsedTime, 10);
+      sounds.play("bubbi_fuve");
+    }
+
+    return () => {
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+        intervalRef.current = null;
+      }
+      sounds.stop("bubbi_fuve");
+    };
+  }, [started, card?.chug_start_start_delta_ms, game.gameStartTimestamp]);
 
   const start = () => {
     if (started) {
@@ -100,7 +122,11 @@ const ChugDialog: FunctionComponent<ChugDialogProps> = (props) => {
   };
 
   const reset = () => {
-    setElapsedTime(0);
+    if (!card?.chug_start_start_delta_ms) {
+      setElapsedTime(0);
+    } else {
+      updateElapsedTime();
+    }
 
     setTimeout(() => {
       buttonRef.current?.focus();
@@ -134,10 +160,8 @@ const ChugDialog: FunctionComponent<ChugDialogProps> = (props) => {
 
   const playFinishSound = () => {
     if (elapsedTime < 5000) {
-      //   this.flashService.flashText("FlAWLESS VICTORY!");
       sounds.play("mkd_flawless");
     } else if (elapsedTime < 7000) {
-      //   this.flashService.flashText("FATALITY!");
       sounds.play("mkd_fatality");
     } else if (elapsedTime < 20000) {
       sounds.play("mkd_laugh");
@@ -150,8 +174,11 @@ const ChugDialog: FunctionComponent<ChugDialogProps> = (props) => {
     if (props.open) {
       reset();
     } else {
-      clearInterval(intervalRef);
-      setIntervalRef(undefined);
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+        intervalRef.current = null;
+      }
+      sounds.stop("bubbi_fuve");
     }
   }, [props.open]);
 
@@ -206,7 +233,7 @@ const ChugDialog: FunctionComponent<ChugDialogProps> = (props) => {
                 },
               }}
             >
-              {player.username}
+              {player?.username || ""}
             </Typography>
 
             <Typography

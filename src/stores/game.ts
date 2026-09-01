@@ -33,6 +33,9 @@ interface GameState {
   dnf_player_indexes: number[];
 
   draws: Card[];
+
+  description?: string;
+  image?: string;
 }
 
 interface GameActions {
@@ -51,6 +54,9 @@ interface GameActions {
   StopChug: () => number;
 
   DrawCard: () => [Card, number];
+
+  SetDescription: (description: string) => void;
+  SetImage: (image: string | null) => void;
 
   Exit: (options?: { dnf: boolean; description?: string }) => void;
 
@@ -78,6 +84,9 @@ const initialState: GameState = {
   dnf_player_indexes: [],
 
   draws: [],
+
+  description: undefined,
+  image: undefined,
 };
 
 const useGame = create<GameState & GameActions>()(
@@ -363,6 +372,14 @@ const useGame = create<GameState & GameActions>()(
         }
       },
 
+      SetDescription: (description: string) => {
+        set({ description });
+      },
+
+      SetImage: (image: string | null) => {
+        set({ image: image ?? undefined });
+      },
+
       Exit: (
         options: {
           dnf: boolean;
@@ -383,7 +400,7 @@ const useGame = create<GameState & GameActions>()(
               mapToRemote(state, {
                 dnf: options.dnf,
                 has_ended: true,
-                description: options.description,
+                description: options.description ?? state.description,
               }),
             );
           } catch (error) {
