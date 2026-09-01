@@ -1,131 +1,146 @@
-import React, {
-  ReactNode,
-  createContext,
-  useContext,
-  useEffect,
-  useState,
+import type React from "react";
+import {
+	createContext,
+	type ReactNode,
+	useContext,
+	useEffect,
+	useState,
 } from "react";
 
 interface Player {
-  id?: number;
+	id?: number;
 
-  username: string;
-  ready: boolean;
+	username: string;
+	ready: boolean;
 
-  password?: string;
-  image?: string;
-  token?: string;
+	password?: string;
+	image?: string;
+	token?: string;
 }
 
 interface NewGameContextType {
-  ready: boolean;
+	ready: boolean;
 
-  players: Player[];
-  setPlayer: (index: number, player: Player) => void;
+	players: Player[];
+	setPlayer: (index: number, player: Player) => void;
 
-  numberOfPlayers: number;
-  offline: boolean;
+	numberOfPlayers: number;
+	offline: boolean;
 
-  setNumberOfPlayers: (number: number) => void;
-  setOffline: (offline: boolean) => void;
+	setNumberOfPlayers: (number: number) => void;
+	setOffline: (offline: boolean) => void;
+
+	title: string;
+	setTitle: (title: string) => void;
+
+	wide: boolean;
+	setWide: (wide: boolean) => void;
 }
 
 // Context
 const NewGameContext = createContext<NewGameContextType | undefined>(undefined);
 
 interface NewGameProviderProps {
-  children: ReactNode;
+	children: ReactNode;
 }
 
 // Provider
 export const NewGameProvider: React.FC<NewGameProviderProps> = ({
-  children,
+	children,
 }) => {
-  const [ready, setReady] = useState<boolean>(false);
+	const [ready, setReady] = useState<boolean>(false);
 
-  const [numberOfPlayers, setNumberOfPlayers] = useState<number>(4);
-  const [offline, setOffline] = useState<boolean>(false);
+	const [numberOfPlayers, setNumberOfPlayers] = useState<number>(4);
+	const [offline, setOffline] = useState<boolean>(false);
+	const [title, setTitle] = useState<string>("New Game");
+	const [wide, setWide] = useState<boolean>(false);
 
-  const [players, setPlayers] = useState<Player[]>(
-    new Array(numberOfPlayers).fill({}),
-  );
+	const [players, setPlayers] = useState<Player[]>(
+		new Array(numberOfPlayers).fill({}),
+	);
 
-  useEffect(() => {
-    setReady(players.every((player) => player.ready));
-  }, [players]);
+	useEffect(() => {
+		setReady(players.every((player) => player.ready));
+	}, [players]);
 
-  const setPlayerHandler = (index: number, player: Player) => {
-    setPlayers([
-      ...players.slice(0, index),
-      player,
-      ...players.slice(index + 1),
-    ]);
-  };
+	const setPlayerHandler = (index: number, player: Player) => {
+		setPlayers([
+			...players.slice(0, index),
+			player,
+			...players.slice(index + 1),
+		]);
+	};
 
-  const setNumberOfPlayersHandler = (number: number) => {
-    setNumberOfPlayers(number);
+	const setNumberOfPlayersHandler = (number: number) => {
+		setNumberOfPlayers(number);
 
-    if (number < players.length) {
-      setPlayers([...players.slice(0, number)]);
-    } else {
-      setPlayers([...players, ...new Array(number - players.length).fill({})]);
-    }
-  };
+		if (number < players.length) {
+			setPlayers([...players.slice(0, number)]);
+		} else {
+			setPlayers([...players, ...new Array(number - players.length).fill({})]);
+		}
+	};
 
-  const setOfflineHandler = (offline: boolean) => {
-    setOffline(offline);
+	const setOfflineHandler = (offline: boolean) => {
+		setOffline(offline);
 
-    if (offline) {
-      setPlayers([
-        ...players.map((player, i) => {
-          return {
-            id: i,
-            username: player.username,
-            ready: !!player.username,
-          };
-        }),
-      ]);
-    }
+		if (offline) {
+			setPlayers([
+				...players.map((player, i) => {
+					return {
+						id: i,
+						username: player.username,
+						ready: !!player.username,
+					};
+				}),
+			]);
+		}
 
-    if (!offline) {
-      setPlayers([
-        ...players.map((player) => {
-          return {
-            username: player.username,
-            ready: false,
-          };
-        }),
-      ]);
-    }
-  };
+		if (!offline) {
+			setPlayers([
+				...players.map((player) => {
+					return {
+						username: player.username,
+						ready: false,
+					};
+				}),
+			]);
+		}
+	};
 
-  return (
-    <NewGameContext.Provider
-      value={{
-        ready,
+	return (
+		<NewGameContext.Provider
+			value={{
+				ready,
 
-        players,
-        setPlayer: setPlayerHandler,
+				players,
+				setPlayer: setPlayerHandler,
 
-        numberOfPlayers,
-        setNumberOfPlayers: setNumberOfPlayersHandler,
+				numberOfPlayers,
+				setNumberOfPlayers: setNumberOfPlayersHandler,
 
-        offline,
-        setOffline: setOfflineHandler,
-      }}
-    >
-      {children}
-    </NewGameContext.Provider>
-  );
+				offline,
+				setOffline: setOfflineHandler,
+
+				title,
+				setTitle,
+
+				wide,
+				setWide,
+			}}
+		>
+			{children}
+		</NewGameContext.Provider>
+	);
 };
 
 // Hook
 export const useNewGame = (): NewGameContextType => {
-  const context = useContext(NewGameContext);
+	const context = useContext(NewGameContext);
 
-  if (context === undefined) {
-    throw new Error("useNewGame must be used within a NewGameProvider");
-  }
+	if (context === undefined) {
+		throw new Error("useNewGame must be used within a NewGameProvider");
+	}
 
-  return context;
+	return context;
 };

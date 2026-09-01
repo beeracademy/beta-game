@@ -1,136 +1,153 @@
 import {
-  Box,
-  Button,
-  Divider,
-  Stack,
-  Tooltip,
-  Typography,
-  alpha,
+    alpha,
+    Box,
+    Button,
+    Divider,
+    Stack,
+    Tooltip,
+    Typography,
 } from "@mui/material";
-import { FunctionComponent } from "react";
+import { type FunctionComponent, useState } from "react";
 import { IoInformationCircleOutline, IoPlay } from "react-icons/io5";
 import { useSounds } from "../../../../hooks/sounds";
+import type { Player } from "../../../../models/player";
 import useGame from "../../../../stores/game";
+import BottomGamesCount from "../../components/BottomGamesCount";
 import { useNewGame } from "../contexts/newGame";
 import GameModeSelector from "./GameModeSelector";
 import NumberOfPlayersSelector from "./NumberOfPlayersSelector";
 import PlayerList from "./PlayerList";
-import BottomGamesCount from "../../components/BottomGamesCount";
+import PreGameScreen from "./PreGameScreen";
 
 const MIN_PLAYERS = 2;
 const MAX_PLAYERS = 6;
 const SIP_IN_A_BEER = 14;
 const NUMBER_OF_ROUNDS = 13;
 
-interface NewGameFormProps {}
+type NewGameFormProps = {};
 
 const NewGameForm: FunctionComponent<NewGameFormProps> = () => {
-  const { play, stopAll } = useSounds();
-  const StartGame = useGame((state) => state.Start);
-  const newGame = useNewGame();
+	const { play, stopAll } = useSounds();
+	const StartGame = useGame((state) => state.Start);
+	const newGame = useNewGame();
 
-  const startGame = () => {
-    if (!newGame.ready) {
-      return;
-    }
+	const [preGameOpen, setPreGameOpen] = useState(false);
 
-    StartGame(newGame.players, {
-      offline: newGame.offline,
-      numberOfRounds: NUMBER_OF_ROUNDS,
-      sipsInABeer: SIP_IN_A_BEER,
-    });
+	const openPreGame = () => {
+		if (!newGame.ready) {
+			return;
+		}
 
-    stopAll();
-    play("baladada");
-  };
+		play("click");
+		newGame.setTitle("Shuffle player order?");
+		newGame.setWide(newGame.players.length > 5);
+		setPreGameOpen(true);
+	};
 
-  const changeGameMode = (offline: boolean) => {
-    play("click");
+	const startGame = (players: Player[]) => {
+		setPreGameOpen(false);
 
-    newGame.setOffline(offline);
-  };
+		StartGame(players, {
+			offline: newGame.offline,
+			numberOfRounds: NUMBER_OF_ROUNDS,
+			sipsInABeer: SIP_IN_A_BEER,
+		});
 
-  const changeNumberOfPlayers = (value: number) => {
-    play("click");
+		stopAll();
+		play("baladada");
+	};
 
-    newGame.setNumberOfPlayers(value);
-  };
+	const changeGameMode = (offline: boolean) => {
+		play("click");
 
-  return (
-    <Stack spacing={2}>
-      <Stack spacing={1}>
-        <Tooltip
-          title="Offline games will not be visible on the website and stats will not be collected."
-          placement="right"
-        >
-          <Box
-            sx={{
-              display: "flex",
-              flexDirection: "row",
-              alignItems: "center",
-              gap: 1,
-              width: "fit-content",
-            }}
-          >
-            <Typography variant="body1">Game mode</Typography>
-            <IoInformationCircleOutline />
-          </Box>
-        </Tooltip>
+		newGame.setOffline(offline);
+	};
 
-        <GameModeSelector value={newGame.offline} onChange={changeGameMode} />
-      </Stack>
+	const changeNumberOfPlayers = (value: number) => {
+		play("click");
 
-      <Stack spacing={1}>
-        <Typography variant="body1">Number of players</Typography>
+		newGame.setNumberOfPlayers(value);
+	};
 
-        <NumberOfPlayersSelector
-          min={MIN_PLAYERS}
-          max={MAX_PLAYERS}
-          value={newGame.numberOfPlayers}
-          onChange={changeNumberOfPlayers}
-        />
-      </Stack>
+	if (preGameOpen) {
+		return <PreGameScreen players={newGame.players} onStart={startGame} />;
+	}
 
-      <Divider />
+	return (
+		<Stack spacing={2}>
+			<Stack spacing={1}>
+				<Tooltip
+					title="Offline games will not be visible on the website and stats will not be collected."
+					placement="right"
+				>
+					<Box
+						sx={{
+							display: "flex",
+							flexDirection: "row",
+							alignItems: "center",
+							gap: 1,
+							width: "fit-content",
+						}}
+					>
+						<Typography variant="body1">Game mode</Typography>
+						<IoInformationCircleOutline />
+					</Box>
+				</Tooltip>
 
-      <Stack spacing={1}>
-        <Typography variant="body1" sx={{}}>
-          {newGame.offline ? "Player names" : "Player login"}
-        </Typography>
+				<GameModeSelector value={newGame.offline} onChange={changeGameMode} />
+			</Stack>
 
-        <PlayerList />
-      </Stack>
-      <Divider />
+			<Stack spacing={1}>
+				<Typography variant="body1">Number of players</Typography>
 
-      <Button
-        variant="contained"
-        color="primary"
-        size="large"
-        onClick={startGame}
-        endIcon={<IoPlay size={24} />}
-        sx={{
-          ...(!newGame.ready && {
-            backgroundColor: (t) =>
-              t.palette.mode === "light"
-                ? "grey.300"
-                : alpha(t.palette.grey[100], 0.15),
-            color: "grey.500",
+				<NumberOfPlayersSelector
+					min={MIN_PLAYERS}
+					max={MAX_PLAYERS}
+					value={newGame.numberOfPlayers}
+					onChange={changeNumberOfPlayers}
+				/>
+			</Stack>
 
-            "&:hover": {
-              backgroundColor: (t) =>
-                t.palette.mode === "light"
-                  ? "grey.300"
-                  : alpha(t.palette.grey[100], 0.15),
-            },
-          }),
-        }}
-      >
-        Start game
-      </Button>
+			<Divider />
 
-      <BottomGamesCount />
+			<Stack spacing={1}>
+				<Typography variant="body1" sx={{}}>
+					{newGame.offline ? "Player names" : "Player login"}
+				</Typography>
 
-      {/* <Button
+				<PlayerList />
+			</Stack>
+			<Divider />
+
+			<Button
+				variant="contained"
+				color="primary"
+				size="large"
+				onClick={openPreGame}
+				endIcon={<IoPlay size={24} />}
+				sx={{
+					...(!newGame.ready && {
+						backgroundColor: (t) =>
+							t.palette.mode === "light"
+								? "grey.300"
+								: alpha(t.palette.grey[100], 0.15),
+						color: "grey.500",
+
+						"&:hover": {
+							backgroundColor: (t) =>
+								t.palette.mode === "light"
+									? "grey.300"
+									: alpha(t.palette.grey[100], 0.15),
+						},
+					}),
+				}}
+			>
+				Start game
+			</Button>
+
+			<BottomGamesCount />
+
+			{/* <Button
       component={NavLink}
       variant="outlined"
       size="large"
@@ -138,8 +155,8 @@ const NewGameForm: FunctionComponent<NewGameFormProps> = () => {
     >
       Continue a game
     </Button> */}
-    </Stack>
-  );
+		</Stack>
+	);
 };
 
 export default NewGameForm;
