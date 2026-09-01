@@ -1,23 +1,25 @@
 import {
-  Box,
-  Button,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogProps,
-  Stack,
-  Typography,
-  useTheme,
+	Box,
+	Button,
+	Dialog,
+	DialogActions,
+	DialogContent,
+	type DialogProps,
+	DialogTitle,
+	Stack,
+	Typography,
+	useMediaQuery,
+	useTheme,
 } from "@mui/material";
 import { detect } from "detect-browser";
-import { FunctionComponent, useEffect, useRef, useState } from "react";
+import { type FunctionComponent, useEffect, useRef, useState } from "react";
 import ReactConfetti from "react-confetti";
 import { useWindowSize } from "react-use";
 import { useSounds } from "../../../hooks/sounds";
 import { default as useGame } from "../../../stores/game";
 import {
-  useGameMetrics,
-  usePlayerMetricsByIndex,
+	useGameMetrics,
+	usePlayerMetricsByIndex,
 } from "../../../stores/metrics";
 import { milisecondsToMMSSsss } from "../../../utilities/time";
 
@@ -26,263 +28,273 @@ const browser = detect();
 interface ChugDialogProps extends DialogProps {}
 
 const ChugDialog: FunctionComponent<ChugDialogProps> = (props) => {
-  const theme = useTheme();
-  const sounds = useSounds();
-  const { width, height } = useWindowSize();
+	const theme = useTheme();
+	const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+	const sounds = useSounds();
+	const { width, height } = useWindowSize();
 
-  const game = useGame();
-  const metrics = useGameMetrics();
-  const playerMetrics = usePlayerMetricsByIndex(metrics.activePlayerIndex);
+	const game = useGame();
+	const metrics = useGameMetrics();
+	const playerMetrics = usePlayerMetricsByIndex(metrics.activePlayerIndex);
 
-  const player = game.players[metrics.activePlayerIndex];
+	const player = game.players[metrics.activePlayerIndex];
 
-  const card = metrics.latestCard;
-  const started = Boolean(
-    metrics.chugging &&
-    card?.chug_start_start_delta_ms !== undefined &&
-    card?.chug_end_start_delta_ms === undefined,
-  );
+	const card = metrics.latestCard;
+	const started = Boolean(
+		metrics.chugging &&
+			card?.chug_start_start_delta_ms !== undefined &&
+			card?.chug_end_start_delta_ms === undefined,
+	);
 
-  const buttonRef = useRef<HTMLButtonElement>(null);
-  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
-  const openedRef = useRef(false);
+	const buttonRef = useRef<HTMLButtonElement>(null);
+	const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+	const openedRef = useRef(false);
 
-  const calculateCurrentElapsedTime = () => {
-    if (
-      card?.chug_start_start_delta_ms === undefined ||
-      !game.gameStartTimestamp
-    ) {
-      return 0;
-    }
+	const calculateCurrentElapsedTime = () => {
+		if (
+			card?.chug_start_start_delta_ms === undefined ||
+			!game.gameStartTimestamp
+		) {
+			return 0;
+		}
 
-    const gameStartDelta = Date.now() - game.gameStartTimestamp;
-    return Math.max(0, gameStartDelta - card.chug_start_start_delta_ms);
-  };
+		const gameStartDelta = Date.now() - game.gameStartTimestamp;
+		return Math.max(0, gameStartDelta - card.chug_start_start_delta_ms);
+	};
 
-  const [elapsedTime, setElapsedTime] = useState<number>(() =>
-    calculateCurrentElapsedTime(),
-  );
+	const [elapsedTime, setElapsedTime] = useState<number>(() =>
+		calculateCurrentElapsedTime(),
+	);
 
-  useEffect(() => {
-    if (!props.open) {
-      openedRef.current = false;
-      return;
-    }
+	useEffect(() => {
+		if (!props.open) {
+			openedRef.current = false;
+			return;
+		}
 
-    if (!openedRef.current) {
-      openedRef.current = true;
-      // Only play open announcement if the chug hasn't already started
-      if (!card?.chug_start_start_delta_ms) {
-        playOpenSound();
-      }
-    }
-  }, [props.open]);
+		if (!openedRef.current) {
+			openedRef.current = true;
+			// Only play open announcement if the chug hasn't already started
+			if (!card?.chug_start_start_delta_ms) {
+				playOpenSound();
+			}
+		}
+	}, [props.open]);
 
-  const updateElapsedTime = () => {
-    setElapsedTime(calculateCurrentElapsedTime());
-  };
+	const updateElapsedTime = () => {
+		setElapsedTime(calculateCurrentElapsedTime());
+	};
 
-  useEffect(() => {
-    if (intervalRef.current) {
-      clearInterval(intervalRef.current);
-      intervalRef.current = null;
-    }
+	useEffect(() => {
+		if (intervalRef.current) {
+			clearInterval(intervalRef.current);
+			intervalRef.current = null;
+		}
 
-    if (!started) {
-      sounds.stop("bubbi_fuve");
-    } else {
-      updateElapsedTime();
-      intervalRef.current = setInterval(updateElapsedTime, 10);
-      sounds.play("bubbi_fuve");
-    }
+		if (!started) {
+			sounds.stop("bubbi_fuve");
+		} else {
+			updateElapsedTime();
+			intervalRef.current = setInterval(updateElapsedTime, 10);
+			sounds.play("bubbi_fuve");
+		}
 
-    return () => {
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current);
-        intervalRef.current = null;
-      }
-      sounds.stop("bubbi_fuve");
-    };
-  }, [started, card?.chug_start_start_delta_ms, game.gameStartTimestamp]);
+		return () => {
+			if (intervalRef.current) {
+				clearInterval(intervalRef.current);
+				intervalRef.current = null;
+			}
+			sounds.stop("bubbi_fuve");
+		};
+	}, [started, card?.chug_start_start_delta_ms, game.gameStartTimestamp]);
 
-  const start = () => {
-    if (started) {
-      return;
-    }
+	const start = () => {
+		if (started) {
+			return;
+		}
 
-    game.StartChug();
-  };
+		game.StartChug();
+	};
 
-  const stop = () => {
-    if (!started) {
-      return;
-    }
+	const stop = () => {
+		if (!started) {
+			return;
+		}
 
-    game.StopChug();
+		game.StopChug();
 
-    playFinishSound();
-  };
+		playFinishSound();
+	};
 
-  const reset = () => {
-    if (!card?.chug_start_start_delta_ms) {
-      setElapsedTime(0);
-    } else {
-      updateElapsedTime();
-    }
+	const reset = () => {
+		if (!card?.chug_start_start_delta_ms) {
+			setElapsedTime(0);
+		} else {
+			updateElapsedTime();
+		}
 
-    setTimeout(() => {
-      buttonRef.current?.focus();
-    }, 0);
-  };
+		setTimeout(() => {
+			buttonRef.current?.focus();
+		}, 0);
+	};
 
-  const playOpenSound = () => {
-    switch (playerMetrics.numberOfChugs) {
-      case 1:
-        sounds.play("mkd_finishim");
-        break;
-      case 2:
-        sounds.play("doublekill");
-        break;
-      case 3:
-        sounds.play("triplekill");
-        break;
-      case 4:
-        sounds.play("ultrakill");
-        break;
-      case 5:
-        sounds.play("megakill");
-        break;
-      case 6:
-        sounds.play("monsterkill");
-        break;
-      default:
-        break;
-    }
-  };
+	const playOpenSound = () => {
+		switch (playerMetrics.numberOfChugs) {
+			case 1:
+				sounds.play("mkd_finishim");
+				break;
+			case 2:
+				sounds.play("doublekill");
+				break;
+			case 3:
+				sounds.play("triplekill");
+				break;
+			case 4:
+				sounds.play("ultrakill");
+				break;
+			case 5:
+				sounds.play("megakill");
+				break;
+			case 6:
+				sounds.play("monsterkill");
+				break;
+			default:
+				break;
+		}
+	};
 
-  const playFinishSound = () => {
-    if (elapsedTime < 5000) {
-      sounds.play("mkd_flawless");
-    } else if (elapsedTime < 7000) {
-      sounds.play("mkd_fatality");
-    } else if (elapsedTime < 20000) {
-      sounds.play("mkd_laugh");
-    } else {
-      sounds.play("humiliation");
-    }
-  };
+	const playFinishSound = () => {
+		if (elapsedTime < 5000) {
+			sounds.play("mkd_flawless");
+		} else if (elapsedTime < 7000) {
+			sounds.play("mkd_fatality");
+		} else if (elapsedTime < 20000) {
+			sounds.play("mkd_laugh");
+		} else {
+			sounds.play("humiliation");
+		}
+	};
 
-  useEffect(() => {
-    if (props.open) {
-      reset();
-    } else {
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current);
-        intervalRef.current = null;
-      }
-      sounds.stop("bubbi_fuve");
-    }
-  }, [props.open]);
+	useEffect(() => {
+		if (props.open) {
+			reset();
+		} else {
+			if (intervalRef.current) {
+				clearInterval(intervalRef.current);
+				intervalRef.current = null;
+			}
+			sounds.stop("bubbi_fuve");
+		}
+	}, [props.open]);
 
-  return (
-    <>
-      {/* 
+	return (
+		<>
+			{/* 
         Firefox lags with confetti, don't know why, so we disable it for now
       */}
-      {props.open && browser?.name !== "firefox" && (
-        <Box
-          sx={{
-            [theme.breakpoints.down("sm")]: {
-              display: "none",
-            },
-          }}
-        >
-          <ReactConfetti width={width} height={height} />
-        </Box>
-      )}
+			{props.open && browser?.name !== "firefox" && (
+				<Box
+					sx={{
+						[theme.breakpoints.down("sm")]: {
+							display: "none",
+						},
+					}}
+				>
+					<ReactConfetti width={width} height={height} />
+				</Box>
+			)}
 
-      <Dialog
-        {...props}
-        fullWidth
-        maxWidth="xs"
-        onClose={() => {
-          buttonRef.current?.focus();
-        }}
-        onClick={() => {
-          buttonRef.current?.focus();
-        }}
-      >
-        <DialogContent
-          sx={{
-            textAlign: "center",
-          }}
-        >
-          <Stack
-            spacing={1}
-            sx={{
-              width: "100%",
-              alignItems: "center",
-            }}
-          >
-            <Typography
-              sx={{
-                overflow: "hidden",
-                whiteSpace: "nowrap",
-                textOverflow: "ellipsis",
-                fontSize: 26,
-                [theme.breakpoints.down("sm")]: {
-                  fontSize: 18,
-                },
-              }}
-            >
-              {player?.username || ""}
-            </Typography>
+			<Dialog
+				{...props}
+				fullWidth
+				fullScreen={isMobile}
+				maxWidth="xs"
+				onClose={() => {
+					buttonRef.current?.focus();
+				}}
+				onClick={() => {
+					buttonRef.current?.focus();
+				}}
+			>
+				<DialogTitle>Chug time!</DialogTitle>
 
-            <Typography
-              sx={{
-                fontSize: 72,
-                [theme.breakpoints.down("sm")]: {
-                  fontSize: 48,
-                },
-              }}
-            >
-              {milisecondsToMMSSsss(elapsedTime)}
-            </Typography>
-          </Stack>
-        </DialogContent>
+				<DialogContent
+					sx={{
+						textAlign: "center",
+						display: "flex",
+						flexDirection: "column",
+						justifyContent: "center",
+						flex: 1,
+					}}
+				>
+					<Stack
+						spacing={1}
+						sx={{
+							width: "100%",
+							alignItems: "center",
+						}}
+					>
+						<Typography
+							sx={{
+								overflow: "hidden",
+								whiteSpace: "nowrap",
+								textOverflow: "ellipsis",
+								fontSize: 34,
+								fontWeight: 600,
+								[theme.breakpoints.down("sm")]: {
+									fontSize: 24,
+								},
+							}}
+						>
+							{player?.username || ""}
+						</Typography>
 
-        <DialogActions>
-          <Button
-            disableRipple
-            ref={buttonRef}
-            variant="contained"
-            color="primary"
-            fullWidth
-            sx={{
-              height: 52,
-              fontSize: 24,
-              fontWeight: "bold",
-            }}
-            onKeyDownCapture={(e) => {
-              if (e.code === "Space") {
-                e.preventDefault();
-                e.stopPropagation();
+						<Typography
+							sx={{
+								fontSize: 88,
+								fontWeight: 700,
+								[theme.breakpoints.down("sm")]: {
+									fontSize: 64,
+								},
+							}}
+						>
+							{milisecondsToMMSSsss(elapsedTime)}
+						</Typography>
+					</Stack>
+				</DialogContent>
 
-                started ? stop() : start();
-              }
-            }}
-            onClick={(e) => {
-              e.stopPropagation();
+				<DialogActions>
+					<Button
+						disableRipple
+						ref={buttonRef}
+						variant="contained"
+						color="primary"
+						fullWidth
+						sx={{
+							height: 52,
+							fontSize: 24,
+							fontWeight: "bold",
+						}}
+						onKeyDownCapture={(e) => {
+							if (e.code === "Space") {
+								e.preventDefault();
+								e.stopPropagation();
 
-              started ? stop() : start();
-            }}
-          >
-            {started ? "Stop" : "Start"}
-          </Button>
-        </DialogActions>
-      </Dialog>
-    </>
-  );
+								started ? stop() : start();
+							}
+						}}
+						onClick={(e) => {
+							e.stopPropagation();
+
+							started ? stop() : start();
+						}}
+					>
+						{started ? "Stop" : "Start"}
+					</Button>
+				</DialogActions>
+			</Dialog>
+		</>
+	);
 };
 
 export default ChugDialog;

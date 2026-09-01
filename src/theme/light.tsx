@@ -91,6 +91,11 @@ light.components = {
 				boxShadow: "none",
 				margin: 12,
 			},
+			paperFullScreen: {
+				borderRadius: 0,
+				border: "none",
+				margin: 0,
+			},
 		},
 	},
 	MuiDialogTitle: {
