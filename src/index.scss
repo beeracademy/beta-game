@@ -42,6 +42,8 @@ body,
   width: 100%;
   padding: 0;
   margin: 0;
+  // Prevents double-tap-to-zoom on mobile browsers that ignore the viewport meta tag
+  touch-action: manipulation;
 }
 
 body,

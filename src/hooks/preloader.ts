@@ -9,12 +9,12 @@ function useAssetsPreloader() {
 
   // Other
   const assets: string[] = [
-    "cards/cardback.png",
-    "cards/cardback-au.png",
-    "blackheart.svg",
-    "skull.svg",
-    "wave.svg",
-    "whiteheart.svg",
+    "/cards/cardback.png",
+    "/cards/cardback-au.png",
+    "/blackheart.svg",
+    "/skull.svg",
+    "/wave.svg",
+    "/whiteheart.svg",
   ];
 
   // Sounds

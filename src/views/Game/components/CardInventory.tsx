@@ -12,7 +12,7 @@ const liftHoverSx: SxProps<Theme> = {
 	transition: "transform 0.2s ease, box-shadow 0.2s ease",
 	"&:hover": {
 		transform: "translateY(-1px)",
-		boxShadow: "0 8px 16px rgba(0, 0, 0, 0.3)",
+		boxShadow: "0 4px 8px rgba(0, 0, 0, 0.15)",
 		zIndex: 2,
 	},
 };

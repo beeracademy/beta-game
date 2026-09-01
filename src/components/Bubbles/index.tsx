@@ -46,27 +46,27 @@ const Wrapper = styled("div")`
   @keyframes flow {
     0% {
       top: 90%;
-      left: 50%;
+      transform: translateX(-50%);
       opacity: 0;
     }
     25% {
       top: 70%;
-      left: 50.5%;
+      transform: translateX(calc(-50% + 2px));
       opacity: 1;
     }
     50% {
       top: 50%;
-      left: 50%;
+      transform: translateX(-50%);
       opacity: 1;
     }
     75% {
       top: 30%;
-      left: 50.5%;
+      transform: translateX(calc(-50% + 2px));
       opacity: 1;
     }
     100% {
       top: 10%;
-      left: 50%;
+      transform: translateX(-50%);
       opacity: 0;
     }
   }
@@ -78,37 +78,37 @@ const Bubbles: FunctionComponent = () => {
       <div
         className="bubble small"
         style={{
-          marginLeft: Math.random() * -100 + "px",
+          left: Math.random() * 70 + 15 + "%",
         }}
       />
       <div
         className="bubble small"
         style={{
-          marginLeft: Math.random() * 100 + "px",
+          left: Math.random() * 70 + 15 + "%",
         }}
       />
       <div
         className="bubble s-medium"
         style={{
-          marginLeft: Math.random() * 100 + "px",
+          left: Math.random() * 70 + 15 + "%",
         }}
       />
       <div
         className="bubble medium"
         style={{
-          marginLeft: Math.random() * -100 + "px",
+          left: Math.random() * 70 + 15 + "%",
         }}
       />
       <div
         className="bubble large"
         style={{
-          marginLeft: Math.random() * 100 + "px",
+          left: Math.random() * 70 + 15 + "%",
         }}
       />
       <div
         className="bubble small-l"
         style={{
-          marginLeft: Math.random() * -100 + "px",
+          left: Math.random() * 70 + 15 + "%",
         }}
       />
     </Wrapper>

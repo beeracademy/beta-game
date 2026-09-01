@@ -5,7 +5,7 @@
 - [ ] Show player personal best in chug dialog
 - [ ] Location support
 - [ ] Better independent sound handling
-- [ ] Assets preloading
+- [x] Assets preloading
 - [ ] Flashing of game events text + sound
 - [ ] Resume game
 - [ ] Mobile support

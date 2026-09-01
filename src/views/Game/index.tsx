@@ -3,20 +3,17 @@ import {
   Button,
   Card,
   CardContent,
-  List,
-  ListItemButton,
-  ListItemIcon,
-  ListItemText,
-  Stack,
-  SwipeableDrawer,
+  Menu,
+  MenuItem,
   useTheme,
 } from "@mui/material";
 import { FunctionComponent, useEffect, useState } from "react";
 import { Helmet } from "react-helmet-async";
-import { BsMoonStarsFill } from "react-icons/bs";
-import { FaChevronUp } from "react-icons/fa6";
-import { IoDesktopOutline } from "react-icons/io5";
+import { BsMoonStarsFill, BsThreeDotsVertical } from "react-icons/bs";
+import { IoLogoGameControllerB } from "react-icons/io";
+import { IoDesktopOutline, IoExitOutline } from "react-icons/io5";
 import { MdWbSunny } from "react-icons/md";
+import { useNavigate } from "react-router-dom";
 import useWebSocket from "../../api/websocket";
 import { useCardFlash } from "../../components/CardFlash";
 import MemeDialog from "../../components/MemeDialog";
@@ -30,20 +27,29 @@ import CardInventory from "./components/CardInventory";
 import Chart from "./components/Chart";
 import ChugDialog from "./components/ChugDialog";
 import ChugsList from "./components/ChugsList";
+import ExitGameDialog from "./components/ExitGameDialog";
 import GameFinishedDialog from "./components/GameFinishedDialog";
 import Header from "./components/Header";
+import MobileNowDrawing from "./components/MobileNowDrawing";
+import MobileStandings from "./components/MobileStandings";
 import PlayerList from "./components/PlayerList";
+import RemoteDialog from "./components/RemoteDialog";
 import GameTable from "./components/Table";
 
 import { useShallow } from "zustand/react/shallow";
 
 const GameView: FunctionComponent = () => {
   const theme = useTheme();
+  const navigate = useNavigate();
 
   const [showTerminal, setShowTerminal] = useState(false);
   const [showSleepyMeme, setShowSleepyMeme] = useState(false);
 
-  const [showMobileDrawer, setShowMobileDrawer] = useState(false);
+  const [mobileMenuAnchor, setMobileMenuAnchor] = useState<HTMLElement | null>(
+    null,
+  );
+  const [mobileRemoteDialogOpen, setMobileRemoteDialogOpen] = useState(false);
+  const [mobileExitDialogOpen, setMobileExitDialogOpen] = useState(false);
 
   const cardFlasher = useCardFlash();
 
@@ -52,6 +58,7 @@ const GameView: FunctionComponent = () => {
       DrawCard: state.DrawCard,
       cards: state.draws,
       offline: state.offline,
+      ExitGame: state.Exit,
     })),
   );
 
@@ -207,13 +214,36 @@ const GameView: FunctionComponent = () => {
     cardFlasher.flash(card);
   };
 
-  const resetIdleTimer = useIdleTimer(() => {
-    if (gameMetrics.chugging) {
+  const resetIdleTimer = useIdleTimer(
+    () => {
+      if (gameMetrics.chugging) {
+        return;
+      }
+      setShowSleepyMeme(true);
+      sounds.play("tryk_paa_den_lange_tast");
+    },
+    1000 * 60 * 15 /* 15 minutes */,
+  );
+
+  const showMobileExitDialog = () => {
+    setMobileMenuAnchor(null);
+
+    if (gameMetrics.done) {
+      game.ExitGame({ dnf: false });
       return;
     }
-    setShowSleepyMeme(true);
-    sounds.play("tryk_paa_den_lange_tast");
-  }, 1000 * 60 * 15 /* 15 minutes */);
+
+    setMobileExitDialogOpen(true);
+  };
+
+  const closeMobileExitDialog = (e: { ok: boolean }) => {
+    setMobileExitDialogOpen(false);
+
+    if (e.ok) {
+      game.ExitGame({ dnf: true });
+      navigate("/login");
+    }
+  };
 
   return (
     <>
@@ -308,6 +338,7 @@ const GameView: FunctionComponent = () => {
             display: "flex",
             flexDirection: "column",
             flex: 1,
+            minHeight: 0,
             gap: 1,
 
             [theme.breakpoints.up("sm")]: {
@@ -317,78 +348,97 @@ const GameView: FunctionComponent = () => {
         >
           <Header />
 
+          <MobileNowDrawing />
+
           <Box
             sx={{
               display: "flex",
-              flexDirection: "row",
+              flexDirection: "column",
               flex: 1,
+              minHeight: 0,
+              gap: 1.5,
+              overflowY: "auto",
+              paddingTop: 1,
+              paddingBottom: 1,
             }}
-          ></Box>
+          >
+            <MobileStandings />
+          </Box>
 
-          <Stack spacing={1}>
-            <Button
-              variant="contained"
-              color="primary"
-              fullWidth
-              sx={{ height: 60, fontSize: 20 }}
-              onClick={drawCard}
+          <Button
+            variant="contained"
+            color="primary"
+            fullWidth
+            sx={{ height: 60, fontSize: 20 }}
+            onClick={drawCard}
+          >
+            Draw card
+          </Button>
+
+          <Button
+            variant="text"
+            color="inherit"
+            fullWidth
+            sx={{ height: 40, color: "text.secondary" }}
+            onClick={(e) => setMobileMenuAnchor(e.currentTarget)}
+          >
+            <BsThreeDotsVertical size={18} style={{ marginRight: 8 }} />
+            More options
+          </Button>
+
+          <Menu
+            anchorEl={mobileMenuAnchor}
+            open={!!mobileMenuAnchor}
+            onClose={() => setMobileMenuAnchor(null)}
+            anchorOrigin={{ vertical: "top", horizontal: "center" }}
+            transformOrigin={{ vertical: "bottom", horizontal: "center" }}
+          >
+            <MenuItem
+              onClick={() => {
+                setMobileMenuAnchor(null);
+                setMobileRemoteDialogOpen(true);
+              }}
             >
-              Draw card
-            </Button>
+              <IoLogoGameControllerB size={20} style={{ marginRight: 12 }} />
+              Game remote
+            </MenuItem>
 
-            <Button
-              variant="text"
-              color="primary"
-              fullWidth
-              onClick={() => setShowMobileDrawer(true)}
+            <MenuItem
+              onClick={() => {
+                sounds.play("click");
+                settings.setThemeMode(getNextThemeMode(settings.themeMode));
+              }}
             >
-              <FaChevronUp />
-            </Button>
+              {settings.themeMode === "system" ? (
+                <IoDesktopOutline size={20} style={{ marginRight: 12 }} />
+              ) : settings.themeMode === "dark" ? (
+                <BsMoonStarsFill size={18} style={{ marginRight: 12 }} />
+              ) : (
+                <MdWbSunny size={20} style={{ marginRight: 12 }} />
+              )}
+              Theme:{" "}
+              {settings.themeMode === "system"
+                ? "System"
+                : settings.themeMode === "dark"
+                  ? "Dark"
+                  : "Light"}
+            </MenuItem>
 
-            <SwipeableDrawer
-              anchor="bottom"
-              open={showMobileDrawer}
-              onOpen={() => setShowMobileDrawer(true)}
-              onClose={() => setShowMobileDrawer(false)}
-              sx={{ display: "flex", flexDirection: "column", gap: 1 }}
-            >
-              <List>
-                <ListItemButton onClick={drawCard}>
-                  <ListItemText primary="Draw card" />
-                </ListItemButton>
+            <MenuItem onClick={showMobileExitDialog}>
+              <IoExitOutline size={20} style={{ marginRight: 12 }} />
+              Exit game
+            </MenuItem>
+          </Menu>
 
-                {/* toggle item for theme mode */}
-                <ListItemButton
-                  onClick={() => {
-                    sounds.play("click");
-                    settings.setThemeMode(
-                      getNextThemeMode(settings.themeMode),
-                    );
-                  }}
-                >
-                  <ListItemIcon sx={{ minWidth: 36 }}>
-                    {settings.themeMode === "system" ? (
-                      <IoDesktopOutline size={20} />
-                    ) : settings.themeMode === "dark" ? (
-                      <BsMoonStarsFill size={18} />
-                    ) : (
-                      <MdWbSunny size={20} />
-                    )}
-                  </ListItemIcon>
-                  <ListItemText
-                    primary="Theme"
-                    secondary={
-                      settings.themeMode === "system"
-                        ? "System"
-                        : settings.themeMode === "dark"
-                          ? "Dark"
-                          : "Light"
-                    }
-                  />
-                </ListItemButton>
-              </List>
-            </SwipeableDrawer>
-          </Stack>
+          <RemoteDialog
+            open={mobileRemoteDialogOpen}
+            onClose={() => setMobileRemoteDialogOpen(false)}
+          />
+
+          <ExitGameDialog
+            open={mobileExitDialogOpen}
+            onClose={closeMobileExitDialog}
+          />
         </Box>
       </Box>
 
