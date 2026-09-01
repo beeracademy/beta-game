@@ -425,7 +425,7 @@ const GameView: FunctionComponent = () => {
 
 						<MenuItem onClick={showMobileExitDialog}>
 							<IoExitOutline size={20} style={{ marginRight: 12 }} />
-							Exit game
+							{gameMetrics.done ? "Exit game" : "Abandon game"}
 						</MenuItem>
 					</Menu>
 

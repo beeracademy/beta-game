@@ -293,7 +293,10 @@ const Header: FunctionComponent = () => {
 						</IconButton>
 					</Tooltip>
 
-					<Tooltip title="Exit game" placement="bottom">
+					<Tooltip
+						title={gameMetrics.done ? "Exit game" : "Abandon game"}
+						placement="bottom"
+					>
 						<IconButton
 							sx={{
 								color: "primary.contrastText",

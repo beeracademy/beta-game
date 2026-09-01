@@ -1,11 +1,11 @@
 import {
-    alpha,
-    Box,
-    Button,
-    Divider,
-    Stack,
-    Tooltip,
-    Typography,
+	alpha,
+	Box,
+	Button,
+	Divider,
+	Stack,
+	Tooltip,
+	Typography,
 } from "@mui/material";
 import { type FunctionComponent, useState } from "react";
 import { IoInformationCircleOutline, IoPlay } from "react-icons/io5";
@@ -142,7 +142,7 @@ const NewGameForm: FunctionComponent<NewGameFormProps> = () => {
 					}),
 				}}
 			>
-				Start game
+				Continue
 			</Button>
 
 			<BottomGamesCount />
