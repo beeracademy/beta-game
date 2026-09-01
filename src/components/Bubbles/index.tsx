@@ -1,5 +1,5 @@
-import { FunctionComponent, memo } from "react";
 import { styled } from "@mui/material";
+import { type FunctionComponent, memo } from "react";
 
 const Wrapper = styled("div")`
   width: 100%;
@@ -73,46 +73,46 @@ const Wrapper = styled("div")`
 `;
 
 const Bubbles: FunctionComponent = () => {
-  return (
-    <Wrapper>
-      <div
-        className="bubble small"
-        style={{
-          left: Math.random() * 70 + 15 + "%",
-        }}
-      />
-      <div
-        className="bubble small"
-        style={{
-          left: Math.random() * 70 + 15 + "%",
-        }}
-      />
-      <div
-        className="bubble s-medium"
-        style={{
-          left: Math.random() * 70 + 15 + "%",
-        }}
-      />
-      <div
-        className="bubble medium"
-        style={{
-          left: Math.random() * 70 + 15 + "%",
-        }}
-      />
-      <div
-        className="bubble large"
-        style={{
-          left: Math.random() * 70 + 15 + "%",
-        }}
-      />
-      <div
-        className="bubble small-l"
-        style={{
-          left: Math.random() * 70 + 15 + "%",
-        }}
-      />
-    </Wrapper>
-  );
+	return (
+		<Wrapper>
+			<div
+				className="bubble small"
+				style={{
+					left: Math.random() * 70 + 15 + "%",
+				}}
+			/>
+			<div
+				className="bubble small"
+				style={{
+					left: Math.random() * 70 + 15 + "%",
+				}}
+			/>
+			<div
+				className="bubble s-medium"
+				style={{
+					left: Math.random() * 70 + 15 + "%",
+				}}
+			/>
+			<div
+				className="bubble medium"
+				style={{
+					left: Math.random() * 70 + 15 + "%",
+				}}
+			/>
+			<div
+				className="bubble large"
+				style={{
+					left: Math.random() * 70 + 15 + "%",
+				}}
+			/>
+			<div
+				className="bubble small-l"
+				style={{
+					left: Math.random() * 70 + 15 + "%",
+				}}
+			/>
+		</Wrapper>
+	);
 };
 
 export default memo(Bubbles);
