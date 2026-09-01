@@ -5,23 +5,21 @@ import { useGameMetrics } from "../../../stores/metrics";
 import PlayerItem from "./PlayerItem";
 
 const PlayerList: FunctionComponent = () => {
-  const game = useGame((state) => ({
-    players: state.players,
-  }));
+  const players = useGame((state) => state.players);
 
   const gameMetrics = useGameMetrics();
 
   return (
     <Stack
       direction="row"
-      alignItems="center"
-      justifyContent="center"
       spacing={2}
       sx={{
+        alignItems: "center",
+        justifyContent: "center",
         marginTop: 5,
       }}
     >
-      {game.players.map((p, i) => (
+      {players.map((p, i) => (
         <PlayerItem
           key={i}
           player={p}

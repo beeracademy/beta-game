@@ -16,14 +16,17 @@ import {
 import { FunctionComponent } from "react";
 import { useSounds } from "../../../hooks/sounds";
 import useGame from "../../../stores/game";
+import { useShallow } from "zustand/react/shallow";
 interface DNFDialogProps extends DialogProps {}
 
 const DNFDialog: FunctionComponent<DNFDialogProps> = (props) => {
-  const { players, dnf_player_indexes, SetPlayerDNF } = useGame((state) => ({
-    players: state.players,
-    dnf_player_indexes: state.dnf_player_indexes,
-    SetPlayerDNF: state.SetPlayerDNF,
-  }));
+  const { players, dnf_player_indexes, SetPlayerDNF } = useGame(
+    useShallow((state) => ({
+      players: state.players,
+      dnf_player_indexes: state.dnf_player_indexes,
+      SetPlayerDNF: state.SetPlayerDNF,
+    })),
+  );
 
   const sound = useSounds();
 
@@ -43,14 +46,16 @@ const DNFDialog: FunctionComponent<DNFDialogProps> = (props) => {
       sx={{
         width: "100%",
       }}
-      PaperProps={{
-        sx: {
-          maxWidth: 800,
-          minWidth: 500,
+      slotProps={{
+        paper: {
+          sx: {
+            maxWidth: 800,
+            minWidth: 500,
+          },
         },
       }}
     >
-      <DialogTitle textAlign="center" variant="h4">
+      <DialogTitle variant="h4" sx={{ textAlign: "center" }}>
         Did not finish?
       </DialogTitle>
 
@@ -66,8 +71,8 @@ const DNFDialog: FunctionComponent<DNFDialogProps> = (props) => {
         <Stack
           direction="row"
           spacing={2}
-          justifyContent="center"
           sx={{
+            justifyContent: "center",
             marginTop: 4,
           }}
         >

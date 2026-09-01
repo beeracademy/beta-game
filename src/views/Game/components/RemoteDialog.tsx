@@ -16,21 +16,22 @@ import { GoDeviceDesktop, GoDeviceMobile } from "react-icons/go";
 import QRCode from "react-qr-code";
 import useGame from "../../../stores/game";
 import useSettings from "../../../stores/settings";
+import { useShallow } from "zustand/react/shallow";
 
 interface RemoteDialogProps extends DialogProps {}
 
 const RemoteDialog: FunctionComponent<RemoteDialogProps> = (props) => {
   const theme = useTheme();
 
-  const game = useGame((state) => ({
-    players: state.players,
-  }));
+  const players = useGame((state) => state.players);
 
-  const settings = useSettings((state) => ({
-    remoteControl: state.remoteControl,
-    remoteToken: state.remoteToken,
-    SetRemoteControl: state.SetRemoteControl,
-  }));
+  const settings = useSettings(
+    useShallow((state) => ({
+      remoteControl: state.remoteControl,
+      remoteToken: state.remoteToken,
+      SetRemoteControl: state.SetRemoteControl,
+    })),
+  );
 
   const [url, setUrl] = useState("");
 
@@ -47,8 +48,10 @@ const RemoteDialog: FunctionComponent<RemoteDialogProps> = (props) => {
       <DialogTitle>
         <Stack
           direction="row"
-          alignItems="center"
-          justifyContent="space-between"
+          sx={{
+            alignItems: "center",
+            justifyContent: "space-between",
+          }}
         >
           <Typography
             sx={{
@@ -107,13 +110,23 @@ const RemoteDialog: FunctionComponent<RemoteDialogProps> = (props) => {
               textAlign: "center",
             }}
           >
-            <QRCode
-              value={url}
-              style={{
+            <Box
+              sx={{
+                p: 2,
+                bgcolor: "white",
+                borderRadius: 2,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
                 opacity: url ? 1 : 0,
                 transition: theme.transitions.create("opacity"),
               }}
-            />
+            >
+              <QRCode
+                value={url}
+                size={220}
+              />
+            </Box>
 
             <Typography color="text.secondary">
               Scan this QR code with your phone to connect or share the link
@@ -140,7 +153,7 @@ const RemoteDialog: FunctionComponent<RemoteDialogProps> = (props) => {
                 onClick={() => {
                   navigator.share({
                     title: "Academy Game Remote",
-                    text: game.players
+                    text: players
                       .map((player) => player.username)
                       .join(", "),
                     url: url,

@@ -44,18 +44,14 @@ const PlayerItem: FunctionComponent<PlayerItemProps> = (props) => {
   const playerMetrics = usePlayerMetricsByIndex(props.index);
   const gameMetrics = useGameMetrics();
 
-  const game = useGame((state) => ({
-    dnf_player_indexes: state.dnf_player_indexes,
-  }));
+  const dnf_player_indexes = useGame((state) => state.dnf_player_indexes);
 
   const isFirstRound = gameMetrics.currentRound === 1;
 
-  const isDNF = game.dnf_player_indexes.includes(props.index);
+  const isDNF = dnf_player_indexes.includes(props.index);
 
-  const settings = useSettings((state) => ({
-    simpleCardsMode: state.simpleCardsMode,
-    SetSimpleCardsMode: state.SetSimpleCardsMode,
-  }));
+  const simpleCardsMode = useSettings((state) => state.simpleCardsMode);
+  const SetSimpleCardsMode = useSettings((state) => state.SetSimpleCardsMode);
 
   const [elapsedTurnTime, setElapsedTurnTime] = useState(0);
   const [intervalRef, setIntervalRef] =
@@ -172,7 +168,7 @@ const PlayerItem: FunctionComponent<PlayerItemProps> = (props) => {
           color: "white",
           userSelect: "none",
         }}
-        onClick={() => settings.SetSimpleCardsMode(!settings.simpleCardsMode)}
+        onClick={() => SetSimpleCardsMode(!simpleCardsMode)}
       >
         <Conditional value={isDNF}>
           <Box
@@ -206,11 +202,11 @@ const PlayerItem: FunctionComponent<PlayerItemProps> = (props) => {
             }}
           >
             <Typography
-              fontSize={20}
-              fontWeight={900}
               align="center"
-              marginBottom={2}
               sx={{
+                fontSize: 20,
+                fontWeight: 900,
+                marginBottom: 2,
                 maxWidth: "100%",
                 overflow: "hidden",
                 textOverflow: "ellipsis",
@@ -220,7 +216,7 @@ const PlayerItem: FunctionComponent<PlayerItemProps> = (props) => {
               {props.player.username}
             </Typography>
 
-            {!settings.simpleCardsMode && (
+            {!simpleCardsMode && (
               <List
                 disablePadding
                 sx={{
@@ -301,14 +297,14 @@ const PlayerItem: FunctionComponent<PlayerItemProps> = (props) => {
               </List>
             )}
 
-            {settings.simpleCardsMode && (
+            {simpleCardsMode && (
               <Stack>
-                <Typography fontSize={64} align="center">
+                <Typography align="center" sx={{ fontSize: 64 }}>
                   {toBase14(playerMetrics.totalSips)}
                   <sub>14</sub>
                 </Typography>
 
-                <Typography fontSize={18} align="center">
+                <Typography align="center" sx={{ fontSize: 18 }}>
                   {secondsToHHMMSS(playerMetrics.totalTime + elapsedTurnTime)}
                 </Typography>
               </Stack>

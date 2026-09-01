@@ -119,11 +119,13 @@ const PlayerItem: FunctionComponent<PlayerItemProps> = (props) => {
             fullWidth
             variant="filled"
             autoComplete="new-password"
-            InputProps={{
-              disableUnderline: true,
-            }}
-            inputProps={{
-              autoComplete: "new-password",
+            slotProps={{
+              input: {
+                disableUnderline: true,
+              },
+              htmlInput: {
+                autoComplete: "new-password",
+              },
             }}
             sx={{
               "& .MuiFilledInput-root": {
@@ -153,11 +155,13 @@ const PlayerItem: FunctionComponent<PlayerItemProps> = (props) => {
                 variant="filled"
                 type="password"
                 autoComplete="new-password"
-                InputProps={{
-                  disableUnderline: true,
-                }}
-                inputProps={{
-                  autoComplete: "new-password",
+                slotProps={{
+                  input: {
+                    disableUnderline: true,
+                  },
+                  htmlInput: {
+                    autoComplete: "new-password",
+                  },
                 }}
                 sx={{
                   "& .MuiFilledInput-root": {

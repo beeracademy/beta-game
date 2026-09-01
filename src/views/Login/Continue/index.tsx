@@ -1,4 +1,5 @@
 import {
+  Box,
   Button,
   Card,
   CardContent,
@@ -9,10 +10,9 @@ import {
   ListItemButton,
   ListItemText,
   Typography,
-  useTheme,
 } from "@mui/material";
 import { FunctionComponent, useEffect, useState } from "react";
-import { Helmet } from "react-helmet";
+import { Helmet } from "react-helmet-async";
 import { NavLink } from "react-router-dom";
 import * as GameAPI from "../../../api/endpoints/game";
 import { Game } from "../../../api/models/game";
@@ -21,14 +21,12 @@ import { Player } from "../../../models/player";
 import useGame from "../../../stores/game";
 import { mapToLocal } from "../../../stores/game.mapper";
 import { datetimeToddmmHHMMSS } from "../../../utilities/time";
+import LoginHeaderActions from "../components/LoginHeaderActions";
+import BottomGamesCount from "../components/BottomGamesCount";
 import ContinueGameDialog from "./components/ContinueGameDialog";
 
 const ContinueGameView: FunctionComponent = () => {
-  const theme = useTheme();
-
-  const { Resume } = useGame((state) => ({
-    Resume: state.Resume,
-  }));
+  const Resume = useGame((state) => state.Resume);
 
   const [player, setPlayer] = useState<Player | null>(null);
   const [resumableGames, setResumableGames] = useState<GameAPI.ResumableGame[]>(
@@ -78,111 +76,123 @@ const ContinueGameView: FunctionComponent = () => {
       <Fade in={true}>
         <Card
           sx={{
-            padding: 1,
-            width: 600,
+            width: { xs: "100%", sm: 580, md: 600 },
+            maxWidth: "100%",
+            height: { xs: "100%", md: "auto" },
+            maxHeight: { xs: "100%", md: "calc(100vh - 48px)" },
+            display: "flex",
+            flexDirection: "column",
+            borderRadius: { xs: 0, sm: 2 },
+            overflow: "hidden",
             zIndex: 10,
-
-            [theme.breakpoints.down("md")]: {
-              height: "100vh",
-              width: "100vw",
-              padding: 0,
-              borderRadius: 0,
-              overflowY: "auto",
-            },
+            boxShadow: (t) =>
+              t.palette.mode === "dark"
+                ? "0 8px 32px rgba(0, 0, 0, 0.5)"
+                : "0 8px 32px rgba(0, 0, 0, 0.12)",
           }}
         >
-          <CardHeader title="Continue a game" />
-
-          <Divider
+          <CardHeader
+            title="Continue a game"
+            action={<LoginHeaderActions />}
             sx={{
-              marginLeft: 2,
-              marginRight: 2,
+              position: "sticky",
+              top: 0,
+              zIndex: 20,
+              backgroundColor: "background.paper",
+              py: { xs: 1.5, sm: 2 },
+              px: { xs: 2, sm: 3 },
+              "& .MuiCardHeader-action": {
+                m: 0,
+                alignSelf: "center",
+              },
             }}
           />
 
-          <CardContent>
-            You can continue a game started from another device by signing in
-            with one of the players participating here and selecting the game
-            you want to continue.
-          </CardContent>
-
-          <CardContent>
-            {/* <PlayerItem
-              onReady={async (p) => {
-                setPlayer(p);
-              }}
-              onRemove={() => {
-                setPlayer(null);
-                setResumableGames([]);
-              }}
-            /> */}
-          </CardContent>
-
-          <Conditional value={player !== null}>
-            <Divider />
-          </Conditional>
-
-          <Conditional value={player !== null && resumableGames.length === 0}>
-            <CardContent
-              sx={{
-                marginTop: 2,
-                marginBottom: 2,
-                textAlign: "center",
-              }}
-            >
-              <Typography>
-                There are no resumable games for this player
-              </Typography>
-            </CardContent>
-          </Conditional>
-
-          <Conditional value={player !== null && resumableGames.length > 0}>
-            <CardContent
-              sx={{
-                maxHeight: 400,
-                overflowY: "auto",
-              }}
-            >
-              {/* List of games with their name, users and creation date */}
-              <List dense disablePadding>
-                {resumableGames.map((game) => {
-                  return (
-                    <ListItemButton
-                      onClick={() => resumeGame(game.id)}
-                      key={game.id}
-                    >
-                      <ListItemText
-                        primary={`Game #${game.id}`}
-                        secondary={datetimeToddmmHHMMSS(game.start_datetime)}
-                      />
-                      <ListItemText
-                        sx={{
-                          textAlign: "right",
-                        }}
-                      >
-                        {game.players.map((p) => p.username).join(", ")}
-                      </ListItemText>
-                    </ListItemButton>
-                  );
-                })}
-              </List>
-            </CardContent>
-          </Conditional>
-
           <Divider />
 
-          <CardContent>
-            <Button
-              variant="contained"
-              color="primary"
-              fullWidth
-              component={NavLink}
-              to="/login"
-              size="large"
-            >
-              Back to new game
-            </Button>
-          </CardContent>
+          <Box
+            sx={{
+              overflowY: "auto",
+              overflowX: "hidden",
+              flex: 1,
+              p: { xs: 1, sm: 2 },
+            }}
+          >
+            <CardContent>
+              You can continue a game started from another device by signing in
+              with one of the players participating here and selecting the game
+              you want to continue.
+            </CardContent>
+
+            <Conditional value={player !== null}>
+              <Divider />
+            </Conditional>
+
+            <Conditional value={player !== null && resumableGames.length === 0}>
+              <CardContent
+                sx={{
+                  marginTop: 2,
+                  marginBottom: 2,
+                  textAlign: "center",
+                }}
+              >
+                <Typography>
+                  There are no resumable games for this player
+                </Typography>
+              </CardContent>
+            </Conditional>
+
+            <Conditional value={player !== null && resumableGames.length > 0}>
+              <CardContent
+                sx={{
+                  maxHeight: 400,
+                  overflowY: "auto",
+                  overflowX: "hidden",
+                }}
+              >
+                {/* List of games with their name, users and creation date */}
+                <List dense disablePadding>
+                  {resumableGames.map((game) => {
+                    return (
+                      <ListItemButton
+                        onClick={() => resumeGame(game.id)}
+                        key={game.id}
+                      >
+                        <ListItemText
+                          primary={`Game #${game.id}`}
+                          secondary={datetimeToddmmHHMMSS(game.start_datetime)}
+                        />
+                        <ListItemText
+                          sx={{
+                            textAlign: "right",
+                          }}
+                        >
+                          {game.players.map((p) => p.username).join(", ")}
+                        </ListItemText>
+                      </ListItemButton>
+                    );
+                  })}
+                </List>
+              </CardContent>
+            </Conditional>
+
+            <Divider sx={{ my: 1 }} />
+
+            <CardContent>
+              <Button
+                variant="contained"
+                color="primary"
+                fullWidth
+                component={NavLink}
+                to="/login"
+                size="large"
+              >
+                Back to new game
+              </Button>
+
+              <BottomGamesCount />
+            </CardContent>
+          </Box>
         </Card>
       </Fade>
 

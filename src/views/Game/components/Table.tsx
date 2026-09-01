@@ -16,17 +16,20 @@ import { FunctionComponent } from "react";
 import { getCardASCIISymbol, getCardSuitColor } from "../../../models/card";
 import useGame from "../../../stores/game";
 import { useGameMetrics } from "../../../stores/metrics";
+import { useShallow } from "zustand/react/shallow";
 
 interface GameTableProps {}
 
 const GameTable: FunctionComponent<GameTableProps> = () => {
   const theme = useTheme();
 
-  const game = useGame((state) => ({
-    players: state.players,
-    numberOfRounds: state.numberOfRounds,
-    draws: state.draws,
-  }));
+  const game = useGame(
+    useShallow((state) => ({
+      players: state.players,
+      numberOfRounds: state.numberOfRounds,
+      draws: state.draws,
+    })),
+  );
 
   const gameMetrics = useGameMetrics();
 
@@ -163,8 +166,8 @@ const GameTable: FunctionComponent<GameTableProps> = () => {
                     <Stack
                       direction="row"
                       spacing={1}
-                      justifyContent="space-between"
                       sx={{
+                        justifyContent: "space-between",
                         margin: "auto",
                         maxWidth: 40,
                       }}

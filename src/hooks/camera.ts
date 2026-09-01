@@ -6,10 +6,15 @@ export const useVideoDevices = () => {
 
   const getDevices = async () => {
     try {
-      await navigator.mediaDevices.getUserMedia({
+      if (!navigator?.mediaDevices?.getUserMedia) {
+        return;
+      }
+
+      const stream = await navigator.mediaDevices.getUserMedia({
         video: true,
         audio: false,
       });
+      stream.getTracks().forEach((track) => track.stop());
 
       const allDevices = await navigator.mediaDevices.enumerateDevices();
       const videoInputDevices = allDevices.filter(

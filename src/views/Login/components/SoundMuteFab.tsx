@@ -1,6 +1,6 @@
-import { Fab, useTheme } from "@mui/material";
+import { Fab } from "@mui/material";
 import { FunctionComponent, useEffect } from "react";
-import { IoVolumeHigh, IoVolumeMute } from "react-icons/io5";
+import { MdMusicNote, MdMusicOff } from "react-icons/md";
 import { SoundName, useSounds } from "../../../hooks/sounds";
 import useSettings from "../../../stores/settings";
 
@@ -13,8 +13,6 @@ interface SoundMuteFabProps {
 const SoundMuteFab: FunctionComponent<SoundMuteFabProps> = ({
   absolutePosition = true,
 }) => {
-  const theme = useTheme();
-
   const { lobbyMusicMuted, SetLobbyMusicMuted } = useSettings();
   const { mute, unmute, play, stop } = useSounds();
 
@@ -40,24 +38,20 @@ const SoundMuteFab: FunctionComponent<SoundMuteFabProps> = ({
   return (
     <Fab
       color="primary"
+      aria-label={lobbyMusicMuted ? "Unmute music" : "Mute music"}
       sx={{
         position: absolutePosition ? "absolute" : undefined,
         bottom: absolutePosition ? 16 : undefined,
         right: absolutePosition ? 16 : undefined,
-
-        [theme.breakpoints.down("md")]: {
-          display: "none",
-        },
       }}
       onClick={() => {
         SetLobbyMusicMuted(!lobbyMusicMuted);
-        Howler.mute(!lobbyMusicMuted);
       }}
     >
       {lobbyMusicMuted ? (
-        <IoVolumeMute size={32} />
+        <MdMusicOff size={28} />
       ) : (
-        <IoVolumeHigh size={32} />
+        <MdMusicNote size={28} />
       )}
     </Fab>
   );

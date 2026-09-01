@@ -11,14 +11,15 @@ import { FunctionComponent, useEffect, useRef, useState } from "react";
 import { AiOutlineFullscreen, AiOutlineFullscreenExit } from "react-icons/ai";
 import { BsMoonStarsFill } from "react-icons/bs";
 import { IoLogoGameControllerB } from "react-icons/io";
-import { IoExitOutline } from "react-icons/io5";
+import { IoExitOutline, IoDesktopOutline } from "react-icons/io5";
 import { MdWbSunny } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
 import { useFullscreen, useToggle } from "react-use";
 import { useSounds } from "../../../hooks/sounds";
 import useGame from "../../../stores/game";
 import { useGameMetrics } from "../../../stores/metrics";
-import useSettings from "../../../stores/settings";
+import useSettings, { getNextThemeMode, ThemeMode } from "../../../stores/settings";
+import { useShallow } from "zustand/react/shallow";
 import { secondsToHHMMSS, secondsToHHMMSSsss } from "../../../utilities/time";
 import DNFDialog from "./DNFDialog";
 import ExitGameDialog from "./ExitGameDialog";
@@ -39,21 +40,25 @@ const Header: FunctionComponent = () => {
 
   const sound = useSounds();
 
-  const game = useGame((state) => ({
-    gameStartTimestamp: state.gameStartTimestamp,
-    gameEndTimestamp: state.gameEndTimestamp,
-    turnStartTimestamp: state.turnStartTimestamp,
-    numberOfRounds: state.numberOfRounds,
-    ExitGame: state.Exit,
-    offline: state.offline,
-  }));
+  const game = useGame(
+    useShallow((state) => ({
+      gameStartTimestamp: state.gameStartTimestamp,
+      gameEndTimestamp: state.gameEndTimestamp,
+      turnStartTimestamp: state.turnStartTimestamp,
+      numberOfRounds: state.numberOfRounds,
+      ExitGame: state.Exit,
+      offline: state.offline,
+    })),
+  );
 
   const gameMetrics = useGameMetrics();
 
-  const settings = useSettings((state) => ({
-    themeMode: state.themeMode,
-    SetThemeMode: state.SetThemeMode,
-  }));
+  const settings = useSettings(
+    useShallow((state) => ({
+      themeMode: state.themeMode,
+      SetThemeMode: state.SetThemeMode,
+    })),
+  );
 
   const [remoteDialogOpen, setRemoteDialogOpen] = useState(false);
   const [exitGameDialogOpen, setExitGameDialogOpen] = useState(false);
@@ -146,37 +151,56 @@ const Header: FunctionComponent = () => {
             </IconButton>
           </Tooltip>
 
-          <Tooltip
-            title="Toggle between light and dark mode"
-            placement="bottom"
-          >
-            <IconButton
-              sx={{
-                color: "primary.contrastText",
-              }}
-              onClick={() => {
-                sound.play("click");
+          {(() => {
+            const themeTitle: Record<ThemeMode, string> = {
+              system: "System",
+              light: "Light",
+              dark: "Dark",
+            };
+            const nextThemeMode = getNextThemeMode(settings.themeMode);
 
-                settings.SetThemeMode(
-                  settings.themeMode === "light" ? "dark" : "light",
-                );
-              }}
-            >
-              {settings.themeMode === "dark" ? (
-                <BsMoonStarsFill size={20} />
-              ) : (
-                <MdWbSunny size={24} />
-              )}
-            </IconButton>
-          </Tooltip>
+            return (
+              <Tooltip
+                title={`Theme: ${themeTitle[settings.themeMode]} (switch to ${themeTitle[nextThemeMode]})`}
+                placement="bottom"
+              >
+                <IconButton
+                  sx={{
+                    color: "primary.contrastText",
+                  }}
+                  onClick={() => {
+                    sound.play("click");
+                    settings.SetThemeMode(nextThemeMode);
+                  }}
+                  aria-label={`Theme: ${themeTitle[settings.themeMode]}. Switch to ${themeTitle[nextThemeMode]} theme.`}
+                >
+                  {settings.themeMode === "system" ? (
+                    <IoDesktopOutline size={20} />
+                  ) : settings.themeMode === "dark" ? (
+                    <BsMoonStarsFill size={20} />
+                  ) : (
+                    <MdWbSunny size={24} />
+                  )}
+                </IconButton>
+              </Tooltip>
+            );
+          })()}
         </Box>
 
-        <Stack direction="row" alignItems="center">
+        <Stack
+          direction="row"
+          sx={{
+            alignItems: "center",
+            marginLeft: "auto",
+            marginRight: "auto",
+            textAlign: "center",
+          }}
+        >
           <Typography
             variant="h5"
             sx={{
               [theme.breakpoints.down("sm")]: {
-                display: "none",
+                fontSize: 12,
               },
             }}
           >
@@ -189,7 +213,6 @@ const Header: FunctionComponent = () => {
               textAlign: "center",
               marginLeft: 8,
               marginRight: 8,
-              width: 200,
             }}
           >
             <Typography
@@ -197,6 +220,10 @@ const Header: FunctionComponent = () => {
                 fontSize: 36,
                 fontWeight: 600,
                 lineHeight: 1,
+
+                [theme.breakpoints.down("sm")]: {
+                  fontSize: 24,
+                },
               }}
             >
               {secondsToHHMMSSsss(elapsedTurnTime)}
@@ -208,7 +235,7 @@ const Header: FunctionComponent = () => {
             variant="h5"
             sx={{
               [theme.breakpoints.down("sm")]: {
-                display: "none",
+                fontSize: 12,
               },
             }}
           >

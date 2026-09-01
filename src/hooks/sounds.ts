@@ -28,6 +28,7 @@ const SoundNames = [
   "multikill",
   "old",
   "ole_vedel",
+  "pop",
   "slot_machine_winner",
   "slot_machine",
   "snack",
@@ -43,6 +44,7 @@ const SoundNames = [
 type SoundName = (typeof SoundNames)[number];
 
 const activeSounds = new Map<SoundName, Howl[]>();
+const mutedSounds = new Set<SoundName>();
 
 SoundNames.forEach((soundName) => {
   new Howl({
@@ -80,6 +82,7 @@ const play = (
   const sound = new Howl({
     src: [`/sounds/${soundName}.mp3`, `/sounds/${soundName}.ogg`],
     loop: options.loop,
+    mute: mutedSounds.has(soundName),
   });
 
   if (options.oneInstance) {
@@ -120,6 +123,7 @@ const pause = (soundName: SoundName) => {
 };
 
 const mute = (soundName: SoundName) => {
+  mutedSounds.add(soundName);
   const sounds = activeSounds.get(soundName);
   if (sounds) {
     sounds.forEach((sound) => sound.mute(true));
@@ -127,6 +131,7 @@ const mute = (soundName: SoundName) => {
 };
 
 const unmute = (soundName: SoundName) => {
+  mutedSounds.delete(soundName);
   const sounds = activeSounds.get(soundName);
   if (sounds) {
     sounds.forEach((sound) => sound.mute(false));

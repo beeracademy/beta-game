@@ -202,8 +202,8 @@ const Terminal: FunctionComponent<TerminalProps> = (props) => {
           <Box key={i}>
             <Typography
               variant="body1"
-              fontFamily="monospace"
               sx={{
+                fontFamily: "monospace",
                 margin: 0,
                 padding: 0,
                 whiteSpace: "pre-wrap",

@@ -108,7 +108,7 @@ const PictureDialog: FunctionComponent<PictureDialogProps> = ({
           width: 500,
         }}
       >
-        <Stack spacing={1} alignItems={"center"}>
+        <Stack spacing={1} sx={{ alignItems: "center" }}>
           <video
             id="video"
             autoPlay
@@ -135,9 +135,11 @@ const PictureDialog: FunctionComponent<PictureDialogProps> = ({
           <Stack
             spacing={1}
             direction="row"
-            justifyContent="space-between"
-            alignItems="center"
-            width={"100%"}
+            sx={{
+              justifyContent: "space-between",
+              alignItems: "center",
+              width: "100%",
+            }}
           >
             <Box sx={{ width: "30%", textAlign: "left" }}>
               <IconButton onClick={onClose}>

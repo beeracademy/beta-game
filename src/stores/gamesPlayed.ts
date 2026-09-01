@@ -6,6 +6,7 @@ interface ComputerGamesCountState {
   completed: number;
   incrementStarted: () => void;
   incrementCompleted: () => void;
+  reset: () => void;
 }
 
 const useGamesPlayed = create<ComputerGamesCountState>()(
@@ -16,6 +17,7 @@ const useGamesPlayed = create<ComputerGamesCountState>()(
       incrementStarted: () => set((state) => ({ started: state.started + 1 })),
       incrementCompleted: () =>
         set((state) => ({ completed: state.completed + 1 })),
+      reset: () => set({ started: 0, completed: 0 }),
     }),
     {
       name: "computer-game-counts",

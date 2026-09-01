@@ -32,14 +32,16 @@ const TimeSynchronizationWarningDialog: FunctionComponent<
   return (
     <Dialog
       open={showTimeWarning}
-      PaperProps={{
-        sx: {
-          maxWidth: "400px",
+      slotProps={{
+        paper: {
+          sx: {
+            maxWidth: "400px",
+          },
         },
       }}
     >
       <DialogContent>
-        <Stack alignItems="center" textAlign="center" spacing={2}>
+        <Stack spacing={2} sx={{ alignItems: "center", textAlign: "center" }}>
           <TbClockX size={96} color={theme.palette.error.dark} />
 
           <p>

@@ -15,6 +15,7 @@ import { useNewGame } from "../contexts/newGame";
 import GameModeSelector from "./GameModeSelector";
 import NumberOfPlayersSelector from "./NumberOfPlayersSelector";
 import PlayerList from "./PlayerList";
+import BottomGamesCount from "../../components/BottomGamesCount";
 
 const MIN_PLAYERS = 2;
 const MAX_PLAYERS = 6;
@@ -126,6 +127,8 @@ const NewGameForm: FunctionComponent<NewGameFormProps> = () => {
       >
         Start game
       </Button>
+
+      <BottomGamesCount />
 
       {/* <Button
       component={NavLink}

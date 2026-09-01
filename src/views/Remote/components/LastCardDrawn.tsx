@@ -7,20 +7,19 @@ interface LastCardDrawnProps {
   height?: number;
 }
 
-const LastCardDrawn: FunctionComponent<LastCardDrawnProps> = (props) => {
+const LastCardDrawn: FunctionComponent<LastCardDrawnProps> = ({
+  width = 300,
+  height,
+}) => {
   const metrics = useGameMetrics();
 
   return (
     <img
       src={getCardImageURI(metrics.latestCard)}
-      width={props.width}
-      height={props.height}
+      width={width}
+      height={height}
     />
   );
-};
-
-LastCardDrawn.defaultProps = {
-  width: 300,
 };
 
 export default LastCardDrawn;

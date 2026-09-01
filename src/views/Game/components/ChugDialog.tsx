@@ -1,4 +1,5 @@
 import {
+  Box,
   Button,
   Dialog,
   DialogActions,
@@ -6,6 +7,7 @@ import {
   DialogProps,
   Stack,
   Typography,
+  useTheme,
 } from "@mui/material";
 import { detect } from "detect-browser";
 import { FunctionComponent, useEffect, useRef, useState } from "react";
@@ -23,6 +25,7 @@ const browser = detect();
 interface ChugDialogProps extends DialogProps {}
 
 const ChugDialog: FunctionComponent<ChugDialogProps> = (props) => {
+  const theme = useTheme();
   const sounds = useSounds();
 
   const game = useGame();
@@ -157,7 +160,17 @@ const ChugDialog: FunctionComponent<ChugDialogProps> = (props) => {
       {/* 
         Firefox lags with confetti, don't know why, so we disable it for now
       */}
-      {props.open && browser?.name !== "firefox" && <ReactConfetti />}
+      {props.open && browser?.name !== "firefox" && (
+        <Box
+          sx={{
+            [theme.breakpoints.down("sm")]: {
+              display: "none",
+            },
+          }}
+        >
+          <ReactConfetti />
+        </Box>
+      )}
 
       <Dialog
         {...props}
@@ -175,24 +188,36 @@ const ChugDialog: FunctionComponent<ChugDialogProps> = (props) => {
         >
           <Stack
             spacing={1}
-            alignItems={"center"}
             sx={{
               width: "100%",
+              alignItems: "center",
             }}
           >
             <Typography
-              fontSize={36}
               sx={{
-                width: 400,
                 overflow: "hidden",
                 whiteSpace: "nowrap",
                 textOverflow: "ellipsis",
+
+                fontSize: 36,
+
+                [theme.breakpoints.down("sm")]: {
+                  fontSize: 24,
+                },
               }}
             >
               {player.username}
             </Typography>
 
-            <Typography fontSize={100}>
+            <Typography
+              sx={{
+                fontSize: 100,
+
+                [theme.breakpoints.down("sm")]: {
+                  fontSize: 64,
+                },
+              }}
+            >
               {milisecondsToMMSSsss(elapsedTime)}
             </Typography>
 

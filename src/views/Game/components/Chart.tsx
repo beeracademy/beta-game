@@ -1,24 +1,23 @@
 import { Box, useTheme } from "@mui/material";
 import { FunctionComponent, useCallback } from "react";
 import ApexChart from "react-apexcharts";
+import type { ApexAxisChartSeries } from "apexcharts";
 import useGame from "../../../stores/game";
 import { usePlayerMetrics } from "../../../stores/metrics";
-import useSettings from "../../../stores/settings";
+import { useShallow } from "zustand/react/shallow";
 
 const Chart: FunctionComponent = () => {
   const theme = useTheme();
 
-  const game = useGame((state) => ({
-    players: state.players,
-    numberOfRounds: state.numberOfRounds,
-    sipsInABeer: state.sipsInABeer,
-  }));
+  const game = useGame(
+    useShallow((state) => ({
+      players: state.players,
+      numberOfRounds: state.numberOfRounds,
+      sipsInABeer: state.sipsInABeer,
+    })),
+  );
 
   const playerMetrics = usePlayerMetrics();
-
-  const settings = useSettings((state) => ({
-    themeMode: state.themeMode,
-  }));
 
   const datasets = useCallback(() => {
     const data: ApexAxisChartSeries = playerMetrics.map((pm, i) => {
@@ -37,7 +36,7 @@ const Chart: FunctionComponent = () => {
     });
 
     return data;
-  }, [playerMetrics, settings.themeMode]);
+  }, [playerMetrics, theme.palette.mode]);
 
   return (
     <Box
@@ -109,7 +108,7 @@ const Chart: FunctionComponent = () => {
             },
           },
           theme: {
-            mode: settings.themeMode,
+            mode: theme.palette.mode,
           },
         }}
         series={datasets()}

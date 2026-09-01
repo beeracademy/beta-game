@@ -13,11 +13,13 @@ import {
   Select,
   Slider,
   Stack,
-  Switch,
+  ToggleButton,
+  ToggleButtonGroup,
 } from "@mui/material";
-import { BsSpeakerFill } from "react-icons/bs";
+import { BsMoonStarsFill, BsSpeakerFill } from "react-icons/bs";
 import { FaGamepad, FaPencilRuler } from "react-icons/fa";
-import { IoClose } from "react-icons/io5";
+import { IoClose, IoDesktopOutline } from "react-icons/io5";
+import { MdWbSunny } from "react-icons/md";
 import useSettings from "../../stores/settings";
 
 const SettingsDialog: FunctionComponent = () => {
@@ -75,16 +77,48 @@ const SettingsDialog: FunctionComponent = () => {
         >
           <Box hidden={activeTab !== 0}>
             <List>
-              <ListItem>
-                <ListItemText primary="Dark mode" />
-                <Switch
-                  checked={settings.themeMode === "dark"}
-                  onChange={() => {
-                    settings.SetThemeMode(
-                      settings.themeMode === "dark" ? "light" : "dark",
-                    );
-                  }}
+              <ListItem
+                sx={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  pr: 2,
+                }}
+              >
+                <ListItemText
+                  primary="Theme"
+                  secondary="Select your preferred theme"
                 />
+                <ToggleButtonGroup
+                  value={settings.themeMode}
+                  exclusive
+                  onChange={(_, newMode) => {
+                    if (newMode) {
+                      settings.SetThemeMode(newMode);
+                    }
+                  }}
+                  size="small"
+                  aria-label="Theme mode"
+                >
+                  <ToggleButton value="system" aria-label="System theme">
+                    <Stack direction="row" spacing={0.75} sx={{ alignItems: "center" }}>
+                      <IoDesktopOutline size={16} />
+                      <span>System</span>
+                    </Stack>
+                  </ToggleButton>
+                  <ToggleButton value="light" aria-label="Light theme">
+                    <Stack direction="row" spacing={0.75} sx={{ alignItems: "center" }}>
+                      <MdWbSunny size={16} />
+                      <span>Light</span>
+                    </Stack>
+                  </ToggleButton>
+                  <ToggleButton value="dark" aria-label="Dark theme">
+                    <Stack direction="row" spacing={0.75} sx={{ alignItems: "center" }}>
+                      <BsMoonStarsFill size={14} />
+                      <span>Dark</span>
+                    </Stack>
+                  </ToggleButton>
+                </ToggleButtonGroup>
               </ListItem>
             </List>
           </Box>

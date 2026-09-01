@@ -2,7 +2,7 @@ import ReactDOM from "react-dom/client";
 import "./index.scss";
 import { BrowserRouter } from "react-router-dom";
 import Routes from "./routes";
-import { Helmet } from "react-helmet";
+import { Helmet, HelmetProvider } from "react-helmet-async";
 import ThemeProvider from "./theme/provider";
 import { CardFlashProvider } from "./components/CardFlash";
 import SettingsDialog from "./components/SettingsDialog";
@@ -12,16 +12,18 @@ console.table(import.meta.env);
 
 ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
   <BrowserRouter>
-    <ThemeProvider>
-      <CardFlashProvider>
-        <Helmet>
-          <title>Academy</title>
-        </Helmet>
+    <HelmetProvider>
+      <ThemeProvider>
+        <CardFlashProvider>
+          <Helmet>
+            <title>Academy</title>
+          </Helmet>
 
-        <Routes />
+          <Routes />
 
-        <SettingsDialog />
-      </CardFlashProvider>
-    </ThemeProvider>
+          <SettingsDialog />
+        </CardFlashProvider>
+      </ThemeProvider>
+    </HelmetProvider>
   </BrowserRouter>,
 );

@@ -5,6 +5,8 @@ import { useCardFlash } from "../../../components/CardFlash";
 import useGame from "../../../stores/game";
 import { useGameMetrics } from "../../../stores/metrics";
 
+import { useShallow } from "zustand/react/shallow";
+
 interface CardInventoryProps {
   onCardClick?: () => void;
 }
@@ -12,11 +14,13 @@ interface CardInventoryProps {
 const CardInventory: FunctionComponent<CardInventoryProps> = ({
   onCardClick,
 }) => {
-  const game = useGame((state) => ({
-    players: state.players,
-    draws: state.draws,
-    DrawCard: state.DrawCard,
-  }));
+  const game = useGame(
+    useShallow((state) => ({
+      players: state.players,
+      draws: state.draws,
+      DrawCard: state.DrawCard,
+    })),
+  );
 
   const cardFlasher = useCardFlash();
 
@@ -99,12 +103,14 @@ const CardInventoryCard: FunctionComponent<CardInventoryCardProps> = (
           {props.value > 0 && (
             <>
               <Typography
-                fontSize={14}
-                fontWeight={800}
-                textAlign="left"
-                paddingLeft="8px"
-                paddingTop="8px"
-                zIndex={989}
+                sx={{
+                  fontSize: 14,
+                  fontWeight: 800,
+                  textAlign: "left",
+                  paddingLeft: "8px",
+                  paddingTop: "8px",
+                  zIndex: 989,
+                }}
               >
                 {props.kind}
               </Typography>
@@ -124,16 +130,16 @@ const CardInventoryCard: FunctionComponent<CardInventoryCardProps> = (
                   ease: "easeInOut",
                 }}
               >
-                <Typography fontSize={32}>{props.value}</Typography>
+                <Typography sx={{ fontSize: 32 }}>{props.value}</Typography>
               </motion.div>
 
               <Typography
-                fontSize={14}
-                fontWeight={800}
-                textAlign="left"
-                paddingLeft="8px"
-                paddingTop="8px"
                 sx={{
+                  fontSize: 14,
+                  fontWeight: 800,
+                  textAlign: "left",
+                  paddingLeft: "8px",
+                  paddingTop: "8px",
                   transform: "rotate(180deg)",
                   color: "primary.main",
                 }}

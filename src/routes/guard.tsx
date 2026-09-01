@@ -8,15 +8,13 @@ interface GameGuardProps {
 }
 
 const GameGuard: FunctionComponent<GameGuardProps> = (props) => {
-  const game = useGame((state) => ({
-    started: !!state.gameStartTimestamp,
-  }));
+  const started = useGame((state) => !!state.gameStartTimestamp);
 
-  if (props.started && !game.started) {
+  if (props.started && !started) {
     return <Navigate to="/login" />;
   }
 
-  if (!props.started && game.started) {
+  if (!props.started && started) {
     return <Navigate to="/" />;
   }
 

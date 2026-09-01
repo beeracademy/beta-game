@@ -3,14 +3,17 @@ import { FunctionComponent } from "react";
 import { getCardASCIISymbol, getCardSuitColor } from "../../../models/card";
 import useGame from "../../../stores/game";
 import { milisecondsToMMSSsss } from "../../../utilities/time";
+import { useShallow } from "zustand/react/shallow";
 
 const ChugsList: FunctionComponent = () => {
   const theme = useTheme();
 
-  const game = useGame((state) => ({
-    draws: state.draws,
-    players: state.players,
-  }));
+  const game = useGame(
+    useShallow((state) => ({
+      draws: state.draws,
+      players: state.players,
+    })),
+  );
 
   const chugs = game.draws
     .map((d, i) => ({
@@ -26,11 +29,11 @@ const ChugsList: FunctionComponent = () => {
   return (
     <Stack
       direction="row"
-      alignItems="center"
-      justifyContent="center"
       spacing={2}
-      height={75}
       sx={{
+        alignItems: "center",
+        justifyContent: "center",
+        height: 75,
         userSelect: "none",
         flexShrink: 0,
       }}
@@ -51,13 +54,15 @@ const ChugsList: FunctionComponent = () => {
           >
             <Stack
               direction="column"
-              alignItems="center"
-              justifyContent="center"
-              height="100%"
-              position="relative"
-              zIndex={1}
-              fontSize={18}
-              gap={1}
+              sx={{
+                alignItems: "center",
+                justifyContent: "center",
+                height: "100%",
+                position: "relative",
+                zIndex: 1,
+                fontSize: 18,
+                gap: 1,
+              }}
             >
               <Box
                 sx={{

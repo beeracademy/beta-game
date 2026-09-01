@@ -1,0 +1,18 @@
+{
+  "$schema": "https://unpkg.com/knip@5/overview/config.json",
+  "project": ["src/**/*.{ts,tsx,scss,sass}"],
+  "ignore": [
+    "src/api/endpoints/stats.ts",
+    "src/api/models/location.ts",
+    "src/api/models/player.ts",
+    "src/models/game.ts",
+    "src/models/location.ts",
+    "src/views/Game/components/Chat.tsx",
+    "src/views/Game/components/PictureDialog.tsx"
+  ],
+  "ignoreExportsUsedInFile": true,
+  "rules": {
+    "exports": "off",
+    "types": "off"
+  }
+}

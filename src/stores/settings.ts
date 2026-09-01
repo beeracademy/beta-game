@@ -1,7 +1,18 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
-type ThemeMode = "light" | "dark";
+type ThemeMode = "system" | "light" | "dark";
+
+export const getNextThemeMode = (current: ThemeMode): ThemeMode => {
+  switch (current) {
+    case "system":
+      return "dark";
+    case "dark":
+      return "light";
+    case "light":
+      return "system";
+  }
+};
 
 interface SettingsState {
   themeMode: ThemeMode;
@@ -22,7 +33,7 @@ interface SettingsActions {
 }
 
 const initialState: SettingsState = {
-  themeMode: "light",
+  themeMode: "system",
 
   simpleCardsMode: true,
 
@@ -58,9 +69,20 @@ const useSettings = create<SettingsState & SettingsActions>()(
     }),
     {
       name: "settings",
+      version: 1,
+      migrate: (persistedState: any, version: number) => {
+        if (version === 0) {
+          return {
+            ...persistedState,
+            themeMode: "system",
+          };
+        }
+        return persistedState;
+      },
     },
   ),
 );
 
 export default useSettings;
 export type { SettingsActions, SettingsState, ThemeMode };
+
