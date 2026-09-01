@@ -43,7 +43,7 @@ describe("GameFinishedDialog", () => {
     });
   });
 
-  it("in offline mode, bypasses picture/description and directly renders choices", () => {
+  it("in offline mode, still renders picture/notes step first (for local testing)", () => {
     useGame.setState({
       offline: true,
       submitted: false,
@@ -51,7 +51,26 @@ describe("GameFinishedDialog", () => {
 
     render(<GameFinishedDialog open={true} />);
 
-    // In offline mode, choices should be directly visible
+    // Notes field and Submit button should be visible, same as online mode
+    expect(
+      screen.getByPlaceholderText(/add game notes or victory message/i),
+    ).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Submit" })).toBeInTheDocument();
+
+    // Choices buttons should not yet be visible
+    expect(
+      screen.queryByRole("button", { name: /play again with the same people/i }),
+    ).not.toBeInTheDocument();
+  });
+
+  it("when already submitted, bypasses picture/description and directly renders choices", () => {
+    useGame.setState({
+      submitted: true,
+    });
+
+    render(<GameFinishedDialog open={true} />);
+
+    // When already submitted, choices should be directly visible
     expect(
       screen.getByRole("button", { name: /play again with the same people/i }),
     ).toBeInTheDocument();
@@ -123,6 +142,7 @@ describe("GameFinishedDialog", () => {
 
     useGame.setState({
       offline: true,
+      submitted: true,
       PlayAgain: playAgainSpy,
     });
 
@@ -145,6 +165,7 @@ describe("GameFinishedDialog", () => {
 
     useGame.setState({
       offline: true,
+      submitted: true,
       Exit: exitSpy,
     });
 
@@ -166,6 +187,7 @@ describe("GameFinishedDialog", () => {
 
     render(<GameFinishedDialog open={true} onClose={onCloseSpy} />);
 
+    // Close (X) icon is available regardless of step
     const closeIconBtn = screen.getByRole("button", { name: "Close" });
     fireEvent.click(closeIconBtn);
 

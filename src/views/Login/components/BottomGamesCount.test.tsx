@@ -3,9 +3,11 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import useGamesPlayed from "../../../stores/gamesPlayed";
 import BottomGamesCount from "./BottomGamesCount";
 
+const playMock = vi.fn();
+
 vi.mock("../../../hooks/sounds", () => ({
   useSounds: () => ({
-    play: vi.fn(),
+    play: playMock,
     pause: vi.fn(),
     mute: vi.fn(),
     unmute: vi.fn(),
@@ -16,17 +18,12 @@ vi.mock("../../../hooks/sounds", () => ({
 
 describe("BottomGamesCount", () => {
   beforeEach(() => {
-    vi.useFakeTimers();
     localStorage.clear();
+    playMock.mockClear();
     useGamesPlayed.setState({
       started: 5,
       completed: 3,
     });
-  });
-
-  afterEach(() => {
-    vi.runOnlyPendingTimers();
-    vi.useRealTimers();
   });
 
   it("renders the current game count", () => {
@@ -36,45 +33,28 @@ describe("BottomGamesCount", () => {
     ).toBeInTheDocument();
   });
 
-  it("does not open dialog if released before long press finishes", () => {
+  it("opens dialog instantly when pressed and plays pop sound", () => {
     render(<BottomGamesCount />);
     const textElement = screen.getByText(
       "5 games started and 3 completed on this computer",
     );
 
-    fireEvent.pointerDown(textElement, { button: 0, clientX: 100, clientY: 100 });
-    act(() => {
-      vi.advanceTimersByTime(800);
-    });
-    fireEvent.pointerUp(textElement);
+    fireEvent.click(textElement);
 
-    act(() => {
-      vi.advanceTimersByTime(1000);
-    });
-
-    expect(screen.queryByText("Reset counter")).not.toBeInTheDocument();
-  });
-
-  it("opens dialog when long pressed and resets counter on confirm", () => {
-    render(<BottomGamesCount />);
-    const textElement = screen.getByText(
-      "5 games started and 3 completed on this computer",
-    );
-
-    fireEvent.pointerDown(textElement, { button: 0, clientX: 100, clientY: 100 });
-
-    act(() => {
-      vi.advanceTimersByTime(1500);
-    });
-
-    act(() => {
-      vi.advanceTimersByTime(250);
-    });
-
+    expect(playMock).toHaveBeenCalledWith("pop");
     expect(screen.getByText("Reset counter")).toBeInTheDocument();
     expect(
       screen.getByText("Do you want to reset the counter?"),
     ).toBeInTheDocument();
+  });
+
+  it("resets counter when confirmed in dialog", () => {
+    render(<BottomGamesCount />);
+    const textElement = screen.getByText(
+      "5 games started and 3 completed on this computer",
+    );
+
+    fireEvent.click(textElement);
 
     const confirmButton = screen.getByRole("button", { name: "Confirm" });
     fireEvent.click(confirmButton);
@@ -92,11 +72,7 @@ describe("BottomGamesCount", () => {
       "5 games started and 3 completed on this computer",
     );
 
-    fireEvent.pointerDown(textElement, { button: 0, clientX: 100, clientY: 100 });
-
-    act(() => {
-      vi.advanceTimersByTime(1750);
-    });
+    fireEvent.click(textElement);
 
     const cancelButton = screen.getByRole("button", { name: "Cancel" });
     fireEvent.click(cancelButton);

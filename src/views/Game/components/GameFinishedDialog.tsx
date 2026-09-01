@@ -42,7 +42,6 @@ const GameFinishedDialog: FunctionComponent<GameFinishedDialogProps> = (
     Exit,
     Submit,
     PlayAgain,
-    offline,
     submitted,
   } = useGame(
     useShallow((state) => ({
@@ -51,7 +50,6 @@ const GameFinishedDialog: FunctionComponent<GameFinishedDialogProps> = (
       Exit: state.Exit,
       Submit: state.Submit,
       PlayAgain: state.PlayAgain,
-      offline: state.offline,
       submitted: state.submitted,
     })),
   );
@@ -60,8 +58,8 @@ const GameFinishedDialog: FunctionComponent<GameFinishedDialogProps> = (
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isRestarting, setIsRestarting] = useState(false);
 
-  // If offline or already submitted, directly show choices step
-  const isDirectToChoices = offline || Boolean(submitted);
+  // TODO: offline no longer bypasses picture/description, to make it testable locally
+  const isDirectToChoices = Boolean(submitted);
   const [step, setStep] = useState<"summary" | "choices">(() =>
     isDirectToChoices ? "choices" : "summary",
   );
@@ -383,6 +381,9 @@ const Camera: FunctionComponent = memo(() => {
   const [selectedDeviceIndex, setSelectedDeviceIndex] = useState<number>(0);
   const [cameraLoading, setCameraLoading] = useState<boolean>(true);
   const [cameraError, setCameraError] = useState<string | null>(null);
+  const [videoAspectRatio, setVideoAspectRatio] = useState<number | null>(
+    null,
+  );
 
   const game = useGame(
     useShallow((state) => ({
@@ -452,6 +453,7 @@ const Camera: FunctionComponent = memo(() => {
 
     setCameraLoading(true);
     setCameraError(null);
+    setVideoAspectRatio(null);
 
     if (!navigator?.mediaDevices?.getUserMedia) {
       setCameraError("Camera is not supported on this device");
@@ -652,7 +654,7 @@ const Camera: FunctionComponent = memo(() => {
           sx={{
             width: "100%",
             maxWidth: 480,
-            aspectRatio: "4 / 3",
+            aspectRatio: videoAspectRatio ?? 4 / 3,
             maxHeight: { xs: "36vh", sm: "360px" },
             overflow: "hidden",
             position: "relative",
@@ -719,6 +721,12 @@ const Camera: FunctionComponent = memo(() => {
             autoPlay
             playsInline
             muted
+            onLoadedMetadata={(e) => {
+              const video = e.currentTarget;
+              if (video.videoWidth && video.videoHeight) {
+                setVideoAspectRatio(video.videoWidth / video.videoHeight);
+              }
+            }}
             style={{
               width: "100%",
               height: "100%",

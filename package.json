@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "dev:https": "HTTPS=true vite",
     "build": "tsc && vite build",
     "format": "prettier --write .",
     "lint": "oxlint",
@@ -43,6 +44,7 @@
     "@testing-library/react": "^16.3.3",
     "@types/react": "^19.2.18",
     "@types/react-dom": "^19.2.5",
+    "@vitejs/plugin-basic-ssl": "^2.3.0",
     "@vitejs/plugin-react": "^6.1.1",
     "@vitest/ui": "^4.1.11",
     "axios-logger": "^2.8.1",
