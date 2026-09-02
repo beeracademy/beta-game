@@ -374,7 +374,6 @@ const ChugDialog: FunctionComponent<ChugDialogProps> = (props) => {
 					<Typography
 						data-testid="chug-timer"
 						sx={{
-							fontFamily: theme.typography.fontFamilyMonospace,
 							fontSize: 100,
 							fontWeight: 700,
 							fontVariantNumeric: "tabular-nums",
