@@ -1,69 +1,69 @@
 import {
-  FunctionComponent,
-  ReactNode,
-  createContext,
-  useContext,
-  useState,
+	createContext,
+	type FunctionComponent,
+	type ReactNode,
+	useContext,
+	useState,
 } from "react";
-import { Card } from "../../models/card";
+import type { Card } from "../../models/card";
 import { CardFlashDialog } from "./dialog";
 
 const CardFlashContext = createContext({
-  show: false,
-  flash: (card: Card, options?: flashCardOptions) => {},
-  hide: () => {},
+	show: false,
+	flash: (card: Card, options?: flashCardOptions) => {},
+	hide: () => {},
 });
 
 export const useCardFlash = () => {
-  return useContext(CardFlashContext);
+	return useContext(CardFlashContext);
 };
 
 export interface CardFlashProviderProps {
-  children: ReactNode | ReactNode[];
-  duration?: number;
+	children: ReactNode | ReactNode[];
+	duration?: number;
 }
 
 export interface flashCardOptions {
-  duration?: number;
+	duration?: number;
 }
 
 export const CardFlashProvider: FunctionComponent<CardFlashProviderProps> = ({
-  duration = 1500,
-  ...props
+	duration = 1500,
+	...props
 }) => {
-  const [show, setShow] = useState(false);
-  const [card, setCard] = useState<Card>();
-  const [_, setTimeoutRef] = useState<ReturnType<typeof setInterval>>();
+	const [show, setShow] = useState(false);
+	const [card, setCard] = useState<Card>();
+	const [_, setTimeoutRef] = useState<ReturnType<typeof setInterval>>();
 
-  const flash = (card: Card, options?: flashCardOptions) => {
-    setCard(card);
+	const flash = (card: Card, options?: flashCardOptions) => {
+		setCard(card);
 
-    setTimeoutRef((prev) => {
-      prev && clearTimeout(prev);
-      return setTimeout(() => {
-        setShow(false);
-        setCard(undefined);
-      }, options?.duration || duration);
-    });
+		setTimeoutRef((prev) => {
+			prev && clearTimeout(prev);
+			return setTimeout(() => {
+				setShow(false);
+				setCard(undefined);
+			}, options?.duration || duration);
+		});
 
-    setShow(true);
-  };
+		setShow(true);
+	};
 
-  const hide = () => {
-    setShow(false);
-    setCard(undefined);
-  };
+	const hide = () => {
+		setShow(false);
+		setCard(undefined);
+	};
 
-  return (
-    <CardFlashContext.Provider
-      value={{
-        show,
-        flash,
-        hide,
-      }}
-    >
-      {card && <CardFlashDialog open={show} card={card} />}
-      {props.children}
-    </CardFlashContext.Provider>
-  );
+	return (
+		<CardFlashContext.Provider
+			value={{
+				show,
+				flash,
+				hide,
+			}}
+		>
+			{card && <CardFlashDialog open={show} card={card} />}
+			{props.children}
+		</CardFlashContext.Provider>
+	);
 };

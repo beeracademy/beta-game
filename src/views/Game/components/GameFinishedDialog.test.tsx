@@ -4,196 +4,203 @@ import useGame from "../../../stores/game";
 import GameFinishedDialog from "./GameFinishedDialog";
 
 vi.mock("@fireworks-js/react", () => ({
-  Fireworks: () => <div data-testid="fireworks-mock" />,
+	Fireworks: () => <div data-testid="fireworks-mock" />,
 }));
 
 vi.mock("../../../hooks/sounds", () => ({
-  useSounds: () => ({
-    play: vi.fn(),
-    pause: vi.fn(),
-    mute: vi.fn(),
-    unmute: vi.fn(),
-    stop: vi.fn(),
-    stopAll: vi.fn(),
-  }),
+	useSounds: () => ({
+		play: vi.fn(),
+		pause: vi.fn(),
+		mute: vi.fn(),
+		unmute: vi.fn(),
+		stop: vi.fn(),
+		stopAll: vi.fn(),
+	}),
 }));
 
 vi.mock("../../../hooks/camera", () => ({
-  useVideoDevices: () => ({
-    devices: [],
-  }),
+	useVideoDevices: () => ({
+		devices: [],
+	}),
 }));
 
 describe("GameFinishedDialog", () => {
-  const samplePlayers = [
-    { id: 1, username: "Alice", token: "tok1" },
-    { id: 2, username: "Bob", token: "tok2" },
-  ];
+	const samplePlayers = [
+		{ id: 1, username: "Alice", token: "tok1" },
+		{ id: 2, username: "Bob", token: "tok2" },
+	];
 
-  beforeEach(() => {
-    localStorage.clear();
-    useGame.setState({
-      players: samplePlayers,
-      offline: false,
-      submitted: false,
-      description: undefined,
-      image: undefined,
-      token: "game-token-123",
-      id: 999,
-    });
-  });
+	beforeEach(() => {
+		localStorage.clear();
+		useGame.setState({
+			players: samplePlayers,
+			offline: false,
+			submitted: false,
+			description: undefined,
+			image: undefined,
+			token: "game-token-123",
+			id: 999,
+		});
+	});
 
-  it("in offline mode, bypasses picture/description and directly renders choices", () => {
-    useGame.setState({
-      offline: true,
-      submitted: false,
-    });
+	it("in offline mode, bypasses picture/description and directly renders choices", () => {
+		useGame.setState({
+			offline: true,
+			submitted: false,
+		});
 
-    render(<GameFinishedDialog open={true} />);
+		render(<GameFinishedDialog open={true} />);
 
-    // Choices buttons should be directly visible
-    expect(
-      screen.getByRole("button", { name: /play again with the same people/i }),
-    ).toBeInTheDocument();
-    expect(
-      screen.getByRole("button", { name: /exit game/i }),
-    ).toBeInTheDocument();
+		// Choices buttons should be directly visible
+		expect(
+			screen.getByRole("button", { name: /play again with the same people/i }),
+		).toBeInTheDocument();
+		expect(
+			screen.getByRole("button", { name: /exit game/i }),
+		).toBeInTheDocument();
 
-    // Notes field and Submit button should NOT be visible
-    expect(
-      screen.queryByPlaceholderText(/any last words before the hangover/i),
-    ).not.toBeInTheDocument();
-    expect(screen.queryByText("Submit")).not.toBeInTheDocument();
-  });
+		// Notes field and Submit button should NOT be visible
+		expect(
+			screen.queryByPlaceholderText(/any last words before the hangover/i),
+		).not.toBeInTheDocument();
+		expect(screen.queryByText("Submit")).not.toBeInTheDocument();
+	});
 
-  it("when already submitted, bypasses picture/description and directly renders choices", () => {
-    useGame.setState({
-      submitted: true,
-    });
+	it("when already submitted, bypasses picture/description and directly renders choices", () => {
+		useGame.setState({
+			submitted: true,
+		});
 
-    render(<GameFinishedDialog open={true} />);
+		render(<GameFinishedDialog open={true} />);
 
-    // When already submitted, choices should be directly visible
-    expect(
-      screen.getByRole("button", { name: /play again with the same people/i }),
-    ).toBeInTheDocument();
-    expect(
-      screen.getByRole("button", { name: /exit game/i }),
-    ).toBeInTheDocument();
-    // 'Close dialog' button should NOT exist (X is used instead)
-    expect(
-      screen.queryByRole("button", { name: "Close dialog" }),
-    ).not.toBeInTheDocument();
+		// When already submitted, choices should be directly visible
+		expect(
+			screen.getByRole("button", { name: /play again with the same people/i }),
+		).toBeInTheDocument();
+		expect(
+			screen.getByRole("button", { name: /exit game/i }),
+		).toBeInTheDocument();
+		// 'Close dialog' button should NOT exist (X is used instead)
+		expect(
+			screen.queryByRole("button", { name: "Close dialog" }),
+		).not.toBeInTheDocument();
 
-    // Notes / victory message input should NOT be present
-    expect(
-      screen.queryByPlaceholderText(/any last words before the hangover/i),
-    ).not.toBeInTheDocument();
-    expect(screen.queryByText("Submit")).not.toBeInTheDocument();
-  });
+		// Notes / victory message input should NOT be present
+		expect(
+			screen.queryByPlaceholderText(/any last words before the hangover/i),
+		).not.toBeInTheDocument();
+		expect(screen.queryByText("Submit")).not.toBeInTheDocument();
+	});
 
-  it("in online mode, renders picture/notes step first with Submit button", () => {
-    useGame.setState({
-      offline: false,
-      submitted: false,
-    });
+	it("in online mode, renders picture/notes step first with Submit button", () => {
+		useGame.setState({
+			offline: false,
+			submitted: false,
+		});
 
-    render(<GameFinishedDialog open={true} />);
+		render(<GameFinishedDialog open={true} />);
 
-    // Notes field and Submit button should be visible
-    expect(
-      screen.getByPlaceholderText(/any last words before the hangover/i),
-    ).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Submit" })).toBeInTheDocument();
+		// Notes field and Submit button should be visible
+		expect(
+			screen.getByPlaceholderText(/any last words before the hangover/i),
+		).toBeInTheDocument();
+		expect(screen.getByRole("button", { name: "Submit" })).toBeInTheDocument();
 
-    // Choices buttons should not yet be visible
-    expect(
-      screen.queryByRole("button", { name: /play again with the same people/i }),
-    ).not.toBeInTheDocument();
-  });
+		// Choices buttons should not yet be visible
+		expect(
+			screen.queryByRole("button", {
+				name: /play again with the same people/i,
+			}),
+		).not.toBeInTheDocument();
+	});
 
-  it("in online mode, submitting transitions to choices", async () => {
-    const submitSpy = vi.fn().mockResolvedValue(undefined);
-    useGame.setState({
-      offline: false,
-      submitted: false,
-      Submit: submitSpy,
-    });
+	it("in online mode, submitting transitions to choices", async () => {
+		const submitSpy = vi.fn().mockResolvedValue(undefined);
+		useGame.setState({
+			offline: false,
+			submitted: false,
+			Submit: submitSpy,
+		});
 
-    render(<GameFinishedDialog open={true} />);
+		render(<GameFinishedDialog open={true} />);
 
-    const submitBtn = screen.getByRole("button", { name: "Submit" });
-    fireEvent.click(submitBtn);
+		const submitBtn = screen.getByRole("button", { name: "Submit" });
+		fireEvent.click(submitBtn);
 
-    await waitFor(() => {
-      expect(submitSpy).toHaveBeenCalled();
-      expect(
-        screen.getByRole("button", { name: /play again with the same people/i }),
-      ).toBeInTheDocument();
-      expect(
-        screen.getByRole("button", { name: /exit game/i }),
-      ).toBeInTheDocument();
-      expect(
-        screen.queryByRole("button", { name: "Close dialog" }),
-      ).not.toBeInTheDocument();
-    });
-  });
+		await waitFor(() => {
+			expect(submitSpy).toHaveBeenCalled();
+			expect(
+				screen.getByRole("button", {
+					name: /play again with the same people/i,
+				}),
+			).toBeInTheDocument();
+			expect(
+				screen.getByRole("button", { name: /exit game/i }),
+			).toBeInTheDocument();
+			expect(
+				screen.queryByRole("button", { name: "Close dialog" }),
+			).not.toBeInTheDocument();
+		});
+	});
 
-  it("triggers PlayAgain on clicking 'Play again with the same people!'", async () => {
-    const playAgainSpy = vi.fn().mockResolvedValue(undefined);
-    const onCloseSpy = vi.fn();
+	it("triggers PlayAgain on clicking 'Play again with the same people!'", async () => {
+		const playAgainSpy = vi.fn().mockResolvedValue(undefined);
+		const onCloseSpy = vi.fn();
 
-    useGame.setState({
-      offline: true,
-      submitted: true,
-      PlayAgain: playAgainSpy,
-    });
+		useGame.setState({
+			offline: true,
+			submitted: true,
+			PlayAgain: playAgainSpy,
+		});
 
-    render(<GameFinishedDialog open={true} onClose={onCloseSpy} />);
+		render(<GameFinishedDialog open={true} onClose={onCloseSpy} />);
 
-    const playAgainBtn = screen.getByRole("button", {
-      name: /play again with the same people/i,
-    });
-    fireEvent.click(playAgainBtn);
+		const playAgainBtn = screen.getByRole("button", {
+			name: /play again with the same people/i,
+		});
+		fireEvent.click(playAgainBtn);
 
-    await waitFor(() => {
-      expect(playAgainSpy).toHaveBeenCalled();
-      expect(onCloseSpy).toHaveBeenCalled();
-    });
-  });
+		await waitFor(() => {
+			expect(playAgainSpy).toHaveBeenCalled();
+			expect(onCloseSpy).toHaveBeenCalled();
+		});
+	});
 
-  it("triggers Exit on clicking 'Exit Game'", () => {
-    const exitSpy = vi.fn();
-    const onCloseSpy = vi.fn();
+	it("triggers Exit on clicking 'Exit Game'", () => {
+		const exitSpy = vi.fn();
+		const onCloseSpy = vi.fn();
 
-    useGame.setState({
-      offline: true,
-      submitted: true,
-      Exit: exitSpy,
-    });
+		useGame.setState({
+			offline: true,
+			submitted: true,
+			Exit: exitSpy,
+		});
 
-    render(<GameFinishedDialog open={true} onClose={onCloseSpy} />);
+		render(<GameFinishedDialog open={true} onClose={onCloseSpy} />);
 
-    const exitBtn = screen.getByRole("button", { name: /exit game/i });
-    fireEvent.click(exitBtn);
+		const exitBtn = screen.getByRole("button", { name: /exit game/i });
+		fireEvent.click(exitBtn);
 
-    expect(exitSpy).toHaveBeenCalledWith({ dnf: false, description: undefined });
-    expect(onCloseSpy).toHaveBeenCalled();
-  });
+		expect(exitSpy).toHaveBeenCalledWith({
+			dnf: false,
+			description: undefined,
+		});
+		expect(onCloseSpy).toHaveBeenCalled();
+	});
 
-  it("calls onClose when the top-right close icon (X) is clicked", () => {
-    const onCloseSpy = vi.fn();
+	it("calls onClose when the top-right close icon (X) is clicked", () => {
+		const onCloseSpy = vi.fn();
 
-    useGame.setState({
-      offline: true,
-    });
+		useGame.setState({
+			offline: true,
+		});
 
-    render(<GameFinishedDialog open={true} onClose={onCloseSpy} />);
+		render(<GameFinishedDialog open={true} onClose={onCloseSpy} />);
 
-    // Close (X) icon is available regardless of step
-    const closeIconBtn = screen.getByRole("button", { name: "Close" });
-    fireEvent.click(closeIconBtn);
+		// Close (X) icon is available regardless of step
+		const closeIconBtn = screen.getByRole("button", { name: "Close" });
+		fireEvent.click(closeIconBtn);
 
-    expect(onCloseSpy).toHaveBeenCalled();
-  });
+		expect(onCloseSpy).toHaveBeenCalled();
+	});
 });
