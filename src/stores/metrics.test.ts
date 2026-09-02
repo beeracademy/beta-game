@@ -1,7 +1,6 @@
 import { beforeEach, describe, expect, it } from "vitest";
 import { Card } from "../models/card";
 import { Player } from "../models/player";
-import { GenerateShuffleIndices } from "../utilities/deck";
 import useGame from "./game";
 import {
   calculateLeaderboard,

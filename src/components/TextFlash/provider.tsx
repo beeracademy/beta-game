@@ -23,7 +23,7 @@ interface TextFlashItem {
 }
 
 const TextFlashContext = createContext({
-  flash: (text: string, options?: TextFlashOptions) => {},
+  flash: (_text: string, _options?: TextFlashOptions) => {},
   clear: () => {},
 });
 
@@ -63,19 +63,21 @@ export const TextFlashProvider: FunctionComponent<TextFlashProviderProps> = ({
   };
 
   const current = queue[0];
+  const currentId = current?.id;
+  const currentDuration = current?.duration;
 
   // Advances the queue once the current message's own animation has had time to play out
   useEffect(() => {
-    if (!current) {
+    if (currentId === undefined || currentDuration === undefined) {
       return;
     }
 
     const timeout = setTimeout(() => {
       setQueue((prev) => prev.slice(1));
-    }, current.duration);
+    }, currentDuration);
 
     return () => clearTimeout(timeout);
-  }, [current?.id]);
+  }, [currentId, currentDuration]);
 
   return (
     <TextFlashContext.Provider value={{ flash, clear }}>

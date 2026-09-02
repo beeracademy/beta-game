@@ -79,18 +79,18 @@ const play = (
     oneInstance: false,
   },
 ) => {
+  if (options.oneInstance) {
+    const existing = activeSounds.get(soundName);
+    if (existing && existing.length > 0) {
+      return existing[0];
+    }
+  }
+
   const sound = new Howl({
     src: [`/sounds/${soundName}.mp3`, `/sounds/${soundName}.ogg`],
     loop: options.loop,
     mute: mutedSounds.has(soundName),
   });
-
-  if (options.oneInstance) {
-    const sounds = activeSounds.get(soundName);
-    if (sounds && sounds.length > 0) {
-      return sounds[0];
-    }
-  }
 
   sound.play();
 

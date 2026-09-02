@@ -1,6 +1,6 @@
 import { AxiosInstance } from "axios";
 
-export function TokenInteceptor(inst: AxiosInstance) {
+export function TokenInterceptor(inst: AxiosInstance) {
   inst.interceptors.request.use(
     async (request) => {
       const orgAuth = request.headers?.Authorization;
@@ -16,7 +16,7 @@ export function TokenInteceptor(inst: AxiosInstance) {
       return request;
     },
     (error) => {
-      Promise.reject(error);
+      return Promise.reject(error);
     },
   );
 }

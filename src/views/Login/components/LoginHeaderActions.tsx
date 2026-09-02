@@ -10,7 +10,7 @@ import useSettings, {
   ThemeMode,
 } from "../../../stores/settings";
 
-export const LoginHeaderActions: FunctionComponent = () => {
+const LoginHeaderActions: FunctionComponent = () => {
   const theme = useTheme();
   const sound = useSounds();
 

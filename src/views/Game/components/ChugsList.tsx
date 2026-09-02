@@ -3,7 +3,7 @@ import type { FunctionComponent } from "react";
 import { useShallow } from "zustand/react/shallow";
 import { getCardASCIISymbol, getCardSuitColor } from "../../../models/card";
 import useGame from "../../../stores/game";
-import { milisecondsToMMSSsss } from "../../../utilities/time";
+import { millisecondsToMMSSsss } from "../../../utilities/time";
 
 const ChugsList: FunctionComponent = () => {
   const theme = useTheme();
@@ -81,7 +81,7 @@ const ChugsList: FunctionComponent = () => {
               >
                 <b>{c.username}</b>
               </Box>
-              <span>{milisecondsToMMSSsss(c.duration)}</span>
+              <span>{millisecondsToMMSSsss(c.duration)}</span>
             </Stack>
 
             <Box

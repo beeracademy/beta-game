@@ -18,12 +18,14 @@ export const customCommands: Command[] = [
       switch (args[0]) {
         case "draw":
           try {
-            const [card, _] = useGame.getState().DrawCard();
+            const [card] = useGame.getState().DrawCard();
             buffer.write(`You drew ${card.value} of ${getCardSuitName(card)}!`);
           } catch (error) {
             buffer.write(`Error: ${error}`);
           }
+          break;
         default:
+          break;
       }
     },
   },
@@ -54,12 +56,13 @@ export const customCommands: Command[] = [
           buffer.write(sounds.SoundNames.join(", "));
           break;
         default:
+          break;
       }
     },
   },
   {
     name: "idhair",
-    execute: (args: string[], buffer: Buffer) => {
+    execute: (_args: string[], buffer: Buffer) => {
       buffer.write("Drewsen <3");
       setTimeout(() => {
         window.open("https://www.youtube.com/watch?v=iL5_7Pey4xE", "_blank");
@@ -68,7 +71,7 @@ export const customCommands: Command[] = [
   },
   {
     name: "important",
-    execute: (args: string[], buffer: Buffer) => {
+    execute: (_args: string[], buffer: Buffer) => {
       buffer.write("yee...");
 
       setTimeout(() => {

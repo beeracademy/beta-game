@@ -14,9 +14,9 @@ const GenerateDeck = (
     );
   }
 
-  const cacheKey = shuffleIndices.join("") + numberOfPlayers;
+  const cacheKey = `${shuffleIndices.join(",")}:${numberOfPlayers}`;
   if (deckCache.has(cacheKey)) {
-    return deckCache.get(cacheKey) as Card[];
+    return [...(deckCache.get(cacheKey) as Card[])];
   }
 
   const deck: Card[] = [];
@@ -36,7 +36,7 @@ const GenerateDeck = (
 
   deckCache.set(cacheKey, deck);
 
-  return deck;
+  return [...deck];
 };
 
 function GenerateShuffleIndices(numberOfPlayers: number): number[] {
@@ -69,7 +69,7 @@ const GetSumOfNHighestCards = (cards: Card[], n: number): number => {
     throw new Error("n should be less than or equal to the number of cards");
   }
 
-  return cards
+  return [...cards]
     .sort((a, b) => a.value - b.value)
     .slice(-n)
     .reduce((acc, card) => acc + card.value, 0);
@@ -84,7 +84,7 @@ const GetSumOfNLowestCards = (cards: Card[], n: number): number => {
     throw new Error("n should be less than or equal to the number of cards");
   }
 
-  return cards
+  return [...cards]
     .sort((a, b) => a.value - b.value)
     .slice(0, n)
     .reduce((acc, card) => acc + card.value, 0);

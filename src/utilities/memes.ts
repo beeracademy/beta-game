@@ -10,10 +10,10 @@ export async function GetRandomMemeByTag(tag: string): Promise<string> {
       Date.now(),
   );
 
-  const { data, errors } = await resp.json();
-  if (resp.ok) {
-    return data.images.original.url;
+  const result = await resp.json();
+  if (resp.ok && result?.data?.images?.original?.url) {
+    return result.data.images.original.url;
   } else {
-    throw new Error(errors);
+    throw new Error(result?.errors || "No meme found");
   }
 }

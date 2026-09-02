@@ -136,7 +136,7 @@ const Terminal: FunctionComponent<TerminalProps> = (props) => {
     {
       name: "exit",
       description: "close the terminal",
-      execute: (args: string[], buffer: Buffer) => {
+      execute: (_args: string[], _buffer: Buffer) => {
         props.onClose();
       },
     },

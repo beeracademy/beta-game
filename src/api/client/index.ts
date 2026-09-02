@@ -1,7 +1,7 @@
 import axios from "axios";
 import AxiosMockAdapter from "axios-mock-adapter";
 import * as AxiosLogger from "axios-logger";
-import { TokenInteceptor } from "../inteceptors/token";
+import { TokenInterceptor } from "../interceptors/token";
 
 const mockInstance = axios.create();
 
@@ -18,7 +18,7 @@ const realInstance = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL,
 });
 
-TokenInteceptor(realInstance);
+TokenInterceptor(realInstance);
 
 export const mock = new AxiosMockAdapter(mockInstance, {
   delayResponse: 200,

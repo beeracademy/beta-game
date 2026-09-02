@@ -30,7 +30,7 @@ export const secondsToHHMMSSsss = (milliseconds: number): string => {
   return `${hoursStr}:${minutesStr}:${secondsStr}.${msStr}`;
 };
 
-export const milisecondsToMMSSsss = (milliseconds: number): string => {
+export const millisecondsToMMSSsss = (milliseconds: number): string => {
   const safeMs = Math.max(0, Math.floor(milliseconds || 0));
   const totalSeconds = Math.floor(safeMs / 1000);
   const minutes = Math.floor(totalSeconds / 60);

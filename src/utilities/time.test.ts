@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
-  milisecondsToMMSSsss,
+  millisecondsToMMSSsss,
   secondsToHHMMSS,
   secondsToHHMMSSsss,
 } from "./time";
@@ -71,11 +71,11 @@ describe("time utilities", () => {
     });
   });
 
-  describe("milisecondsToMMSSsss", () => {
+  describe("millisecondsToMMSSsss", () => {
     it("should format minutes, seconds and milliseconds", () => {
-      expect(milisecondsToMMSSsss(0)).toBe("00:00.000");
-      expect(milisecondsToMMSSsss(199923)).toBe("03:19.923");
-      expect(milisecondsToMMSSsss(65 * 60 * 1000 + 123)).toBe("65:00.123");
+      expect(millisecondsToMMSSsss(0)).toBe("00:00.000");
+      expect(millisecondsToMMSSsss(199923)).toBe("03:19.923");
+      expect(millisecondsToMMSSsss(65 * 60 * 1000 + 123)).toBe("65:00.123");
     });
   });
 });

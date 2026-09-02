@@ -14,7 +14,7 @@ import { IoClose } from "react-icons/io5";
 import { useShallow } from "zustand/react/shallow";
 import { getCardASCIISymbol, getCardSuitColor } from "../../../models/card";
 import useGame from "../../../stores/game";
-import { milisecondsToMMSSsss } from "../../../utilities/time";
+import { millisecondsToMMSSsss } from "../../../utilities/time";
 
 interface ChugsHistoryDialogProps extends DialogProps {}
 
@@ -121,7 +121,7 @@ const ChugsHistoryDialog: FunctionComponent<ChugsHistoryDialogProps> = (
                       textAlign: "right",
                     }}
                   >
-                    {milisecondsToMMSSsss(c.duration)}
+                    {millisecondsToMMSSsss(c.duration)}
                   </Typography>
                 </Stack>
               );

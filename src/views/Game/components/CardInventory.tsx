@@ -3,7 +3,6 @@ import { Box, Card, darken, Stack, Typography, useTheme } from "@mui/material";
 import { AnimatePresence, motion } from "framer-motion";
 import { type FunctionComponent, memo } from "react";
 import { useShallow } from "zustand/react/shallow";
-import { useCardFlash } from "../../../components/CardFlash";
 import useGame from "../../../stores/game";
 import { useGameMetrics } from "../../../stores/metrics";
 
@@ -31,8 +30,6 @@ const CardInventory: FunctionComponent<CardInventoryProps> = ({
       DrawCard: state.DrawCard,
     })),
   );
-
-  const cardFlasher = useCardFlash();
 
   const gameMetrics = useGameMetrics();
 
@@ -86,6 +83,7 @@ const CardInventoryCard: FunctionComponent<CardInventoryCardProps> = (
     >
       <AnimatePresence initial={false}>
         <Card
+          key="card"
           variant="outlined"
           onClick={props.onClick}
           sx={{

@@ -3,6 +3,8 @@ import {
   type FunctionComponent,
   type ReactNode,
   useContext,
+  useEffect,
+  useRef,
   useState,
 } from "react";
 import type { Card } from "../../models/card";
@@ -10,7 +12,7 @@ import { CardFlashDialog } from "./dialog";
 
 const CardFlashContext = createContext({
   show: false,
-  flash: (card: Card, options?: flashCardOptions) => {},
+  flash: (_card: Card, _options?: flashCardOptions) => {},
   hide: () => {},
 });
 
@@ -33,23 +35,35 @@ export const CardFlashProvider: FunctionComponent<CardFlashProviderProps> = ({
 }) => {
   const [show, setShow] = useState(false);
   const [card, setCard] = useState<Card>();
-  const [_, setTimeoutRef] = useState<ReturnType<typeof setInterval>>();
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const flash = (card: Card, options?: flashCardOptions) => {
-    setCard(card);
+  useEffect(() => {
+    return () => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+    };
+  }, []);
 
-    setTimeoutRef((prev) => {
-      prev && clearTimeout(prev);
-      return setTimeout(() => {
-        setShow(false);
-        setCard(undefined);
-      }, options?.duration || duration);
-    });
+  const flash = (newCard: Card, options?: flashCardOptions) => {
+    setCard(newCard);
+
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+    }
+
+    timeoutRef.current = setTimeout(() => {
+      setShow(false);
+      setCard(undefined);
+    }, options?.duration || duration);
 
     setShow(true);
   };
 
   const hide = () => {
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+    }
     setShow(false);
     setCard(undefined);
   };

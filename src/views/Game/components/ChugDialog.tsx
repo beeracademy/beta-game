@@ -28,7 +28,7 @@ import {
   useGameMetrics,
   usePlayerMetricsByIndex,
 } from "../../../stores/metrics";
-import { milisecondsToMMSSsss } from "../../../utilities/time";
+import { millisecondsToMMSSsss } from "../../../utilities/time";
 
 const browser = detect();
 
@@ -356,12 +356,12 @@ const ChugDialog: FunctionComponent<ChugDialogProps> = (props) => {
                 },
               }}
             >
-              {milisecondsToMMSSsss(elapsedTime)}
+              {millisecondsToMMSSsss(elapsedTime)}
             </Typography>
 
             {personalBest !== null && (
               <Typography color="text.secondary">
-                Personal best {milisecondsToMMSSsss(personalBest.durationMs)}{" "}
+                Personal best {millisecondsToMMSSsss(personalBest.durationMs)}{" "}
                 from season {personalBest.seasonNumber}
               </Typography>
             )}
@@ -385,13 +385,21 @@ const ChugDialog: FunctionComponent<ChugDialogProps> = (props) => {
                 e.preventDefault();
                 e.stopPropagation();
 
-                started ? stop() : start();
+                if (started) {
+                  stop();
+                } else {
+                  start();
+                }
               }
             }}
             onClick={(e) => {
               e.stopPropagation();
 
-              started ? stop() : start();
+              if (started) {
+                stop();
+              } else {
+                start();
+              }
             }}
           >
             {started ? "Stop" : "Start"}

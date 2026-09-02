@@ -1,7 +1,6 @@
 import { Box, Container } from "@mui/material";
 import { FunctionComponent, memo } from "react";
 import { Outlet } from "react-router-dom";
-import ConfirmDialog from "../../components/ConfirmDialog";
 import TimeSynchronizationWarningDialog from "./components/TimeSynchronizationWarningDialog";
 import useLobbyMusic from "./hooks/useLobbyMusic";
 
@@ -28,14 +27,6 @@ const LoginView: FunctionComponent = () => {
         <Outlet />
 
         <Wallpaper />
-
-        <ConfirmDialog
-          title="Create new user"
-          message="Do you want to create user 'test'?"
-          open={false}
-          onCancel={() => {}}
-          onConfirm={() => {}}
-        />
       </Container>
 
       <TimeSynchronizationWarningDialog />

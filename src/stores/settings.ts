@@ -49,22 +49,22 @@ const useSettings = create<SettingsState & SettingsActions>()(
       ...initialState,
 
       SetSimpleCardsMode: (value: boolean) => {
-        set((state) => ({ simpleCardsMode: value }));
+        set({ simpleCardsMode: value });
       },
 
       SetRemoteControl: (value: boolean) => {
-        set((state) => ({
+        set({
           remoteControl: value,
           remoteToken: value ? window.crypto.randomUUID() : undefined,
-        }));
+        });
       },
 
       SetThemeMode: (value: ThemeMode) => {
-        set((state) => ({ themeMode: value }));
+        set({ themeMode: value });
       },
 
       SetLobbyMusicMuted: (value: boolean) => {
-        set((state) => ({ lobbyMusicMuted: value }));
+        set({ lobbyMusicMuted: value });
       },
     }),
     {
