@@ -1,3 +1,3 @@
-export type { CardFlashProviderProps } from "./provider";
-export { CardFlashProvider, useCardFlash } from "./provider";
 export { CardFlashDialog } from "./dialog";
+export { CardFlashProvider, useCardFlash } from "./provider";
+export type { CardFlashProviderProps } from "./provider";

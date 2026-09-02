@@ -23,7 +23,12 @@ interface RemoteDialogProps extends DialogProps {}
 const RemoteDialog: FunctionComponent<RemoteDialogProps> = (props) => {
   const theme = useTheme();
 
-  const players = useGame((state) => state.players);
+  const game = useGame(
+    useShallow((state) => ({
+      players: state.players,
+      offline: state.offline,
+    })),
+  );
 
   const settings = useSettings(
     useShallow((state) => ({
@@ -45,6 +50,9 @@ const RemoteDialog: FunctionComponent<RemoteDialogProps> = (props) => {
   }, [settings.remoteControl, settings.remoteToken]);
 
   const handleToggle = () => {
+    if (game.offline) {
+      return;
+    }
     setUrl("");
     setCopied(false);
     settings.SetRemoteControl(!settings.remoteControl);
@@ -68,7 +76,19 @@ const RemoteDialog: FunctionComponent<RemoteDialogProps> = (props) => {
 
       <DialogTitle>Game Remote</DialogTitle>
 
-      {!settings.remoteControl && (
+      {game.offline && (
+        <DialogContent sx={{ textAlign: "center" }}>
+          <Box sx={{ py: 3, opacity: 0.6 }}>
+            <GoDeviceMobile size={64} />
+            <GoDeviceDesktop size={64} />
+          </Box>
+          <Typography color="text.secondary">
+            Game remote is not available for offline games.
+          </Typography>
+        </DialogContent>
+      )}
+
+      {!game.offline && !settings.remoteControl && (
         <DialogContent sx={{ textAlign: "center" }}>
           <Box sx={{ py: 3, opacity: 0.6 }}>
             <GoDeviceMobile size={64} />
@@ -81,7 +101,7 @@ const RemoteDialog: FunctionComponent<RemoteDialogProps> = (props) => {
         </DialogContent>
       )}
 
-      {settings.remoteControl && (
+      {!game.offline && settings.remoteControl && (
         <DialogContent
           sx={{
             display: "flex",
@@ -113,7 +133,7 @@ const RemoteDialog: FunctionComponent<RemoteDialogProps> = (props) => {
 
       <DialogActions>
         {/* Copy / Share — only shown when remote is active */}
-        {settings.remoteControl && !navigator.share && (
+        {!game.offline && settings.remoteControl && !navigator.share && (
           <Button
             fullWidth
             variant="contained"
@@ -132,7 +152,7 @@ const RemoteDialog: FunctionComponent<RemoteDialogProps> = (props) => {
           </Button>
         )}
 
-        {settings.remoteControl && navigator.share && (
+        {!game.offline && settings.remoteControl && navigator.share && (
           <Button
             fullWidth
             variant="contained"
@@ -141,7 +161,7 @@ const RemoteDialog: FunctionComponent<RemoteDialogProps> = (props) => {
             onClick={() => {
               navigator.share({
                 title: "Academy Game Remote",
-                text: players.map((p) => p.username).join(", "),
+                text: game.players.map((p) => p.username).join(", "),
                 url,
               });
             }}
@@ -151,15 +171,17 @@ const RemoteDialog: FunctionComponent<RemoteDialogProps> = (props) => {
         )}
 
         {/* Toggle button — primary when off, secondary when on */}
-        <Button
-          fullWidth
-          variant={settings.remoteControl ? "outlined" : "contained"}
-          color={settings.remoteControl ? "inherit" : "primary"}
-          size="large"
-          onClick={handleToggle}
-        >
-          {settings.remoteControl ? "Disable remote" : "Enable remote"}
-        </Button>
+        {!game.offline && (
+          <Button
+            fullWidth
+            variant={settings.remoteControl ? "outlined" : "contained"}
+            color={settings.remoteControl ? "inherit" : "primary"}
+            size="large"
+            onClick={handleToggle}
+          >
+            {settings.remoteControl ? "Disable remote" : "Enable remote"}
+          </Button>
+        )}
       </DialogActions>
     </Dialog>
   );

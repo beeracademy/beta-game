@@ -43,7 +43,7 @@ describe("GameFinishedDialog", () => {
     });
   });
 
-  it("in offline mode, still renders picture/notes step first (for local testing)", () => {
+  it("in offline mode, bypasses picture/description and directly renders choices", () => {
     useGame.setState({
       offline: true,
       submitted: false,
@@ -51,16 +51,19 @@ describe("GameFinishedDialog", () => {
 
     render(<GameFinishedDialog open={true} />);
 
-    // Notes field and Submit button should be visible, same as online mode
+    // Choices buttons should be directly visible
     expect(
-      screen.getByPlaceholderText(/add game notes or victory message/i),
+      screen.getByRole("button", { name: /play again with the same people/i }),
     ).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Submit" })).toBeInTheDocument();
-
-    // Choices buttons should not yet be visible
     expect(
-      screen.queryByRole("button", { name: /play again with the same people/i }),
+      screen.getByRole("button", { name: /exit game/i }),
+    ).toBeInTheDocument();
+
+    // Notes field and Submit button should NOT be visible
+    expect(
+      screen.queryByPlaceholderText(/any last words before the hangover/i),
     ).not.toBeInTheDocument();
+    expect(screen.queryByText("Submit")).not.toBeInTheDocument();
   });
 
   it("when already submitted, bypasses picture/description and directly renders choices", () => {
@@ -84,7 +87,7 @@ describe("GameFinishedDialog", () => {
 
     // Notes / victory message input should NOT be present
     expect(
-      screen.queryByPlaceholderText(/add game notes or victory message/i),
+      screen.queryByPlaceholderText(/any last words before the hangover/i),
     ).not.toBeInTheDocument();
     expect(screen.queryByText("Submit")).not.toBeInTheDocument();
   });
@@ -99,7 +102,7 @@ describe("GameFinishedDialog", () => {
 
     // Notes field and Submit button should be visible
     expect(
-      screen.getByPlaceholderText(/add game notes or victory message/i),
+      screen.getByPlaceholderText(/any last words before the hangover/i),
     ).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Submit" })).toBeInTheDocument();
 

@@ -18,17 +18,22 @@ export interface UserStatsResponse {
   total_games: number;
   total_time_played_seconds: number;
   total_sips: number;
-  best_game: number;
-  worst_game: number;
-  best_game_sips: number;
-  worst_game_sips: number;
+  best_game: number | null;
+  worst_game: number | null;
+  best_game_sips: number | null;
+  worst_game_sips: number | null;
   total_chugs: number;
-  fastest_chug: number;
-  fastest_chug_duration_ms: number;
-  average_chug_time_seconds: number;
+  fastest_chug: number | null;
+  fastest_chug_duration_ms?: number | null;
+  average_chug_time_seconds: number | null;
 }
 
-export async function getUserStats(userId: number): Promise<UserStatsResponse> {
-  const response = await client.get<UserStatsResponse>(`/api/stats/${userId}/`);
+// API returns one entry per season, plus a season_number: 0 entry aggregating all-time totals
+export async function getUserStats(
+  userId: number,
+): Promise<UserStatsResponse[]> {
+  const response = await client.get<UserStatsResponse[]>(
+    `/api/stats/${userId}/`,
+  );
   return response.data;
 }
