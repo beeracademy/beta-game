@@ -28,7 +28,7 @@ import {
   usePlayerMetricsByIndex,
 } from "../../../stores/metrics";
 import useSettings from "../../../stores/settings";
-import { toBase14 } from "../../../utilities/base14";
+import Base14Sips from "../../../components/Base14Sips";
 import { secondsToHHMMSS } from "../../../utilities/time";
 
 interface PlayerItemProps {
@@ -239,8 +239,10 @@ const PlayerItem: FunctionComponent<PlayerItemProps> = (props) => {
                       textAlign: "right",
                     }}
                   >
-                    {toBase14(playerMetrics.totalSips)}
-                    <sub>14</sub>
+                    <Base14Sips
+                      value={playerMetrics.totalSips}
+                      denotationOpacity={0.6}
+                    />
                   </ListItemText>
                 </ListItem>
 
@@ -257,8 +259,10 @@ const PlayerItem: FunctionComponent<PlayerItemProps> = (props) => {
                       textAlign: "right",
                     }}
                   >
-                    {toBase14(playerMetrics.maxSips)}
-                    <sub>14</sub>
+                    <Base14Sips
+                      value={playerMetrics.maxSips}
+                      denotationOpacity={0.6}
+                    />
                   </ListItemText>
                 </ListItem>
                 <ListItem disableGutters disablePadding>
@@ -274,8 +278,10 @@ const PlayerItem: FunctionComponent<PlayerItemProps> = (props) => {
                       textAlign: "right",
                     }}
                   >
-                    {toBase14(playerMetrics.minSips)}
-                    <sub>14</sub>
+                    <Base14Sips
+                      value={playerMetrics.minSips}
+                      denotationOpacity={0.6}
+                    />
                   </ListItemText>
                 </ListItem>
                 <ListItem disableGutters disablePadding>
@@ -300,8 +306,11 @@ const PlayerItem: FunctionComponent<PlayerItemProps> = (props) => {
             {simpleCardsMode && (
               <Stack>
                 <Typography align="center" sx={{ fontSize: 64 }}>
-                  {toBase14(playerMetrics.totalSips)}
-                  <sub>14</sub>
+                  <Base14Sips
+                    value={playerMetrics.totalSips}
+                    denotationOpacity={0.6}
+                    denotationFontSize="0.4em"
+                  />
                 </Typography>
 
                 <Typography align="center" sx={{ fontSize: 18 }}>

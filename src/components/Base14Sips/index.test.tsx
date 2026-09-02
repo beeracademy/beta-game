@@ -14,4 +14,10 @@ describe("Base14Sips component", () => {
     const sub = screen.getByText("14");
     expect(sub).toHaveStyle({ opacity: "0.5" });
   });
+
+  it("applies custom font size to subscript denotation", () => {
+    render(<Base14Sips value={27} denotationFontSize="0.4em" />);
+    const sub = screen.getByText("14");
+    expect(sub.style.fontSize).toBe("0.4em");
+  });
 });
