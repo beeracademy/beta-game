@@ -323,6 +323,28 @@ const SharedControlView: FunctionComponent<SharedControlViewProps> = () => {
         }
       }
 
+      if (data.event === "DNF_STATE") {
+        const payload = data.payload as
+          | {
+              dnf_player_indexes?: number[];
+              dnf_player_ids?: number[];
+            }
+          | number[];
+
+        if (Array.isArray(payload)) {
+          useGame.setState({ dnf_player_indexes: payload });
+        } else if (Array.isArray(payload?.dnf_player_indexes)) {
+          useGame.setState({ dnf_player_indexes: payload.dnf_player_indexes });
+        } else if (Array.isArray(payload?.dnf_player_ids)) {
+          const players = useGame.getState().players;
+          const playerIds = players.map((p) => p.id);
+          const indexes = payload.dnf_player_ids
+            .map((id) => playerIds.indexOf(id))
+            .filter((idx) => idx !== -1);
+          useGame.setState({ dnf_player_indexes: indexes });
+        }
+      }
+
       if (data.event === "REMOTES_DISCONNECT") {
         // Host explicitly closed shared control — stop reconnecting
         clearPingTimeout();
@@ -336,6 +358,7 @@ const SharedControlView: FunctionComponent<SharedControlViewProps> = () => {
     // That way, if responses stop coming the 10s window will actually expire.
     armPingTimeout();
     ws.send({ event: "GET_GAME_STATE" });
+    ws.send({ event: "GET_DNF_STATE" });
 
     pingIntervalRef.current = setInterval(() => {
       wsRef.current.send({ event: "GET_GAME_STATE" });
@@ -356,6 +379,7 @@ const SharedControlView: FunctionComponent<SharedControlViewProps> = () => {
       if (document.visibilityState === "visible") {
         armPingTimeout();
         ws.send({ event: "GET_GAME_STATE" });
+        ws.send({ event: "GET_DNF_STATE" });
       }
     };
 

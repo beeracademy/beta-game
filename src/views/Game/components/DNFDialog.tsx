@@ -13,9 +13,10 @@ import {
   Typography,
   useTheme,
 } from "@mui/material";
-import { FunctionComponent } from "react";
+import { FunctionComponent, useEffect } from "react";
 import { useSounds } from "../../../hooks/sounds";
 import useGame from "../../../stores/game";
+import { useSharedControl } from "../../../stores/sharedControl";
 import { useShallow } from "zustand/react/shallow";
 interface DNFDialogProps extends DialogProps {}
 
@@ -28,13 +29,32 @@ const DNFDialog: FunctionComponent<DNFDialogProps> = (props) => {
     })),
   );
 
+  const { isRemote, send: sendRemote } = useSharedControl();
   const sound = useSounds();
+
+  useEffect(() => {
+    if (props.open && isRemote) {
+      sendRemote({ event: "GET_DNF_STATE" });
+    }
+  }, [props.open, isRemote]);
 
   const toggle = (index: number) => {
     const isDNF = !dnf_player_indexes.includes(index);
 
     if (isDNF) {
       sound.play("wilhelm_scream");
+    }
+
+    if (isRemote) {
+      sendRemote({
+        event: "SET_PLAYER_DNF",
+        payload: {
+          playerIndex: index,
+          playerId: players[index]?.id,
+          dnf: isDNF,
+        },
+      });
+      return;
     }
 
     SetPlayerDNF(index, isDNF);

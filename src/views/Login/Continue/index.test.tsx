@@ -73,6 +73,9 @@ describe("ContinueGameView", () => {
     expect(
       screen.getByRole("link", { name: "Back to new game" }),
     ).toHaveAttribute("href", "/login");
+    expect(
+      screen.queryByText(/completed on this computer/i),
+    ).not.toBeInTheDocument();
   });
 
   it("handles login failure with error alert and plays snack sound", async () => {
@@ -134,7 +137,7 @@ describe("ContinueGameView", () => {
     });
 
     expect(GameAPI.getResumableGames).toHaveBeenCalledWith("tok_abc");
-    expect(playMock).toHaveBeenCalledWith("click");
+    expect(playMock).not.toHaveBeenCalled();
   });
 
   it("lists resumable games and resumes selected game upon confirmation", async () => {

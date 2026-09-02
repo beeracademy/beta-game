@@ -23,6 +23,7 @@ import useSettings, {
   getNextThemeMode,
   type ThemeMode,
 } from "../../../stores/settings";
+import { useSharedControl } from "../../../stores/sharedControl";
 import { secondsToHHMMSS, secondsToHHMMSSsss } from "../../../utilities/time";
 import DNFDialog from "./DNFDialog";
 import ExitGameDialog from "./ExitGameDialog";
@@ -62,6 +63,8 @@ const Header: FunctionComponent = () => {
       SetThemeMode: state.SetThemeMode,
     })),
   );
+
+  const { isRemote } = useSharedControl();
 
   const [sharedControlDialogOpen, setSharedControlDialogOpen] = useState(false);
   const [exitGameDialogOpen, setExitGameDialogOpen] = useState(false);
@@ -141,18 +144,20 @@ const Header: FunctionComponent = () => {
             },
           }}
         >
-          <Tooltip title="Shared control settings" placement="bottom">
-            <IconButton
-              sx={{
-                color: "primary.contrastText",
-              }}
-              onClick={() => {
-                setSharedControlDialogOpen(true);
-              }}
-            >
-              <IoLogoGameControllerB />
-            </IconButton>
-          </Tooltip>
+          {!isRemote && (
+            <Tooltip title="Shared control settings" placement="bottom">
+              <IconButton
+                sx={{
+                  color: "primary.contrastText",
+                }}
+                onClick={() => {
+                  setSharedControlDialogOpen(true);
+                }}
+              >
+                <IoLogoGameControllerB />
+              </IconButton>
+            </Tooltip>
+          )}
 
           {(() => {
             const themeTitle: Record<ThemeMode, string> = {
@@ -293,27 +298,36 @@ const Header: FunctionComponent = () => {
             </IconButton>
           </Tooltip>
 
-          <Tooltip
-            title={gameMetrics.done ? "Exit game" : "Abandon game"}
-            placement="bottom"
-          >
-            <IconButton
-              sx={{
-                color: "primary.contrastText",
-              }}
-              onClick={showExitGameDialog}
+          {!isRemote && (
+            <Tooltip
+              title={gameMetrics.done ? "Exit game" : "Abandon game"}
+              placement="bottom"
             >
-              <IoExitOutline />
-            </IconButton>
-          </Tooltip>
+              <IconButton
+                sx={{
+                  color: "primary.contrastText",
+                }}
+                onClick={showExitGameDialog}
+              >
+                <IoExitOutline />
+              </IconButton>
+            </Tooltip>
+          )}
         </Box>
       </Card>
 
-      <SharedControlDialog
-        open={sharedControlDialogOpen}
-        onClose={() => setSharedControlDialogOpen(false)}
-      />
-      <ExitGameDialog open={exitGameDialogOpen} onClose={closeExitGameDialog} />
+      {!isRemote && (
+        <>
+          <SharedControlDialog
+            open={sharedControlDialogOpen}
+            onClose={() => setSharedControlDialogOpen(false)}
+          />
+          <ExitGameDialog
+            open={exitGameDialogOpen}
+            onClose={closeExitGameDialog}
+          />
+        </>
+      )}
       <DNFDialog open={dnfDialogOpen} onClose={() => setDNFDialogOpen(false)} />
     </>
   );

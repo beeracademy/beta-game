@@ -34,7 +34,6 @@ import type { Player } from "../../../models/player";
 import useGame from "../../../stores/game";
 import { mapToLocal } from "../../../stores/game.mapper";
 import { datetimeToddmmHHMMSS } from "../../../utilities/time";
-import BottomGamesCount from "../components/BottomGamesCount";
 import LoginHeaderActions from "../components/LoginHeaderActions";
 import ContinueGameDialog from "./components/ContinueGameDialog";
 
@@ -67,7 +66,6 @@ const ContinueGameView: FunctionComponent = () => {
 
     try {
       const resp = await AuthAPI.login(username.trim(), password);
-      play("click");
       setPlayer({
         id: resp.id,
         username: username.trim(),
@@ -495,8 +493,6 @@ const ContinueGameView: FunctionComponent = () => {
               >
                 Back to new game
               </Button>
-
-              <BottomGamesCount />
             </CardContent>
           </Box>
         </Card>

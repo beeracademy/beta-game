@@ -243,6 +243,81 @@ const GameView: FunctionComponent = () => {
         }
       }
 
+      if (data.event === "GET_DNF_STATE" || data.event === "GET_DNF") {
+        const state = useGame.getState();
+        ws.send({
+          event: "DNF_STATE",
+          payload: {
+            dnf_player_indexes: state.dnf_player_indexes,
+            dnf_player_ids: state.dnf_player_indexes
+              .filter((idx) => state.players[idx]?.id !== undefined)
+              .map((idx) => state.players[idx].id as number),
+          },
+        });
+      }
+
+      if (data.event === "SET_PLAYER_DNF" || data.event === "SET_DNF") {
+        const payload = data.payload as {
+          playerIndex?: number;
+          index?: number;
+          playerId?: number;
+          dnf?: boolean;
+        };
+        const state = useGame.getState();
+        let targetIndex = payload?.playerIndex ?? payload?.index;
+        if (targetIndex === undefined && payload?.playerId !== undefined) {
+          const found = state.players.findIndex(
+            (p) => p.id === payload.playerId,
+          );
+          if (found !== -1) {
+            targetIndex = found;
+          }
+        }
+        if (
+          targetIndex !== undefined &&
+          targetIndex >= 0 &&
+          targetIndex < state.players.length &&
+          typeof payload?.dnf === "boolean"
+        ) {
+          try {
+            useGame.getState().SetPlayerDNF(targetIndex, payload.dnf);
+          } catch (error) {
+            console.error("[Remote]", "SET_PLAYER_DNF failed", error);
+          }
+        }
+      }
+
+      if (data.event === "TOGGLE_PLAYER_DNF" || data.event === "TOGGLE_DNF") {
+        const payload = data.payload as {
+          playerIndex?: number;
+          index?: number;
+          playerId?: number;
+        };
+        const state = useGame.getState();
+        let targetIndex = payload?.playerIndex ?? payload?.index;
+        if (targetIndex === undefined && payload?.playerId !== undefined) {
+          const found = state.players.findIndex(
+            (p) => p.id === payload.playerId,
+          );
+          if (found !== -1) {
+            targetIndex = found;
+          }
+        }
+        if (
+          targetIndex !== undefined &&
+          targetIndex >= 0 &&
+          targetIndex < state.players.length
+        ) {
+          try {
+            const isCurrentlyDNF =
+              state.dnf_player_indexes.includes(targetIndex);
+            useGame.getState().SetPlayerDNF(targetIndex, !isCurrentlyDNF);
+          } catch (error) {
+            console.error("[Remote]", "TOGGLE_PLAYER_DNF failed", error);
+          }
+        }
+      }
+
       if (data.event === "DRAW_CARD") {
         drawCard();
       }
@@ -269,6 +344,26 @@ const GameView: FunctionComponent = () => {
         event: "GAME_STATE",
         payload: state,
       });
+
+      // If DNF state changed, emit DNF_STATE immediately
+      const prevDnfs = prevState.dnf_player_indexes;
+      const currentDnfs = state.dnf_player_indexes;
+      const dnfChanged =
+        !prevDnfs ||
+        prevDnfs.length !== currentDnfs.length ||
+        prevDnfs.some((val, idx) => val !== currentDnfs[idx]);
+
+      if (dnfChanged) {
+        ws.send({
+          event: "DNF_STATE",
+          payload: {
+            dnf_player_indexes: currentDnfs,
+            dnf_player_ids: currentDnfs
+              .filter((idx) => state.players[idx]?.id !== undefined)
+              .map((idx) => state.players[idx].id as number),
+          },
+        });
+      }
 
       // If chug was started locally on host, emit CHUG_START_TIME immediately
       const lastCard = state.draws[state.draws.length - 1];
@@ -390,6 +485,60 @@ const GameView: FunctionComponent = () => {
     },
     1000 * 60 * 15 /* 15 minutes */,
   );
+
+  // Tracks card count to ensure drawn cards are flashed on remote clients
+  const prevRemoteCardsCountRef = useRef(game.cards.length);
+
+  useEffect(() => {
+    if (!isRemote) {
+      prevRemoteCardsCountRef.current = game.cards.length;
+      return;
+    }
+
+    const cardsCount = game.cards.length;
+    const cardWasDrawn = cardsCount > prevRemoteCardsCountRef.current;
+    prevRemoteCardsCountRef.current = cardsCount;
+
+    if (!cardWasDrawn) {
+      return;
+    }
+
+    setShowSleepyMeme(false);
+    resetIdleTimer();
+
+    const latestCard = game.cards[game.cards.length - 1];
+    if (!latestCard) {
+      return;
+    }
+
+    // If chug card, don't flash card, flash hype text
+    if (latestCard.value === 14) {
+      cardFlasher.hide();
+      textFlasher.flash(pickHypeMessage(), { variant: "hype" });
+      return;
+    }
+
+    // If last card, don't flash it
+    const totalCards =
+      gameMetrics.numberOfCards > 0
+        ? gameMetrics.numberOfCards
+        : game.players.length * 13;
+    const cardsLeft = totalCards - cardsCount;
+    if (cardsLeft <= 0) {
+      cardFlasher.hide();
+      return;
+    }
+
+    cardFlasher.flash(latestCard);
+  }, [
+    isRemote,
+    game.cards,
+    gameMetrics.numberOfCards,
+    gameMetrics.numberOfCardsDrawn,
+    cardFlasher,
+    textFlasher,
+    resetIdleTimer,
+  ]);
 
   const showMobileExitDialog = () => {
     setMobileMenuAnchor(null);

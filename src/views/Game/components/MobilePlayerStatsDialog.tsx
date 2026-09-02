@@ -9,12 +9,13 @@ import {
   Typography,
   useTheme,
 } from "@mui/material";
-import type { FunctionComponent, ReactNode } from "react";
+import { FunctionComponent, ReactNode, useEffect } from "react";
 import { IoClose, IoSkullOutline, IoSparkles } from "react-icons/io5";
 import { useShallow } from "zustand/react/shallow";
 import Base14Sips from "../../../components/Base14Sips";
 import { useSounds } from "../../../hooks/sounds";
 import useGame from "../../../stores/game";
+import { useSharedControl } from "../../../stores/sharedControl";
 import { usePlayerMetricsByIndex } from "../../../stores/metrics";
 import { secondsToHHMMSS } from "../../../utilities/time";
 
@@ -31,6 +32,7 @@ const MobilePlayerStatsDialog: FunctionComponent<
 > = (props) => {
   const theme = useTheme();
   const sound = useSounds();
+  const { isRemote, send: sendRemote } = useSharedControl();
 
   const game = useGame(
     useShallow((state) => ({
@@ -44,18 +46,39 @@ const MobilePlayerStatsDialog: FunctionComponent<
   const player = game.players[props.index];
   const isDNF = game.dnf_player_indexes.includes(props.index);
 
+  useEffect(() => {
+    if (props.open && isRemote) {
+      sendRemote({ event: "GET_DNF_STATE" });
+    }
+  }, [props.open, isRemote]);
+
   if (!player) {
     return null;
   }
 
-  const playerColors = theme.player as Record<number, string>;
-  const color = playerColors[props.index] ?? playerColors[0];
+  const playerColors = (theme.player ?? {}) as Record<number, string>;
+  const color =
+    playerColors[props.index] ??
+    playerColors[0] ??
+    theme.palette.primary.main;
 
   const toggleDNF = () => {
     const nextDNF = !isDNF;
 
     if (nextDNF) {
       sound.play("wilhelm_scream");
+    }
+
+    if (isRemote) {
+      sendRemote({
+        event: "SET_PLAYER_DNF",
+        payload: {
+          playerIndex: props.index,
+          playerId: player?.id,
+          dnf: nextDNF,
+        },
+      });
+      return;
     }
 
     game.SetPlayerDNF(props.index, nextDNF);
