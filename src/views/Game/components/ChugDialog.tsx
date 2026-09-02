@@ -23,6 +23,7 @@ import { useTextFlash } from "../../../components/TextFlash";
 import { pickKillStreakMessage } from "../../../components/TextFlash/messages";
 import { useSounds } from "../../../hooks/sounds";
 import { default as useGame } from "../../../stores/game";
+import { useSharedControl } from "../../../stores/sharedControl";
 import {
     useGameMetrics,
     usePlayerMetricsByIndex,
@@ -73,6 +74,7 @@ const ChugDialog: FunctionComponent<ChugDialogProps> = (props) => {
 	const { width, height } = useWindowSize();
 
 	const game = useGame();
+	const { isRemote, send: sendRemote } = useSharedControl();
 	const metrics = useGameMetrics();
 	const playerMetrics = usePlayerMetricsByIndex(metrics.activePlayerIndex);
 
@@ -151,8 +153,14 @@ const ChugDialog: FunctionComponent<ChugDialogProps> = (props) => {
 			if (!card?.chug_start_start_delta_ms) {
 				playOpenSound();
 			}
+
+			// If on remote and dialog is open (e.g. reload or fresh connect during chug),
+			// request chug start time sync once
+			if (isRemote) {
+				sendRemote({ event: "GET_CHUG_TIME" });
+			}
 		}
-	}, [props.open]);
+	}, [props.open, isRemote]);
 
 	const updateElapsedTime = () => {
 		setElapsedTime(calculateCurrentElapsedTime());
@@ -186,11 +194,21 @@ const ChugDialog: FunctionComponent<ChugDialogProps> = (props) => {
 			return;
 		}
 
+		if (isRemote) {
+			sendRemote({ event: "START_CHUG" });
+			return;
+		}
+
 		game.StartChug();
 	};
 
 	const stop = () => {
 		if (!started) {
+			return;
+		}
+
+		if (isRemote) {
+			sendRemote({ event: "STOP_CHUG" });
 			return;
 		}
 

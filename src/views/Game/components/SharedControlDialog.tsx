@@ -18,9 +18,9 @@ import { useShallow } from "zustand/react/shallow";
 import useGame from "../../../stores/game";
 import useSettings from "../../../stores/settings";
 
-interface RemoteDialogProps extends DialogProps {}
+interface SharedControlDialogProps extends DialogProps {}
 
-const RemoteDialog: FunctionComponent<RemoteDialogProps> = (props) => {
+const SharedControlDialog: FunctionComponent<SharedControlDialogProps> = (props) => {
 	const theme = useTheme();
 
 	const game = useGame(
@@ -74,7 +74,7 @@ const RemoteDialog: FunctionComponent<RemoteDialogProps> = (props) => {
 				<IoClose size={20} />
 			</IconButton>
 
-			<DialogTitle>Game Remote</DialogTitle>
+			<DialogTitle>Shared Control</DialogTitle>
 
 			{game.offline && (
 				<DialogContent sx={{ textAlign: "center" }}>
@@ -83,7 +83,7 @@ const RemoteDialog: FunctionComponent<RemoteDialogProps> = (props) => {
 						<GoDeviceDesktop size={64} />
 					</Box>
 					<Typography color="text.secondary">
-						Game remote is not available for offline games.
+						Shared control is not available for offline games.
 					</Typography>
 				</DialogContent>
 			)}
@@ -95,7 +95,7 @@ const RemoteDialog: FunctionComponent<RemoteDialogProps> = (props) => {
 						<GoDeviceDesktop size={64} />
 					</Box>
 					<Typography color="text.secondary">
-						Game remote lets you control the game from your phone — draw cards,
+						Shared control lets other devices see and control the game — draw cards,
 						see metrics, and more.
 					</Typography>
 				</DialogContent>
@@ -132,7 +132,7 @@ const RemoteDialog: FunctionComponent<RemoteDialogProps> = (props) => {
 			)}
 
 			<DialogActions>
-				{/* Copy / Share — only shown when remote is active */}
+				{/* Copy / Share — only shown when shared control is active */}
 				{!game.offline && settings.remoteControl && !navigator.share && (
 					<Button
 						fullWidth
@@ -160,7 +160,7 @@ const RemoteDialog: FunctionComponent<RemoteDialogProps> = (props) => {
 						size="large"
 						onClick={() => {
 							navigator.share({
-								title: "Academy Game Remote",
+								title: "Academy — Shared Control",
 								text: game.players.map((p) => p.username).join(", "),
 								url,
 							});
@@ -179,7 +179,7 @@ const RemoteDialog: FunctionComponent<RemoteDialogProps> = (props) => {
 						size="large"
 						onClick={handleToggle}
 					>
-						{settings.remoteControl ? "Disable remote" : "Enable remote"}
+						{settings.remoteControl ? "Disable shared control" : "Enable shared control"}
 					</Button>
 				)}
 			</DialogActions>
@@ -187,4 +187,4 @@ const RemoteDialog: FunctionComponent<RemoteDialogProps> = (props) => {
 	);
 };
 
-export default RemoteDialog;
+export default SharedControlDialog;

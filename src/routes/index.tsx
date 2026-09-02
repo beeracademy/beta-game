@@ -10,7 +10,7 @@ import GameView from "../views/Game";
 import LoginView from "../views/Login";
 import ContinueGameView from "../views/Login/Continue";
 import NewGameView from "../views/Login/New";
-import RemoteView from "../views/Remote";
+import SharedControlView from "../views/SharedControl";
 import { GameGuard } from "./guard";
 
 const Routes: FunctionComponent = () => {
@@ -46,7 +46,7 @@ const Routes: FunctionComponent = () => {
 					<Route path="*" element={<Navigate to="/login" />} />
 				</Route>
 
-				<Route path="remote" element={<RemoteView />} />
+				<Route path="remote" element={<SharedControlView />} />
 			</RouterRoutes>
 		</Suspense>
 	);

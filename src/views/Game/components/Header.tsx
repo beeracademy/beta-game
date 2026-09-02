@@ -26,7 +26,7 @@ import useSettings, {
 import { secondsToHHMMSS, secondsToHHMMSSsss } from "../../../utilities/time";
 import DNFDialog from "./DNFDialog";
 import ExitGameDialog from "./ExitGameDialog";
-import RemoteDialog from "./RemoteDialog";
+import SharedControlDialog from "./SharedControlDialog";
 
 const Header: FunctionComponent = () => {
 	const theme = useTheme();
@@ -63,7 +63,7 @@ const Header: FunctionComponent = () => {
 		})),
 	);
 
-	const [remoteDialogOpen, setRemoteDialogOpen] = useState(false);
+	const [sharedControlDialogOpen, setSharedControlDialogOpen] = useState(false);
 	const [exitGameDialogOpen, setExitGameDialogOpen] = useState(false);
 	const [dnfDialogOpen, setDNFDialogOpen] = useState(false);
 
@@ -141,13 +141,13 @@ const Header: FunctionComponent = () => {
 						},
 					}}
 				>
-					<Tooltip title="Game remote settings" placement="bottom">
+					<Tooltip title="Shared control settings" placement="bottom">
 						<IconButton
 							sx={{
 								color: "primary.contrastText",
 							}}
 							onClick={() => {
-								setRemoteDialogOpen(true);
+								setSharedControlDialogOpen(true);
 							}}
 						>
 							<IoLogoGameControllerB />
@@ -309,9 +309,9 @@ const Header: FunctionComponent = () => {
 				</Box>
 			</Card>
 
-			<RemoteDialog
-				open={remoteDialogOpen}
-				onClose={() => setRemoteDialogOpen(false)}
+			<SharedControlDialog
+				open={sharedControlDialogOpen}
+				onClose={() => setSharedControlDialogOpen(false)}
 			/>
 			<ExitGameDialog open={exitGameDialogOpen} onClose={closeExitGameDialog} />
 			<DNFDialog open={dnfDialogOpen} onClose={() => setDNFDialogOpen(false)} />

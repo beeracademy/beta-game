@@ -42,6 +42,7 @@ import {
 	usePlayerMetrics,
 } from "../../stores/metrics";
 import useSettings from "../../stores/settings";
+import { useSharedControl } from "../../stores/sharedControl";
 import CardInventory from "./components/CardInventory";
 import Chart from "./components/Chart";
 import ChugDialog from "./components/ChugDialog";
@@ -53,12 +54,13 @@ import Header from "./components/Header";
 import MobileNowDrawing from "./components/MobileNowDrawing";
 import MobileStandings from "./components/MobileStandings";
 import PlayerList from "./components/PlayerList";
-import RemoteDialog from "./components/RemoteDialog";
+import SharedControlDialog from "./components/SharedControlDialog";
 import GameTable from "./components/Table";
 
 const GameView: FunctionComponent = () => {
 	const theme = useTheme();
 	const navigate = useNavigate();
+	const { isRemote, send: sendRemote } = useSharedControl();
 
 	const [showTerminal, setShowTerminal] = useState(false);
 	const [showSleepyMeme, setShowSleepyMeme] = useState(false);
@@ -66,7 +68,7 @@ const GameView: FunctionComponent = () => {
 	const [mobileMenuAnchor, setMobileMenuAnchor] = useState<HTMLElement | null>(
 		null,
 	);
-	const [mobileRemoteDialogOpen, setMobileRemoteDialogOpen] = useState(false);
+	const [mobileSharedControlDialogOpen, setMobileSharedControlDialogOpen] = useState(false);
 	const [mobileExitDialogOpen, setMobileExitDialogOpen] = useState(false);
 	const [mobileChugsDialogOpen, setMobileChugsDialogOpen] = useState(false);
 
@@ -159,6 +161,10 @@ const GameView: FunctionComponent = () => {
 	}, []);
 
 	useEffect(() => {
+		if (isRemote) {
+			return;
+		}
+
 		if (!settings.remoteControl) {
 			return;
 		}
@@ -168,9 +174,13 @@ const GameView: FunctionComponent = () => {
 		return () => {
 			ws.close();
 		};
-	}, [settings.remoteControl, settings.remoteToken]);
+	}, [isRemote, settings.remoteControl, settings.remoteToken]);
 
 	useEffect(() => {
+		if (isRemote) {
+			return;
+		}
+
 		if (!ws.ready) {
 			return;
 		}
@@ -183,24 +193,84 @@ const GameView: FunctionComponent = () => {
 				});
 			}
 
+			if (data.event === "GET_CHUG_TIME") {
+				const state = useGame.getState();
+				const lastCard = state.draws[state.draws.length - 1];
+				if (
+					lastCard &&
+					lastCard.value === 14 &&
+					lastCard.chug_start_start_delta_ms !== undefined &&
+					lastCard.chug_end_start_delta_ms === undefined
+				) {
+					ws.send({
+						event: "CHUG_START_TIME",
+						payload: {
+							gameStartTimestamp: state.gameStartTimestamp,
+							chugStartStartDeltaMs: lastCard.chug_start_start_delta_ms,
+							chugStartTime: state.gameStartTimestamp + lastCard.chug_start_start_delta_ms,
+						},
+					});
+				}
+			}
+
 			if (data.event === "DRAW_CARD") {
 				drawCard();
 			}
+
+			if (data.event === "START_CHUG") {
+				try {
+					useGame.getState().StartChug();
+				} catch (error) {
+					console.error("[Remote]", "START_CHUG failed", error);
+				}
+			}
+
+			if (data.event === "STOP_CHUG") {
+				try {
+					useGame.getState().StopChug();
+				} catch (error) {
+					console.error("[Remote]", "STOP_CHUG failed", error);
+				}
+			}
 		});
 
-		const unsubscribe = useGame.subscribe((state) => {
+		const unsubscribe = useGame.subscribe((state, prevState) => {
 			ws.send({
 				event: "GAME_STATE",
 				payload: state,
 			});
+
+			// If chug was started locally on host, emit CHUG_START_TIME immediately
+			const lastCard = state.draws[state.draws.length - 1];
+			const prevLastCard = prevState.draws[prevState.draws.length - 1];
+			if (
+				lastCard &&
+				lastCard.value === 14 &&
+				lastCard.chug_start_start_delta_ms !== undefined &&
+				lastCard.chug_end_start_delta_ms === undefined &&
+				prevLastCard?.chug_start_start_delta_ms === undefined
+			) {
+				ws.send({
+					event: "CHUG_START_TIME",
+					payload: {
+						gameStartTimestamp: state.gameStartTimestamp,
+						chugStartStartDeltaMs: lastCard.chug_start_start_delta_ms,
+						chugStartTime: state.gameStartTimestamp + lastCard.chug_start_start_delta_ms,
+					},
+				});
+			}
 		});
 
 		return () => {
 			unsubscribe();
 		};
-	}, [ws.ready]);
+	}, [isRemote, ws.ready]);
 
 	useEffect(() => {
+		if (isRemote) {
+			return;
+		}
+
 		if (!ws.ready) {
 			return;
 		}
@@ -213,7 +283,8 @@ const GameView: FunctionComponent = () => {
 		});
 
 		ws.close();
-	}, [settings.remoteControl]);
+	}, [isRemote, settings.remoteControl]);
+
 
 	const handleKeyDown = (e: KeyboardEvent) => {
 		if (MetricsStore.getState().game.done) {
@@ -253,6 +324,13 @@ const GameView: FunctionComponent = () => {
 	const drawCard = () => {
 		setShowSleepyMeme(false);
 		resetIdleTimer();
+
+		// On a remote, proxy the draw through WebSocket — the host draws and
+		// broadcasts GAME_STATE back, at which point flash/sounds fire normally.
+		if (isRemote) {
+			sendRemote({ event: "DRAW_CARD" });
+			return;
+		}
 
 		const [card, cardsLeft] = game.DrawCard();
 
@@ -499,40 +577,42 @@ const GameView: FunctionComponent = () => {
 								Chugs
 							</Button>
 
-							<Button
-								fullWidth
-								variant="text"
-								color="inherit"
-								startIcon={
-									<Box
-										sx={{
-											width: 16,
-											display: "flex",
-											justifyContent: "center",
-										}}
-									>
-										<IoLogoGameControllerB size={18} />
-									</Box>
-								}
-								onClick={() => {
-									setMobileMenuAnchor(null);
-									setMobileRemoteDialogOpen(true);
-								}}
-								sx={{
-									justifyContent: "flex-start",
-									borderRadius: 2,
-									paddingX: 1.5,
-									paddingY: 1.5,
-									fontSize: 15,
-									fontWeight: 600,
-									"& .MuiButton-startIcon": {
-										marginLeft: 0,
-										marginRight: 1.75,
-									},
-								}}
-							>
-								Game remote
-							</Button>
+							{!isRemote && (
+								<Button
+									fullWidth
+									variant="text"
+									color="inherit"
+									startIcon={
+										<Box
+											sx={{
+												width: 16,
+												display: "flex",
+												justifyContent: "center",
+											}}
+										>
+											<IoLogoGameControllerB size={18} />
+										</Box>
+									}
+									onClick={() => {
+										setMobileMenuAnchor(null);
+										setMobileSharedControlDialogOpen(true);
+									}}
+									sx={{
+										justifyContent: "flex-start",
+										borderRadius: 2,
+										paddingX: 1.5,
+										paddingY: 1.5,
+										fontSize: 15,
+										fontWeight: 600,
+										"& .MuiButton-startIcon": {
+											marginLeft: 0,
+											marginRight: 1.75,
+										},
+									}}
+								>
+									Shared control
+								</Button>
+							)}
 
 							<Stack
 								direction="row"
@@ -612,48 +692,50 @@ const GameView: FunctionComponent = () => {
 								</Stack>
 							</Stack>
 
-							<Button
-								fullWidth
-								variant="text"
-								color="error"
-								startIcon={
-									<Box
-										sx={{
-											width: 16,
-											display: "flex",
-											justifyContent: "center",
-										}}
-									>
-										<IoExitOutline size={18} />
-									</Box>
-								}
-								onClick={showMobileExitDialog}
-								sx={{
-									justifyContent: "flex-start",
-									borderRadius: 2,
-									paddingX: 1.5,
-									paddingY: 1.5,
-									marginTop: 0.5,
-									fontSize: 15,
-									fontWeight: 600,
-									"& .MuiButton-startIcon": {
-										marginLeft: 0,
-										marginRight: 1.75,
-									},
-									backgroundColor: (t) => alpha(t.palette.error.main, 0.08),
-									"&:hover": {
-										backgroundColor: (t) => alpha(t.palette.error.main, 0.16),
-									},
-								}}
-							>
-								{gameMetrics.done ? "Exit game" : "Abandon game"}
-							</Button>
+							{!isRemote && (
+								<Button
+									fullWidth
+									variant="text"
+									color="error"
+									startIcon={
+										<Box
+											sx={{
+												width: 16,
+												display: "flex",
+												justifyContent: "center",
+											}}
+										>
+											<IoExitOutline size={18} />
+										</Box>
+									}
+									onClick={showMobileExitDialog}
+									sx={{
+										justifyContent: "flex-start",
+										borderRadius: 2,
+										paddingX: 1.5,
+										paddingY: 1.5,
+										marginTop: 0.5,
+										fontSize: 15,
+										fontWeight: 600,
+										"& .MuiButton-startIcon": {
+											marginLeft: 0,
+											marginRight: 1.75,
+										},
+										backgroundColor: (t) => alpha(t.palette.error.main, 0.08),
+										"&:hover": {
+											backgroundColor: (t) => alpha(t.palette.error.main, 0.16),
+										},
+									}}
+								>
+									{gameMetrics.done ? "Exit game" : "Abandon game"}
+								</Button>
+							)}
 						</Stack>
 					</Menu>
 
-					<RemoteDialog
-						open={mobileRemoteDialogOpen}
-						onClose={() => setMobileRemoteDialogOpen(false)}
+					<SharedControlDialog
+						open={mobileSharedControlDialogOpen}
+						onClose={() => setMobileSharedControlDialogOpen(false)}
 					/>
 
 					<ChugsHistoryDialog
@@ -673,7 +755,7 @@ const GameView: FunctionComponent = () => {
 			<ChugDialog open={gameMetrics.chugging} />
 
 			<GameFinishedDialog
-				open={isGameDone && finishedDialogOpen}
+				open={isGameDone && finishedDialogOpen && !isRemote}
 				onClose={() => setFinishedDialogOpen(false)}
 			/>
 		</>
