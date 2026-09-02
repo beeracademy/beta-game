@@ -101,19 +101,31 @@ const SettingsDialog: FunctionComponent = () => {
                   aria-label="Theme mode"
                 >
                   <ToggleButton value="system" aria-label="System theme">
-                    <Stack direction="row" spacing={0.75} sx={{ alignItems: "center" }}>
+                    <Stack
+                      direction="row"
+                      spacing={0.75}
+                      sx={{ alignItems: "center" }}
+                    >
                       <IoDesktopOutline size={16} />
                       <span>System</span>
                     </Stack>
                   </ToggleButton>
                   <ToggleButton value="light" aria-label="Light theme">
-                    <Stack direction="row" spacing={0.75} sx={{ alignItems: "center" }}>
+                    <Stack
+                      direction="row"
+                      spacing={0.75}
+                      sx={{ alignItems: "center" }}
+                    >
                       <MdWbSunny size={16} />
                       <span>Light</span>
                     </Stack>
                   </ToggleButton>
                   <ToggleButton value="dark" aria-label="Dark theme">
-                    <Stack direction="row" spacing={0.75} sx={{ alignItems: "center" }}>
+                    <Stack
+                      direction="row"
+                      spacing={0.75}
+                      sx={{ alignItems: "center" }}
+                    >
                       <BsMoonStarsFill size={14} />
                       <span>Dark</span>
                     </Stack>

@@ -63,7 +63,14 @@ const Splash: FunctionComponent<SplashProps> = ({
       }}
     >
       {/* Icon circle with optional ripple */}
-      <Box sx={{ position: "relative", display: "flex", alignItems: "center", justifyContent: "center" }}>
+      <Box
+        sx={{
+          position: "relative",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
         {showRipple && (
           <>
             <Box
@@ -117,7 +124,15 @@ const Splash: FunctionComponent<SplashProps> = ({
       </Box>
 
       {/* Text */}
-      <Box sx={{ textAlign: "center", display: "flex", flexDirection: "column", alignItems: "center", gap: 0.75 }}>
+      <Box
+        sx={{
+          textAlign: "center",
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          gap: 0.75,
+        }}
+      >
         <Typography
           variant="h6"
           sx={{ fontWeight: 600, color: "text.primary" }}
@@ -166,7 +181,9 @@ const RECONNECT_DELAY_MS = 2_000;
 interface SharedControlViewProps {}
 
 const SharedControlView: FunctionComponent<SharedControlViewProps> = () => {
-  const [phase, setPhase] = useState<"connecting" | "live" | "reconnecting" | "unavailable">("connecting");
+  const [phase, setPhase] = useState<
+    "connecting" | "live" | "reconnecting" | "unavailable"
+  >("connecting");
 
   const theme = useTheme();
 
@@ -298,7 +315,8 @@ const SharedControlView: FunctionComponent<SharedControlViewProps> = () => {
               chug_start_start_delta_ms: payload.chugStartStartDeltaMs,
             };
             useGame.setState({
-              gameStartTimestamp: payload.gameStartTimestamp ?? currentState.gameStartTimestamp,
+              gameStartTimestamp:
+                payload.gameStartTimestamp ?? currentState.gameStartTimestamp,
               draws,
             });
           }
@@ -377,7 +395,9 @@ const SharedControlView: FunctionComponent<SharedControlViewProps> = () => {
         }}
       >
         <Splash
-          title={phase === "connecting" ? "Connecting to game" : "Reconnecting…"}
+          title={
+            phase === "connecting" ? "Connecting to game" : "Reconnecting…"
+          }
           subtitle={
             phase === "reconnecting"
               ? "Waiting for the host to respond"

@@ -41,14 +41,8 @@ const DNFDialog: FunctionComponent<DNFDialogProps> = (props) => {
   };
 
   return (
-    <Dialog
-      {...props}
-      fullWidth
-      sx={{ width: "100%" }}
-    >
-      <DialogTitle>
-        Did not finish?
-      </DialogTitle>
+    <Dialog {...props} fullWidth sx={{ width: "100%" }}>
+      <DialogTitle>Did not finish?</DialogTitle>
 
       <DialogContent
         sx={{

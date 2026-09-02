@@ -103,8 +103,8 @@ describe("Metrics Store & Derivation", () => {
     it("calculates cumulative and total sips and beer count accurately", () => {
       const draws: Card[] = [
         { value: 10, suit: "S" }, // P0: 10
-        { value: 4, suit: "C" },  // P1: 4
-        { value: 8, suit: "H" },  // P0: 10 + 8 = 18
+        { value: 4, suit: "C" }, // P1: 4
+        { value: 8, suit: "H" }, // P0: 10 + 8 = 18
         { value: 14, suit: "D" }, // P1: 4 + 14 = 18
       ];
 
@@ -161,7 +161,11 @@ describe("Metrics Store & Derivation", () => {
 
   describe("Full Store Integration", () => {
     it("updates metrics on card draws and maintains derived state", async () => {
-      const shuffle = GenerateShuffleIndices(samplePlayers.length);
+      // Deterministic shuffle indices ensuring first card drawn is not an Ace (which would trigger chugging)
+      const shuffle = Array.from(
+        { length: samplePlayers.length * 13 - 1 },
+        (_, i) => 0,
+      );
       await useGame.getState().Start(samplePlayers, {
         sipsInABeer: 14,
         numberOfRounds: 13,

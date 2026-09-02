@@ -44,4 +44,3 @@ const ThemeModeFab: FunctionComponent<ThemeModeFabProps> = ({
 };
 
 export default ThemeModeFab;
-

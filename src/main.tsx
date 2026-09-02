@@ -16,21 +16,21 @@ console.table(import.meta.env);
 useLocation.getState().RequestLocation();
 
 ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
-	<BrowserRouter>
-		<HelmetProvider>
-			<ThemeProvider>
-				<CardFlashProvider>
-					<TextFlashProvider>
-						<Helmet>
-							<title>Academy</title>
-						</Helmet>
+  <BrowserRouter>
+    <HelmetProvider>
+      <ThemeProvider>
+        <CardFlashProvider>
+          <TextFlashProvider>
+            <Helmet>
+              <title>Academy</title>
+            </Helmet>
 
-						<Routes />
+            <Routes />
 
-						<SettingsDialog />
-					</TextFlashProvider>
-				</CardFlashProvider>
-			</ThemeProvider>
-		</HelmetProvider>
-	</BrowserRouter>,
+            <SettingsDialog />
+          </TextFlashProvider>
+        </CardFlashProvider>
+      </ThemeProvider>
+    </HelmetProvider>
+  </BrowserRouter>,
 );

@@ -1,9 +1,9 @@
 import { Box, Dialog } from "@mui/material";
 import {
-    type CSSProperties,
-    type FunctionComponent,
-    useEffect,
-    useState,
+  type CSSProperties,
+  type FunctionComponent,
+  useEffect,
+  useState,
 } from "react";
 import { type Card, getCardImageURI } from "../../models/card";
 

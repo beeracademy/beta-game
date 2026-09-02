@@ -85,4 +85,3 @@ const useSettings = create<SettingsState & SettingsActions>()(
 
 export default useSettings;
 export type { SettingsActions, SettingsState, ThemeMode };
-

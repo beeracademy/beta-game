@@ -165,8 +165,7 @@ const useGame = create<GameState & GameActions>()(
             token = resp.token;
 
             gameStartDateString = resp.start_datetime;
-            gameStartTimestamp =
-              Date.parse(resp.start_datetime) || Date.now();
+            gameStartTimestamp = Date.parse(resp.start_datetime) || Date.now();
             turnStartTimestamp = gameStartTimestamp;
 
             shuffleIndices = resp.shuffle_indices;
@@ -345,10 +344,7 @@ const useGame = create<GameState & GameActions>()(
 
         const updatedCard: Card = {
           ...latestCard,
-          chug_end_start_delta_ms: Math.max(
-            0,
-            now - state.gameStartTimestamp,
-          ),
+          chug_end_start_delta_ms: Math.max(0, now - state.gameStartTimestamp),
         };
 
         const draws = [...state.draws.slice(0, -1), updatedCard];
@@ -398,7 +394,11 @@ const useGame = create<GameState & GameActions>()(
               }),
             );
           } catch (error) {
-            console.error("[Game]", "Failed to update game state on submit", error);
+            console.error(
+              "[Game]",
+              "Failed to update game state on submit",
+              error,
+            );
           }
         }
 

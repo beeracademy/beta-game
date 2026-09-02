@@ -3,8 +3,12 @@ import { FunctionComponent, useEffect } from "react";
 import { BsMoonStarsFill } from "react-icons/bs";
 import { IoDesktopOutline } from "react-icons/io5";
 import { MdMusicNote, MdMusicOff, MdWbSunny } from "react-icons/md";
+import { Howler } from "howler";
 import { useSounds } from "../../../hooks/sounds";
-import useSettings, { getNextThemeMode, ThemeMode } from "../../../stores/settings";
+import useSettings, {
+  getNextThemeMode,
+  ThemeMode,
+} from "../../../stores/settings";
 
 export const LoginHeaderActions: FunctionComponent = () => {
   const theme = useTheme();

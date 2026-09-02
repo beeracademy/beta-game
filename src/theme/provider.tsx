@@ -1,4 +1,7 @@
-import { ThemeProvider as MuiThemeProvider, useMediaQuery } from "@mui/material";
+import {
+  ThemeProvider as MuiThemeProvider,
+  useMediaQuery,
+} from "@mui/material";
 import { FunctionComponent, ReactNode, useMemo } from "react";
 import useSettings from "../stores/settings";
 import { dark } from "./dark";
@@ -21,9 +24,7 @@ const ThemeProvider: FunctionComponent<ThemeProviderProps> = (props) => {
   }, [themeMode, prefersDarkMode]);
 
   return (
-    <MuiThemeProvider theme={resolvedTheme}>
-      {props.children}
-    </MuiThemeProvider>
+    <MuiThemeProvider theme={resolvedTheme}>{props.children}</MuiThemeProvider>
   );
 };
 

@@ -83,9 +83,7 @@ describe("Game state derivation & refresh resilience", () => {
 
     it("derives gameEndTimestamp only when all cards are drawn", () => {
       const start = 100000;
-      const draws: Card[] = [
-        { value: 5, suit: "S", start_delta_ms: 1000 },
-      ];
+      const draws: Card[] = [{ value: 5, suit: "S", start_delta_ms: 1000 }];
       expect(deriveGameEndTimestamp(start, draws, 26)).toBe(0);
 
       const fullDraws: Card[] = Array.from({ length: 26 }, (_, i) => ({
@@ -105,9 +103,7 @@ describe("Game state derivation & refresh resilience", () => {
         official: true,
         start_datetime: "2026-09-01T12:00:00.000Z",
         shuffle_indices: [0, 1, 2],
-        cards: [
-          { value: 7, suit: "S", start_delta_ms: 5000 },
-        ],
+        cards: [{ value: 7, suit: "S", start_delta_ms: 5000 }],
         players: [
           { id: 101, username: "Player1", image: "/img1.jpg" },
           { id: 102, username: "Player2", image: "/img2.jpg" },
@@ -126,7 +122,9 @@ describe("Game state derivation & refresh resilience", () => {
       expect(local.dnf_player_indexes).toEqual([1]);
       expect(local.description).toBe("Great game!");
       expect(local.image).toBe("data:image/jpeg;base64,sample");
-      expect(local.turnStartTimestamp).toBe(Date.parse(serverGame.start_datetime) + 5000);
+      expect(local.turnStartTimestamp).toBe(
+        Date.parse(serverGame.start_datetime) + 5000,
+      );
     });
 
     it("maps local state to remote including description and dnf", () => {
@@ -187,7 +185,9 @@ describe("Game state derivation & refresh resilience", () => {
 
       // Start chug
       useGame.getState().StartChug();
-      expect(useGame.getState().draws[0].chug_start_start_delta_ms).toBeDefined();
+      expect(
+        useGame.getState().draws[0].chug_start_start_delta_ms,
+      ).toBeDefined();
 
       // Simulate refresh during chug in progress
       const persistedMidChug = JSON.parse(JSON.stringify(useGame.getState()));
@@ -221,14 +221,18 @@ describe("Game state derivation & refresh resilience", () => {
       useGame.getState().SetImage("data:image/jpeg;base64,victory_pic_data");
 
       expect(useGame.getState().description).toBe("Epic victory celebration");
-      expect(useGame.getState().image).toBe("data:image/jpeg;base64,victory_pic_data");
+      expect(useGame.getState().image).toBe(
+        "data:image/jpeg;base64,victory_pic_data",
+      );
 
       // Simulate page refresh / restart
       const snapshot = JSON.parse(JSON.stringify(useGame.getState()));
       useGame.getState().Resume(snapshot);
 
       expect(useGame.getState().description).toBe("Epic victory celebration");
-      expect(useGame.getState().image).toBe("data:image/jpeg;base64,victory_pic_data");
+      expect(useGame.getState().image).toBe(
+        "data:image/jpeg;base64,victory_pic_data",
+      );
     });
 
     it("derives done state and keeps GameFinishedDialog open when all cards drawn", () => {

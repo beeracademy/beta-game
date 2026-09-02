@@ -48,11 +48,7 @@ const SoundMuteFab: FunctionComponent<SoundMuteFabProps> = ({
         SetLobbyMusicMuted(!lobbyMusicMuted);
       }}
     >
-      {lobbyMusicMuted ? (
-        <MdMusicOff size={28} />
-      ) : (
-        <MdMusicNote size={28} />
-      )}
+      {lobbyMusicMuted ? <MdMusicOff size={28} /> : <MdMusicNote size={28} />}
     </Fab>
   );
 };

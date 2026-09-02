@@ -1,14 +1,14 @@
 import {
-	alpha,
-	Box,
-	Button,
-	Card,
-	CardContent,
-	Divider,
-	Menu,
-	Stack,
-	Typography,
-	useTheme,
+  alpha,
+  Box,
+  Button,
+  Card,
+  CardContent,
+  Divider,
+  Menu,
+  Stack,
+  Typography,
+  useTheme,
 } from "@mui/material";
 import { type FunctionComponent, useEffect, useRef, useState } from "react";
 import { Helmet } from "react-helmet-async";
@@ -16,9 +16,9 @@ import { BsMoonStarsFill, BsThreeDotsVertical } from "react-icons/bs";
 import { GiBeerBottle } from "react-icons/gi";
 import { IoLogoGameControllerB } from "react-icons/io";
 import {
-	IoColorPaletteOutline,
-	IoDesktopOutline,
-	IoExitOutline,
+  IoColorPaletteOutline,
+  IoDesktopOutline,
+  IoExitOutline,
 } from "react-icons/io5";
 import { MdWbSunny } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
@@ -29,17 +29,17 @@ import MemeDialog from "../../components/MemeDialog";
 import Terminal from "../../components/Terminal";
 import { useTextFlash } from "../../components/TextFlash";
 import {
-	pickHypeMessage,
-	pickJesterMessage,
-	pickKingMessage,
+  pickHypeMessage,
+  pickJesterMessage,
+  pickKingMessage,
 } from "../../components/TextFlash/messages";
 import useIdleTimer from "../../hooks/idleTimer";
 import { useSounds } from "../../hooks/sounds";
 import useGame from "../../stores/game";
 import {
-	MetricsStore,
-	useGameMetrics,
-	usePlayerMetrics,
+  MetricsStore,
+  useGameMetrics,
+  usePlayerMetrics,
 } from "../../stores/metrics";
 import useSettings from "../../stores/settings";
 import { useSharedControl } from "../../stores/sharedControl";
@@ -58,708 +58,710 @@ import SharedControlDialog from "./components/SharedControlDialog";
 import GameTable from "./components/Table";
 
 const GameView: FunctionComponent = () => {
-	const theme = useTheme();
-	const navigate = useNavigate();
-	const { isRemote, send: sendRemote } = useSharedControl();
-
-	const [showTerminal, setShowTerminal] = useState(false);
-	const [showSleepyMeme, setShowSleepyMeme] = useState(false);
-
-	const [mobileMenuAnchor, setMobileMenuAnchor] = useState<HTMLElement | null>(
-		null,
-	);
-	const [mobileSharedControlDialogOpen, setMobileSharedControlDialogOpen] = useState(false);
-	const [mobileExitDialogOpen, setMobileExitDialogOpen] = useState(false);
-	const [mobileChugsDialogOpen, setMobileChugsDialogOpen] = useState(false);
-
-	const cardFlasher = useCardFlash();
-	const textFlasher = useTextFlash();
-
-	const game = useGame(
-		useShallow((state) => ({
-			DrawCard: state.DrawCard,
-			cards: state.draws,
-			offline: state.offline,
-			ExitGame: state.Exit,
-			players: state.players,
-		})),
-	);
-
-	const settings = useSettings(
-		useShallow((state) => ({
-			themeMode: state.themeMode,
-			setThemeMode: state.SetThemeMode,
-			remoteControl: state.remoteControl,
-			remoteToken: state.remoteToken,
-		})),
-	);
-
-	const gameMetrics = useGameMetrics();
-	const playerMetrics = usePlayerMetrics();
-	const isGameDone = gameMetrics.done && !gameMetrics.chugging;
-	const [finishedDialogOpen, setFinishedDialogOpen] = useState(true);
-
-	useEffect(() => {
-		if (!isGameDone) {
-			setFinishedDialogOpen(true);
-		}
-	}, [isGameDone]);
-
-	// Tracks the previously announced King/Jester so a flash only fires on an actual change
-	const leaderboardRef = useRef<{ leader: number; jester: number }>({
-		leader: -1,
-		jester: -1,
-	});
-
-	useEffect(() => {
-		const leaderIndex = playerMetrics.findIndex((p) => p.isLeading);
-		const jesterIndex = playerMetrics.findIndex((p) => p.isLast);
-
-		// Round 1 never has a King/Jester yet, just record the (empty) baseline
-		if (gameMetrics.currentRound === 1 || playerMetrics.length === 0) {
-			leaderboardRef.current = { leader: leaderIndex, jester: jesterIndex };
-			return;
-		}
-
-		const prev = leaderboardRef.current;
-
-		if (leaderIndex !== -1 && leaderIndex !== prev.leader) {
-			const name = game.players[leaderIndex]?.username;
-			if (name) {
-				textFlasher.flash(pickKingMessage(name), { variant: "king" });
-			}
-		}
-
-		if (jesterIndex !== -1 && jesterIndex !== prev.jester) {
-			const name = game.players[jesterIndex]?.username;
-			if (name) {
-				textFlasher.flash(pickJesterMessage(name), { variant: "jester" });
-			}
-		}
-
-		leaderboardRef.current = { leader: leaderIndex, jester: jesterIndex };
-	}, [playerMetrics, gameMetrics.currentRound]);
-
-	const sounds = useSounds();
-
-	let spacePressed = false;
-
-	const ws = useWebSocket();
-
-	useEffect(() => {
-		console.log(
-			"To open the game terminal, press the ` key. (top left of keyboard, no not escape... the one below escape)",
-		);
-
-		window.addEventListener("keydown", handleKeyDown);
-		window.addEventListener("keyup", handleKeyUp);
-
-		return () => {
-			window.removeEventListener("keydown", handleKeyDown);
-			window.removeEventListener("keyup", handleKeyUp);
-		};
-	}, []);
-
-	useEffect(() => {
-		if (isRemote) {
-			return;
-		}
-
-		if (!settings.remoteControl) {
-			return;
-		}
-
-		ws.connect(`wss://academy.beer/ws/remote/${settings.remoteToken}/`);
-
-		return () => {
-			ws.close();
-		};
-	}, [isRemote, settings.remoteControl, settings.remoteToken]);
-
-	useEffect(() => {
-		if (isRemote) {
-			return;
-		}
-
-		if (!ws.ready) {
-			return;
-		}
-
-		ws.receive((data) => {
-			if (data.event === "GET_GAME_STATE") {
-				ws.send({
-					event: "GAME_STATE",
-					payload: useGame.getState(),
-				});
-			}
-
-			if (data.event === "GET_CHUG_TIME") {
-				const state = useGame.getState();
-				const lastCard = state.draws[state.draws.length - 1];
-				if (
-					lastCard &&
-					lastCard.value === 14 &&
-					lastCard.chug_start_start_delta_ms !== undefined &&
-					lastCard.chug_end_start_delta_ms === undefined
-				) {
-					ws.send({
-						event: "CHUG_START_TIME",
-						payload: {
-							gameStartTimestamp: state.gameStartTimestamp,
-							chugStartStartDeltaMs: lastCard.chug_start_start_delta_ms,
-							chugStartTime: state.gameStartTimestamp + lastCard.chug_start_start_delta_ms,
-						},
-					});
-				}
-			}
-
-			if (data.event === "DRAW_CARD") {
-				drawCard();
-			}
-
-			if (data.event === "START_CHUG") {
-				try {
-					useGame.getState().StartChug();
-				} catch (error) {
-					console.error("[Remote]", "START_CHUG failed", error);
-				}
-			}
-
-			if (data.event === "STOP_CHUG") {
-				try {
-					useGame.getState().StopChug();
-				} catch (error) {
-					console.error("[Remote]", "STOP_CHUG failed", error);
-				}
-			}
-		});
-
-		const unsubscribe = useGame.subscribe((state, prevState) => {
-			ws.send({
-				event: "GAME_STATE",
-				payload: state,
-			});
-
-			// If chug was started locally on host, emit CHUG_START_TIME immediately
-			const lastCard = state.draws[state.draws.length - 1];
-			const prevLastCard = prevState.draws[prevState.draws.length - 1];
-			if (
-				lastCard &&
-				lastCard.value === 14 &&
-				lastCard.chug_start_start_delta_ms !== undefined &&
-				lastCard.chug_end_start_delta_ms === undefined &&
-				prevLastCard?.chug_start_start_delta_ms === undefined
-			) {
-				ws.send({
-					event: "CHUG_START_TIME",
-					payload: {
-						gameStartTimestamp: state.gameStartTimestamp,
-						chugStartStartDeltaMs: lastCard.chug_start_start_delta_ms,
-						chugStartTime: state.gameStartTimestamp + lastCard.chug_start_start_delta_ms,
-					},
-				});
-			}
-		});
-
-		return () => {
-			unsubscribe();
-		};
-	}, [isRemote, ws.ready]);
-
-	useEffect(() => {
-		if (isRemote) {
-			return;
-		}
-
-		if (!ws.ready) {
-			return;
-		}
-
-		if (settings.remoteControl) {
-			return;
-		}
-		ws.send({
-			event: "REMOTES_DISCONNECT",
-		});
-
-		ws.close();
-	}, [isRemote, settings.remoteControl]);
-
-
-	const handleKeyDown = (e: KeyboardEvent) => {
-		if (MetricsStore.getState().game.done) {
-			return;
-		}
-
-		if (e.code === "Backquote") {
-			setShowTerminal((prev) => !prev);
-		}
-
-		if (e.code === "Space") {
-			e.preventDefault();
-
-			if (spacePressed) {
-				return;
-			}
-
-			spacePressed = true;
-
-			// When chugging is in progress, Space is reserved for ChugDialog start/stop
-			if (MetricsStore.getState().game.chugging) {
-				return;
-			}
-
-			try {
-				drawCard();
-			} catch (error) {
-				console.error(error);
-			}
-		}
-	};
-
-	const handleKeyUp = (e: KeyboardEvent) => {
-		spacePressed = false;
-	};
-
-	const drawCard = () => {
-		setShowSleepyMeme(false);
-		resetIdleTimer();
-
-		// On a remote, proxy the draw through WebSocket — the host draws and
-		// broadcasts GAME_STATE back, at which point flash/sounds fire normally.
-		if (isRemote) {
-			sendRemote({ event: "DRAW_CARD" });
-			return;
-		}
-
-		const [card, cardsLeft] = game.DrawCard();
-
-		// If chug card, don't flash it
-		if (card.value === 14) {
-			cardFlasher.hide();
-			textFlasher.flash(pickHypeMessage(), { variant: "hype" });
-			return;
-		}
-
-		// If last card, don't flash it
-		if (cardsLeft === 0) {
-			cardFlasher.hide();
-			return;
-		}
-
-		cardFlasher.flash(card);
-	};
-
-	const resetIdleTimer = useIdleTimer(
-		() => {
-			if (gameMetrics.chugging) {
-				return;
-			}
-			setShowSleepyMeme(true);
-			sounds.play("tryk_paa_den_lange_tast");
-		},
-		1000 * 60 * 15 /* 15 minutes */,
-	);
-
-	const showMobileExitDialog = () => {
-		setMobileMenuAnchor(null);
-
-		if (gameMetrics.done) {
-			game.ExitGame({ dnf: false });
-			return;
-		}
-
-		setMobileExitDialogOpen(true);
-	};
-
-	const closeMobileExitDialog = (e: { ok: boolean }) => {
-		setMobileExitDialogOpen(false);
-
-		if (e.ok) {
-			game.ExitGame({ dnf: true });
-			navigate("/login");
-		}
-	};
-
-	return (
-		<>
-			<Helmet>
-				<title>Academy</title>
-			</Helmet>
-
-			<Box
-				sx={{
-					display: "flex",
-					flexDirection: "row",
-					width: "100vw",
-					backgroundColor: "background.default",
-					overflow: "auto",
-					padding: 1,
-					gap: 2,
-				}}
-			>
-				{/* Desktop */}
-
-				<Box
-					sx={{
-						display: "flex",
-						flexDirection: "column",
-						flex: 1,
-						gap: 2,
-
-						[theme.breakpoints.down("sm")]: {
-							display: "none",
-						},
-					}}
-				>
-					<Header />
-
-					<CardInventory onCardClick={drawCard} />
-
-					<ChugsList />
-
-					<Card
-						variant="outlined"
-						sx={{
-							margin: "auto 0",
-							height: "100%",
-							maxHeight: "600px",
-							minHeight: "400px",
-							display: "flex",
-							flexDirection: "column",
-						}}
-					>
-						<CardContent
-							sx={{
-								boxSizing: "border-box",
-								justifyContent: "center",
-								alignItems: "center",
-								display: "flex",
-								height: "100%",
-								flex: 1,
-								gap: 2,
-								p: 2,
-								"&:last-child": {
-									pb: 2,
-								},
-							}}
-						>
-							<GameTable />
-							<Chart />
-						</CardContent>
-					</Card>
-
-					<PlayerList />
-
-					<Terminal
-						open={showTerminal}
-						onClose={() => {
-							setShowTerminal(false);
-						}}
-					/>
-
-					<MemeDialog
-						open={showSleepyMeme}
-						onClose={() => {
-							setShowSleepyMeme(false);
-						}}
-						tag="sleepy boring snoring"
-					/>
-				</Box>
-
-				{/* Mobile */}
-
-				<Box
-					sx={{
-						display: "flex",
-						flexDirection: "column",
-						flex: 1,
-						minHeight: 0,
-						gap: 1,
-
-						[theme.breakpoints.up("sm")]: {
-							display: "none",
-						},
-					}}
-				>
-					<Header />
-
-					<MobileNowDrawing />
-
-					<Box
-						sx={{
-							display: "flex",
-							flexDirection: "column",
-							flex: 1,
-							minHeight: 0,
-							gap: 1.5,
-							overflowY: "auto",
-							paddingTop: 1,
-							paddingBottom: 1,
-						}}
-					>
-						<MobileStandings />
-					</Box>
-
-					<Button
-						variant="contained"
-						color="primary"
-						fullWidth
-						disabled={isGameDone}
-						sx={{ height: 60, fontSize: 20 }}
-						onClick={drawCard}
-					>
-						Draw card
-					</Button>
-
-					<Button
-						variant="text"
-						color="inherit"
-						fullWidth
-						sx={{ height: 40, color: "text.secondary" }}
-						onClick={(e) => setMobileMenuAnchor(e.currentTarget)}
-					>
-						<BsThreeDotsVertical size={18} style={{ marginRight: 8 }} />
-						More options
-					</Button>
-
-					<Menu
-						anchorEl={mobileMenuAnchor}
-						open={!!mobileMenuAnchor}
-						onClose={() => setMobileMenuAnchor(null)}
-						anchorOrigin={{ vertical: "top", horizontal: "center" }}
-						transformOrigin={{ vertical: "bottom", horizontal: "center" }}
-						slotProps={{
-							paper: {
-								sx: {
-									borderRadius: 3,
-									minWidth: 260,
-								},
-							},
-							list: {
-								sx: { padding: 1 },
-							},
-						}}
-					>
-						<Stack divider={<Divider />}>
-							<Button
-								fullWidth
-								variant="text"
-								color="inherit"
-								startIcon={
-									<Box
-										sx={{
-											width: 16,
-											display: "flex",
-											justifyContent: "center",
-										}}
-									>
-										<GiBeerBottle size={18} />
-									</Box>
-								}
-								onClick={() => {
-									setMobileMenuAnchor(null);
-									setMobileChugsDialogOpen(true);
-								}}
-								sx={{
-									justifyContent: "flex-start",
-									borderRadius: 2,
-									paddingX: 1.5,
-									paddingY: 1.5,
-									fontSize: 15,
-									fontWeight: 600,
-									"& .MuiButton-startIcon": {
-										marginLeft: 0,
-										marginRight: 1.75,
-									},
-								}}
-							>
-								Chugs
-							</Button>
-
-							{!isRemote && (
-								<Button
-									fullWidth
-									variant="text"
-									color="inherit"
-									startIcon={
-										<Box
-											sx={{
-												width: 16,
-												display: "flex",
-												justifyContent: "center",
-											}}
-										>
-											<IoLogoGameControllerB size={18} />
-										</Box>
-									}
-									onClick={() => {
-										setMobileMenuAnchor(null);
-										setMobileSharedControlDialogOpen(true);
-									}}
-									sx={{
-										justifyContent: "flex-start",
-										borderRadius: 2,
-										paddingX: 1.5,
-										paddingY: 1.5,
-										fontSize: 15,
-										fontWeight: 600,
-										"& .MuiButton-startIcon": {
-											marginLeft: 0,
-											marginRight: 1.75,
-										},
-									}}
-								>
-									Shared control
-								</Button>
-							)}
-
-							<Stack
-								direction="row"
-								sx={{
-									alignItems: "center",
-									justifyContent: "space-between",
-									paddingX: 1.5,
-									paddingY: 1,
-								}}
-							>
-								<Stack direction="row" sx={{ alignItems: "center", gap: 1.75 }}>
-									<Box
-										sx={{
-											width: 16,
-											display: "flex",
-											justifyContent: "center",
-										}}
-									>
-										<IoColorPaletteOutline size={16} />
-									</Box>
-									<Typography sx={{ fontSize: 15, fontWeight: 600 }}>
-										Theme
-									</Typography>
-								</Stack>
-
-								<Stack
-									direction="row"
-									sx={{
-										backgroundColor: "action.hover",
-										borderRadius: 5,
-										padding: 0.5,
-										gap: 0.25,
-									}}
-								>
-									{(
-										[
-											["light", <MdWbSunny key="light" size={15} />],
-											["system", <IoDesktopOutline key="system" size={15} />],
-											["dark", <BsMoonStarsFill key="dark" size={13} />],
-										] as const
-									).map(([mode, icon]) => (
-										<Box
-											key={mode}
-											component="button"
-											type="button"
-											aria-label={`${mode} theme`}
-											onClick={() => {
-												sounds.play("click");
-												settings.setThemeMode(mode);
-											}}
-											sx={{
-												display: "flex",
-												alignItems: "center",
-												justifyContent: "center",
-												width: 30,
-												height: 26,
-												border: "none",
-												borderRadius: 4,
-												cursor: "pointer",
-												color:
-													settings.themeMode === mode
-														? "text.primary"
-														: "text.disabled",
-												backgroundColor:
-													settings.themeMode === mode
-														? "background.paper"
-														: "transparent",
-												boxShadow:
-													settings.themeMode === mode
-														? "0 1px 2px rgba(0, 0, 0, 0.2)"
-														: "none",
-											}}
-										>
-											{icon}
-										</Box>
-									))}
-								</Stack>
-							</Stack>
-
-							{!isRemote && (
-								<Button
-									fullWidth
-									variant="text"
-									color="error"
-									startIcon={
-										<Box
-											sx={{
-												width: 16,
-												display: "flex",
-												justifyContent: "center",
-											}}
-										>
-											<IoExitOutline size={18} />
-										</Box>
-									}
-									onClick={showMobileExitDialog}
-									sx={{
-										justifyContent: "flex-start",
-										borderRadius: 2,
-										paddingX: 1.5,
-										paddingY: 1.5,
-										marginTop: 0.5,
-										fontSize: 15,
-										fontWeight: 600,
-										"& .MuiButton-startIcon": {
-											marginLeft: 0,
-											marginRight: 1.75,
-										},
-										backgroundColor: (t) => alpha(t.palette.error.main, 0.08),
-										"&:hover": {
-											backgroundColor: (t) => alpha(t.palette.error.main, 0.16),
-										},
-									}}
-								>
-									{gameMetrics.done ? "Exit game" : "Abandon game"}
-								</Button>
-							)}
-						</Stack>
-					</Menu>
-
-					<SharedControlDialog
-						open={mobileSharedControlDialogOpen}
-						onClose={() => setMobileSharedControlDialogOpen(false)}
-					/>
-
-					<ChugsHistoryDialog
-						open={mobileChugsDialogOpen}
-						onClose={() => setMobileChugsDialogOpen(false)}
-					/>
-
-					<ExitGameDialog
-						open={mobileExitDialogOpen}
-						onClose={closeMobileExitDialog}
-					/>
-				</Box>
-			</Box>
-
-			{/* Shared */}
-
-			<ChugDialog open={gameMetrics.chugging} />
-
-			<GameFinishedDialog
-				open={isGameDone && finishedDialogOpen && !isRemote}
-				onClose={() => setFinishedDialogOpen(false)}
-			/>
-		</>
-	);
+  const theme = useTheme();
+  const navigate = useNavigate();
+  const { isRemote, send: sendRemote } = useSharedControl();
+
+  const [showTerminal, setShowTerminal] = useState(false);
+  const [showSleepyMeme, setShowSleepyMeme] = useState(false);
+
+  const [mobileMenuAnchor, setMobileMenuAnchor] = useState<HTMLElement | null>(
+    null,
+  );
+  const [mobileSharedControlDialogOpen, setMobileSharedControlDialogOpen] =
+    useState(false);
+  const [mobileExitDialogOpen, setMobileExitDialogOpen] = useState(false);
+  const [mobileChugsDialogOpen, setMobileChugsDialogOpen] = useState(false);
+
+  const cardFlasher = useCardFlash();
+  const textFlasher = useTextFlash();
+
+  const game = useGame(
+    useShallow((state) => ({
+      DrawCard: state.DrawCard,
+      cards: state.draws,
+      offline: state.offline,
+      ExitGame: state.Exit,
+      players: state.players,
+    })),
+  );
+
+  const settings = useSettings(
+    useShallow((state) => ({
+      themeMode: state.themeMode,
+      setThemeMode: state.SetThemeMode,
+      remoteControl: state.remoteControl,
+      remoteToken: state.remoteToken,
+    })),
+  );
+
+  const gameMetrics = useGameMetrics();
+  const playerMetrics = usePlayerMetrics();
+  const isGameDone = gameMetrics.done && !gameMetrics.chugging;
+  const [finishedDialogOpen, setFinishedDialogOpen] = useState(true);
+
+  useEffect(() => {
+    if (!isGameDone) {
+      setFinishedDialogOpen(true);
+    }
+  }, [isGameDone]);
+
+  // Tracks the previously announced King/Jester so a flash only fires on an actual change
+  const leaderboardRef = useRef<{ leader: number; jester: number }>({
+    leader: -1,
+    jester: -1,
+  });
+
+  useEffect(() => {
+    const leaderIndex = playerMetrics.findIndex((p) => p.isLeading);
+    const jesterIndex = playerMetrics.findIndex((p) => p.isLast);
+
+    // Round 1 never has a King/Jester yet, just record the (empty) baseline
+    if (gameMetrics.currentRound === 1 || playerMetrics.length === 0) {
+      leaderboardRef.current = { leader: leaderIndex, jester: jesterIndex };
+      return;
+    }
+
+    const prev = leaderboardRef.current;
+
+    if (leaderIndex !== -1 && leaderIndex !== prev.leader) {
+      const name = game.players[leaderIndex]?.username;
+      if (name) {
+        textFlasher.flash(pickKingMessage(name), { variant: "king" });
+      }
+    }
+
+    if (jesterIndex !== -1 && jesterIndex !== prev.jester) {
+      const name = game.players[jesterIndex]?.username;
+      if (name) {
+        textFlasher.flash(pickJesterMessage(name), { variant: "jester" });
+      }
+    }
+
+    leaderboardRef.current = { leader: leaderIndex, jester: jesterIndex };
+  }, [playerMetrics, gameMetrics.currentRound]);
+
+  const sounds = useSounds();
+
+  let spacePressed = false;
+
+  const ws = useWebSocket();
+
+  useEffect(() => {
+    console.log(
+      "To open the game terminal, press the ` key. (top left of keyboard, no not escape... the one below escape)",
+    );
+
+    window.addEventListener("keydown", handleKeyDown);
+    window.addEventListener("keyup", handleKeyUp);
+
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+      window.removeEventListener("keyup", handleKeyUp);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (isRemote) {
+      return;
+    }
+
+    if (!settings.remoteControl) {
+      return;
+    }
+
+    ws.connect(`wss://academy.beer/ws/remote/${settings.remoteToken}/`);
+
+    return () => {
+      ws.close();
+    };
+  }, [isRemote, settings.remoteControl, settings.remoteToken]);
+
+  useEffect(() => {
+    if (isRemote) {
+      return;
+    }
+
+    if (!ws.ready) {
+      return;
+    }
+
+    ws.receive((data) => {
+      if (data.event === "GET_GAME_STATE") {
+        ws.send({
+          event: "GAME_STATE",
+          payload: useGame.getState(),
+        });
+      }
+
+      if (data.event === "GET_CHUG_TIME") {
+        const state = useGame.getState();
+        const lastCard = state.draws[state.draws.length - 1];
+        if (
+          lastCard &&
+          lastCard.value === 14 &&
+          lastCard.chug_start_start_delta_ms !== undefined &&
+          lastCard.chug_end_start_delta_ms === undefined
+        ) {
+          ws.send({
+            event: "CHUG_START_TIME",
+            payload: {
+              gameStartTimestamp: state.gameStartTimestamp,
+              chugStartStartDeltaMs: lastCard.chug_start_start_delta_ms,
+              chugStartTime:
+                state.gameStartTimestamp + lastCard.chug_start_start_delta_ms,
+            },
+          });
+        }
+      }
+
+      if (data.event === "DRAW_CARD") {
+        drawCard();
+      }
+
+      if (data.event === "START_CHUG") {
+        try {
+          useGame.getState().StartChug();
+        } catch (error) {
+          console.error("[Remote]", "START_CHUG failed", error);
+        }
+      }
+
+      if (data.event === "STOP_CHUG") {
+        try {
+          useGame.getState().StopChug();
+        } catch (error) {
+          console.error("[Remote]", "STOP_CHUG failed", error);
+        }
+      }
+    });
+
+    const unsubscribe = useGame.subscribe((state, prevState) => {
+      ws.send({
+        event: "GAME_STATE",
+        payload: state,
+      });
+
+      // If chug was started locally on host, emit CHUG_START_TIME immediately
+      const lastCard = state.draws[state.draws.length - 1];
+      const prevLastCard = prevState.draws[prevState.draws.length - 1];
+      if (
+        lastCard &&
+        lastCard.value === 14 &&
+        lastCard.chug_start_start_delta_ms !== undefined &&
+        lastCard.chug_end_start_delta_ms === undefined &&
+        prevLastCard?.chug_start_start_delta_ms === undefined
+      ) {
+        ws.send({
+          event: "CHUG_START_TIME",
+          payload: {
+            gameStartTimestamp: state.gameStartTimestamp,
+            chugStartStartDeltaMs: lastCard.chug_start_start_delta_ms,
+            chugStartTime:
+              state.gameStartTimestamp + lastCard.chug_start_start_delta_ms,
+          },
+        });
+      }
+    });
+
+    return () => {
+      unsubscribe();
+    };
+  }, [isRemote, ws.ready]);
+
+  useEffect(() => {
+    if (isRemote) {
+      return;
+    }
+
+    if (!ws.ready) {
+      return;
+    }
+
+    if (settings.remoteControl) {
+      return;
+    }
+    ws.send({
+      event: "REMOTES_DISCONNECT",
+    });
+
+    ws.close();
+  }, [isRemote, settings.remoteControl]);
+
+  const handleKeyDown = (e: KeyboardEvent) => {
+    if (MetricsStore.getState().game.done) {
+      return;
+    }
+
+    if (e.code === "Backquote") {
+      setShowTerminal((prev) => !prev);
+    }
+
+    if (e.code === "Space") {
+      e.preventDefault();
+
+      if (spacePressed) {
+        return;
+      }
+
+      spacePressed = true;
+
+      // When chugging is in progress, Space is reserved for ChugDialog start/stop
+      if (MetricsStore.getState().game.chugging) {
+        return;
+      }
+
+      try {
+        drawCard();
+      } catch (error) {
+        console.error(error);
+      }
+    }
+  };
+
+  const handleKeyUp = (e: KeyboardEvent) => {
+    spacePressed = false;
+  };
+
+  const drawCard = () => {
+    setShowSleepyMeme(false);
+    resetIdleTimer();
+
+    // On a remote, proxy the draw through WebSocket — the host draws and
+    // broadcasts GAME_STATE back, at which point flash/sounds fire normally.
+    if (isRemote) {
+      sendRemote({ event: "DRAW_CARD" });
+      return;
+    }
+
+    const [card, cardsLeft] = game.DrawCard();
+
+    // If chug card, don't flash it
+    if (card.value === 14) {
+      cardFlasher.hide();
+      textFlasher.flash(pickHypeMessage(), { variant: "hype" });
+      return;
+    }
+
+    // If last card, don't flash it
+    if (cardsLeft === 0) {
+      cardFlasher.hide();
+      return;
+    }
+
+    cardFlasher.flash(card);
+  };
+
+  const resetIdleTimer = useIdleTimer(
+    () => {
+      if (gameMetrics.chugging) {
+        return;
+      }
+      setShowSleepyMeme(true);
+      sounds.play("tryk_paa_den_lange_tast");
+    },
+    1000 * 60 * 15 /* 15 minutes */,
+  );
+
+  const showMobileExitDialog = () => {
+    setMobileMenuAnchor(null);
+
+    if (gameMetrics.done) {
+      game.ExitGame({ dnf: false });
+      return;
+    }
+
+    setMobileExitDialogOpen(true);
+  };
+
+  const closeMobileExitDialog = (e: { ok: boolean }) => {
+    setMobileExitDialogOpen(false);
+
+    if (e.ok) {
+      game.ExitGame({ dnf: true });
+      navigate("/login");
+    }
+  };
+
+  return (
+    <>
+      <Helmet>
+        <title>Academy</title>
+      </Helmet>
+
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: "row",
+          width: "100vw",
+          backgroundColor: "background.default",
+          overflow: "auto",
+          padding: 1,
+          gap: 2,
+        }}
+      >
+        {/* Desktop */}
+
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            flex: 1,
+            gap: 2,
+
+            [theme.breakpoints.down("sm")]: {
+              display: "none",
+            },
+          }}
+        >
+          <Header />
+
+          <CardInventory onCardClick={drawCard} />
+
+          <ChugsList />
+
+          <Card
+            variant="outlined"
+            sx={{
+              margin: "auto 0",
+              height: "100%",
+              maxHeight: "600px",
+              minHeight: "400px",
+              display: "flex",
+              flexDirection: "column",
+            }}
+          >
+            <CardContent
+              sx={{
+                boxSizing: "border-box",
+                justifyContent: "center",
+                alignItems: "center",
+                display: "flex",
+                height: "100%",
+                flex: 1,
+                gap: 2,
+                p: 2,
+                "&:last-child": {
+                  pb: 2,
+                },
+              }}
+            >
+              <GameTable />
+              <Chart />
+            </CardContent>
+          </Card>
+
+          <PlayerList />
+
+          <Terminal
+            open={showTerminal}
+            onClose={() => {
+              setShowTerminal(false);
+            }}
+          />
+
+          <MemeDialog
+            open={showSleepyMeme}
+            onClose={() => {
+              setShowSleepyMeme(false);
+            }}
+            tag="sleepy boring snoring"
+          />
+        </Box>
+
+        {/* Mobile */}
+
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            flex: 1,
+            minHeight: 0,
+            gap: 1,
+
+            [theme.breakpoints.up("sm")]: {
+              display: "none",
+            },
+          }}
+        >
+          <Header />
+
+          <MobileNowDrawing />
+
+          <Box
+            sx={{
+              display: "flex",
+              flexDirection: "column",
+              flex: 1,
+              minHeight: 0,
+              gap: 1.5,
+              overflowY: "auto",
+              paddingTop: 1,
+              paddingBottom: 1,
+            }}
+          >
+            <MobileStandings />
+          </Box>
+
+          <Button
+            variant="contained"
+            color="primary"
+            fullWidth
+            disabled={isGameDone}
+            sx={{ height: 60, fontSize: 20 }}
+            onClick={drawCard}
+          >
+            Draw card
+          </Button>
+
+          <Button
+            variant="text"
+            color="inherit"
+            fullWidth
+            sx={{ height: 40, color: "text.secondary" }}
+            onClick={(e) => setMobileMenuAnchor(e.currentTarget)}
+          >
+            <BsThreeDotsVertical size={18} style={{ marginRight: 8 }} />
+            More options
+          </Button>
+
+          <Menu
+            anchorEl={mobileMenuAnchor}
+            open={!!mobileMenuAnchor}
+            onClose={() => setMobileMenuAnchor(null)}
+            anchorOrigin={{ vertical: "top", horizontal: "center" }}
+            transformOrigin={{ vertical: "bottom", horizontal: "center" }}
+            slotProps={{
+              paper: {
+                sx: {
+                  borderRadius: 3,
+                  minWidth: 260,
+                },
+              },
+              list: {
+                sx: { padding: 1 },
+              },
+            }}
+          >
+            <Stack divider={<Divider />}>
+              <Button
+                fullWidth
+                variant="text"
+                color="inherit"
+                startIcon={
+                  <Box
+                    sx={{
+                      width: 16,
+                      display: "flex",
+                      justifyContent: "center",
+                    }}
+                  >
+                    <GiBeerBottle size={18} />
+                  </Box>
+                }
+                onClick={() => {
+                  setMobileMenuAnchor(null);
+                  setMobileChugsDialogOpen(true);
+                }}
+                sx={{
+                  justifyContent: "flex-start",
+                  borderRadius: 2,
+                  paddingX: 1.5,
+                  paddingY: 1.5,
+                  fontSize: 15,
+                  fontWeight: 600,
+                  "& .MuiButton-startIcon": {
+                    marginLeft: 0,
+                    marginRight: 1.75,
+                  },
+                }}
+              >
+                Chugs
+              </Button>
+
+              {!isRemote && (
+                <Button
+                  fullWidth
+                  variant="text"
+                  color="inherit"
+                  startIcon={
+                    <Box
+                      sx={{
+                        width: 16,
+                        display: "flex",
+                        justifyContent: "center",
+                      }}
+                    >
+                      <IoLogoGameControllerB size={18} />
+                    </Box>
+                  }
+                  onClick={() => {
+                    setMobileMenuAnchor(null);
+                    setMobileSharedControlDialogOpen(true);
+                  }}
+                  sx={{
+                    justifyContent: "flex-start",
+                    borderRadius: 2,
+                    paddingX: 1.5,
+                    paddingY: 1.5,
+                    fontSize: 15,
+                    fontWeight: 600,
+                    "& .MuiButton-startIcon": {
+                      marginLeft: 0,
+                      marginRight: 1.75,
+                    },
+                  }}
+                >
+                  Shared control
+                </Button>
+              )}
+
+              <Stack
+                direction="row"
+                sx={{
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  paddingX: 1.5,
+                  paddingY: 1,
+                }}
+              >
+                <Stack direction="row" sx={{ alignItems: "center", gap: 1.75 }}>
+                  <Box
+                    sx={{
+                      width: 16,
+                      display: "flex",
+                      justifyContent: "center",
+                    }}
+                  >
+                    <IoColorPaletteOutline size={16} />
+                  </Box>
+                  <Typography sx={{ fontSize: 15, fontWeight: 600 }}>
+                    Theme
+                  </Typography>
+                </Stack>
+
+                <Stack
+                  direction="row"
+                  sx={{
+                    backgroundColor: "action.hover",
+                    borderRadius: 5,
+                    padding: 0.5,
+                    gap: 0.25,
+                  }}
+                >
+                  {(
+                    [
+                      ["light", <MdWbSunny key="light" size={15} />],
+                      ["system", <IoDesktopOutline key="system" size={15} />],
+                      ["dark", <BsMoonStarsFill key="dark" size={13} />],
+                    ] as const
+                  ).map(([mode, icon]) => (
+                    <Box
+                      key={mode}
+                      component="button"
+                      type="button"
+                      aria-label={`${mode} theme`}
+                      onClick={() => {
+                        sounds.play("click");
+                        settings.setThemeMode(mode);
+                      }}
+                      sx={{
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        width: 30,
+                        height: 26,
+                        border: "none",
+                        borderRadius: 4,
+                        cursor: "pointer",
+                        color:
+                          settings.themeMode === mode
+                            ? "text.primary"
+                            : "text.disabled",
+                        backgroundColor:
+                          settings.themeMode === mode
+                            ? "background.paper"
+                            : "transparent",
+                        boxShadow:
+                          settings.themeMode === mode
+                            ? "0 1px 2px rgba(0, 0, 0, 0.2)"
+                            : "none",
+                      }}
+                    >
+                      {icon}
+                    </Box>
+                  ))}
+                </Stack>
+              </Stack>
+
+              {!isRemote && (
+                <Button
+                  fullWidth
+                  variant="text"
+                  color="error"
+                  startIcon={
+                    <Box
+                      sx={{
+                        width: 16,
+                        display: "flex",
+                        justifyContent: "center",
+                      }}
+                    >
+                      <IoExitOutline size={18} />
+                    </Box>
+                  }
+                  onClick={showMobileExitDialog}
+                  sx={{
+                    justifyContent: "flex-start",
+                    borderRadius: 2,
+                    paddingX: 1.5,
+                    paddingY: 1.5,
+                    marginTop: 0.5,
+                    fontSize: 15,
+                    fontWeight: 600,
+                    "& .MuiButton-startIcon": {
+                      marginLeft: 0,
+                      marginRight: 1.75,
+                    },
+                    backgroundColor: (t) => alpha(t.palette.error.main, 0.08),
+                    "&:hover": {
+                      backgroundColor: (t) => alpha(t.palette.error.main, 0.16),
+                    },
+                  }}
+                >
+                  {gameMetrics.done ? "Exit game" : "Abandon game"}
+                </Button>
+              )}
+            </Stack>
+          </Menu>
+
+          <SharedControlDialog
+            open={mobileSharedControlDialogOpen}
+            onClose={() => setMobileSharedControlDialogOpen(false)}
+          />
+
+          <ChugsHistoryDialog
+            open={mobileChugsDialogOpen}
+            onClose={() => setMobileChugsDialogOpen(false)}
+          />
+
+          <ExitGameDialog
+            open={mobileExitDialogOpen}
+            onClose={closeMobileExitDialog}
+          />
+        </Box>
+      </Box>
+
+      {/* Shared */}
+
+      <ChugDialog open={gameMetrics.chugging} />
+
+      <GameFinishedDialog
+        open={isGameDone && finishedDialogOpen && !isRemote}
+        onClose={() => setFinishedDialogOpen(false)}
+      />
+    </>
+  );
 };
 
 export default GameView;

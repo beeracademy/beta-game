@@ -927,7 +927,9 @@ const Camera: FunctionComponent = memo(() => {
           }}
         >
           {/* Left side spacer to keep shutter centered, matches flip button width */}
-          <Box sx={{ width: 44, display: "flex", justifyContent: "flex-start" }}>
+          <Box
+            sx={{ width: 44, display: "flex", justifyContent: "flex-start" }}
+          >
             {hasMultipleCameras && !imageUrl && <Box sx={{ width: 44 }} />}
           </Box>
 

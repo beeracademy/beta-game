@@ -1,46 +1,37 @@
-import { DialogProps } from "@mui/material";
-import { FunctionComponent } from "react";
-import { Game } from "../../../../api/models/game";
+import type { FunctionComponent } from "react";
+import type { Game } from "../../../../api/models/game";
 import ConfirmDialog from "../../../../components/ConfirmDialog";
 import { datetimeToddmmHHMMSS } from "../../../../utilities/time";
 
-interface ContinueGameDialogProps extends DialogProps {
+interface ContinueGameDialogProps {
+  open: boolean;
   game: Game;
+  onConfirm: () => void;
+  onCancel: () => void;
 }
 
-const ContinueGameDialog: FunctionComponent<ContinueGameDialogProps> = (
-  props,
-) => {
+const ContinueGameDialog: FunctionComponent<ContinueGameDialogProps> = ({
+  open,
+  game,
+  onConfirm,
+  onCancel,
+}) => {
   const playerNames =
-    (props.game as any).players && Array.isArray((props.game as any).players)
-      ? (props.game as any).players.map((p: any) => p.username)
-      : props.game.player_names || [];
+    (game as any).players && Array.isArray((game as any).players)
+      ? (game as any).players.map((p: any) => p.username)
+      : game.player_names || [];
 
   return (
     <ConfirmDialog
-      {...props}
-      title="Continue a game"
-      message={`Are you sure you want to continue game ${
-        props.game.id
+      open={open}
+      title="Resume a game"
+      message={`Are you sure you want to resume game ${
+        game.id
       } started at ${datetimeToddmmHHMMSS(
-        props.game.start_datetime,
+        game.start_datetime,
       )} with ${playerNames.join(", ")}?`}
-      onCancel={() =>
-        props.onClose?.(
-          {
-            ok: false,
-          },
-          "backdropClick",
-        )
-      }
-      onConfirm={() =>
-        props.onClose?.(
-          {
-            ok: true,
-          },
-          "backdropClick",
-        )
-      }
+      onCancel={onCancel}
+      onConfirm={onConfirm}
     />
   );
 };

@@ -1,5 +1,4 @@
 # TODOS
 
-- [ ] Improved UI in game remote
-- [ ] Resume game
+- [x] Resume game
 - [ ] Add chat?
