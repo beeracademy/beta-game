@@ -192,12 +192,14 @@ const SharedControlView: FunctionComponent<SharedControlViewProps> = () => {
 
   // Ref so ping-related callbacks always see the current ws without re-wiring effects
   const wsRef = useRef(ws);
-  wsRef.current = ws;
-
   // Track phase in a ref too, so the ws.ready effect can read it without being
   // added as a dependency (avoids tearing down/re-creating the socket on every phase change)
   const phaseRef = useRef(phase);
-  phaseRef.current = phase;
+
+  useEffect(() => {
+    wsRef.current = ws;
+    phaseRef.current = phase;
+  });
 
   // Ping timeout handle — cleared whenever GAME_STATE arrives
   const pingTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -253,7 +255,7 @@ const SharedControlView: FunctionComponent<SharedControlViewProps> = () => {
     return () => {
       ws.close();
     };
-  }, [token]);
+  }, [token, ws]);
 
   // ── socket closed → reconnect ────────────────────────────────────────────────
   //
@@ -281,7 +283,7 @@ const SharedControlView: FunctionComponent<SharedControlViewProps> = () => {
     return () => {
       clearReconnectTimer();
     };
-  }, [ws.ready]);
+  }, [ws.ready, clearReconnectTimer, token]);
 
   // ── message handling + pings (while socket is open) ──────────────────────────
 
@@ -368,7 +370,7 @@ const SharedControlView: FunctionComponent<SharedControlViewProps> = () => {
       clearPingTimeout();
       clearPingInterval();
     };
-  }, [ws.ready]);
+  }, [ws.ready, armPingTimeout, clearPingTimeout, clearPingInterval, ws]);
 
   // ── hard-sync on tab focus ───────────────────────────────────────────────────
 
@@ -387,7 +389,7 @@ const SharedControlView: FunctionComponent<SharedControlViewProps> = () => {
     return () => {
       document.removeEventListener("visibilitychange", handleVisibilityChange);
     };
-  }, [ws.ready]);
+  }, [ws.ready, armPingTimeout, ws]);
 
   // ── render ───────────────────────────────────────────────────────────────────
 

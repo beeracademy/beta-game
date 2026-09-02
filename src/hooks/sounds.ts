@@ -53,19 +53,6 @@ SoundNames.forEach((soundName) => {
   });
 });
 
-const useSounds = () => {
-  return {
-    play: play,
-
-    pause: pause,
-
-    mute: mute,
-    unmute: unmute,
-
-    stop: stop,
-    stopAll: stopAll,
-  };
-};
 
 interface playOptions {
   loop?: boolean;
@@ -152,6 +139,19 @@ const stopAll = () => {
   });
 
   activeSounds.clear();
+};
+
+const SOUNDS = {
+  play,
+  pause,
+  mute,
+  unmute,
+  stop,
+  stopAll,
+};
+
+const useSounds = () => {
+  return SOUNDS;
 };
 
 export { SoundNames, mute, pause, play, stop, stopAll, unmute, useSounds };

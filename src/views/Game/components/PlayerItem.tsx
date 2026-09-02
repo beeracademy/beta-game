@@ -54,23 +54,17 @@ const PlayerItem: FunctionComponent<PlayerItemProps> = (props) => {
   const SetSimpleCardsMode = useSettings((state) => state.SetSimpleCardsMode);
 
   const [elapsedTurnTime, setElapsedTurnTime] = useState(0);
-  const [intervalRef, setIntervalRef] =
-    useState<ReturnType<typeof setInterval>>();
-
-  const updateElapsedTime = () => {
-    setElapsedTurnTime(gameMetrics.GetElapsedTurnTime());
-  };
 
   useEffect(() => {
-    clearInterval(intervalRef);
-    setIntervalRef(undefined);
     setElapsedTurnTime(0);
 
     if (gameMetrics.activePlayerIndex === props.index) {
-      const interval = setInterval(updateElapsedTime, 1);
-      setIntervalRef(interval);
+      const interval = setInterval(() => {
+        setElapsedTurnTime(gameMetrics.GetElapsedTurnTime());
+      }, 1);
+      return () => clearInterval(interval);
     }
-  }, [gameMetrics.activePlayerIndex, props.index]);
+  }, [gameMetrics, props.index]);
 
   const color = useCallback(() => {
     if (props.index < Object.keys(theme.player).length && props.index > 0) {

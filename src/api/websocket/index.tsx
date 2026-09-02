@@ -1,11 +1,13 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 const useWebSocket = () => {
   const [socket, setSocket] = useState<WebSocket | null>(null);
   const [ready, setReady] = useState(false);
   const [error, setError] = useState(false);
+  const socketRef = useRef<WebSocket | null>(null);
 
   useEffect(() => {
+    socketRef.current = socket;
     if (!socket) {
       return;
     }
@@ -27,32 +29,37 @@ const useWebSocket = () => {
     };
   }, [socket]);
 
-  const connect = (url: string) => {
-    const socket = new WebSocket(url);
-    setSocket(socket);
-  };
+  const connect = useCallback((url: string) => {
+    const s = new WebSocket(url);
+    socketRef.current = s;
+    setSocket(s);
+  }, []);
 
-  const send = (data: any) => {
-    if (socket) {
-      socket.send(JSON.stringify(data));
+  const send = useCallback((data: any) => {
+    if (socketRef.current) {
+      socketRef.current.send(JSON.stringify(data));
     }
-  };
+  }, []);
 
-  const receive = (callback: (data: any) => void) => {
-    if (socket) {
-      socket.onmessage = (event) => {
+  const receive = useCallback((callback: (data: any) => void) => {
+    if (socketRef.current) {
+      socketRef.current.onmessage = (event) => {
         callback(JSON.parse(event.data));
       };
     }
-  };
+  }, []);
 
-  const close = () => {
-    if (socket) {
-      socket.close();
+  const close = useCallback(() => {
+    if (socketRef.current) {
+      socketRef.current.close();
+      socketRef.current = null;
     }
-  };
+  }, []);
 
-  return { connect, send, receive, close, ready, error };
+  return useMemo(
+    () => ({ connect, send, receive, close, ready, error }),
+    [connect, send, receive, close, ready, error],
+  );
 };
 
 export default useWebSocket;

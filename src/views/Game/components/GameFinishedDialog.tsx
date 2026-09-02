@@ -17,6 +17,7 @@ import {
 import {
   type FunctionComponent,
   memo,
+  useCallback,
   useEffect,
   useRef,
   useState,
@@ -89,7 +90,7 @@ const GameFinishedDialog: FunctionComponent<GameFinishedDialogProps> = (
     if (savedDescription !== undefined && savedDescription !== description) {
       setMessage(savedDescription);
     }
-  }, [savedDescription]);
+  }, [savedDescription, description]);
 
   const handleDescriptionChange = (value: string) => {
     setMessage(value);
@@ -102,7 +103,7 @@ const GameFinishedDialog: FunctionComponent<GameFinishedDialogProps> = (
       cheeredRef.current = true;
       sounds.play("cheering");
     }
-  }, [props.open]);
+  }, [props.open, sounds]);
 
   const handleSubmit = async () => {
     setIsSubmitting(true);
@@ -479,7 +480,7 @@ const Camera: FunctionComponent = memo(() => {
     if (game.savedImage && !imageUrl) {
       setImageUrl(game.savedImage);
     }
-  }, [game.savedImage]);
+  }, [game.savedImage, imageUrl]);
 
   // Create preview URL for captured blob and revoke when updated/unmounted
   useEffect(() => {
@@ -507,7 +508,7 @@ const Camera: FunctionComponent = memo(() => {
     };
   }, []);
 
-  const startCamera = async () => {
+  const startCamera = useCallback(async () => {
     if (streamRef.current) {
       streamRef.current.getTracks().forEach((track) => track.stop());
       streamRef.current = null;
@@ -558,7 +559,7 @@ const Camera: FunctionComponent = memo(() => {
       setCameraError("Could not access camera");
       setCameraLoading(false);
     }
-  };
+  }, [facingMode, cameraDevices, selectedDeviceIndex]);
 
   // Manage camera stream lifecycle
   useEffect(() => {
@@ -578,7 +579,7 @@ const Camera: FunctionComponent = memo(() => {
         streamRef.current = null;
       }
     };
-  }, [facingMode, selectedDeviceIndex, cameraDevices, imageUrl]);
+  }, [imageUrl, startCamera]);
 
   const capture = async () => {
     sounds.play("camera_shutter");

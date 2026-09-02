@@ -36,7 +36,7 @@ const DNFDialog: FunctionComponent<DNFDialogProps> = (props) => {
     if (props.open && isRemote) {
       sendRemote({ event: "GET_DNF_STATE" });
     }
-  }, [props.open, isRemote]);
+  }, [props.open, isRemote, sendRemote]);
 
   const toggle = (index: number) => {
     const isDNF = !dnf_player_indexes.includes(index);

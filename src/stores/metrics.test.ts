@@ -163,7 +163,7 @@ describe("Metrics Store & Derivation", () => {
       // Deterministic shuffle indices ensuring first card drawn is not an Ace (which would trigger chugging)
       const shuffle = Array.from(
         { length: samplePlayers.length * 13 - 1 },
-        (_, i) => 0,
+        () => 0,
       );
       await useGame.getState().Start(samplePlayers, {
         sipsInABeer: 14,

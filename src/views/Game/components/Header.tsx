@@ -97,23 +97,23 @@ const Header: FunctionComponent = () => {
   const [elapsedGameTime, setElapsedGameTime] = useState(0);
   const [elapsedTurnTime, setElapsedTurnTime] = useState(0);
 
-  const updateTimes = () => {
-    setElapsedGameTime(gameMetrics.GetElapsedGameTime());
-
-    if (gameMetrics.done) {
-      setElapsedTurnTime(0);
-    } else {
-      setElapsedTurnTime(gameMetrics.GetElapsedTurnTime());
-    }
-  };
-
   useEffect(() => {
+    const updateTimes = () => {
+      setElapsedGameTime(gameMetrics.GetElapsedGameTime());
+
+      if (gameMetrics.done) {
+        setElapsedTurnTime(0);
+      } else {
+        setElapsedTurnTime(gameMetrics.GetElapsedTurnTime());
+      }
+    };
+
     updateTimes();
 
     const interval = setInterval(updateTimes, 1);
 
     return () => clearInterval(interval);
-  }, [gameMetrics.done, game.gameStartTimestamp, game.turnStartTimestamp]);
+  }, [gameMetrics, game.gameStartTimestamp, game.turnStartTimestamp]);
 
   return (
     <>

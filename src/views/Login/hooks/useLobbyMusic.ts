@@ -17,7 +17,7 @@ const useLobbyMusic = () => {
     return () => {
       stop(lobbyMusic);
     };
-  }, []);
+  }, [play, stop]);
 
   useEffect(() => {
     if (lobbyMusicMuted) {
@@ -25,7 +25,7 @@ const useLobbyMusic = () => {
     } else {
       unmute(lobbyMusic);
     }
-  }, [lobbyMusicMuted]);
+  }, [lobbyMusicMuted, mute, unmute]);
 };
 
 export default useLobbyMusic;

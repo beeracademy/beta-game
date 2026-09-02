@@ -1,5 +1,5 @@
 import { styled } from "@mui/material";
-import { type FunctionComponent, memo } from "react";
+import { type FunctionComponent, memo, useState } from "react";
 
 const Wrapper = styled("div")`
   width: 100%;
@@ -72,45 +72,31 @@ const Wrapper = styled("div")`
   }
 `;
 
+const BUBBLE_CLASSES = [
+  "bubble small",
+  "bubble small",
+  "bubble s-medium",
+  "bubble medium",
+  "bubble large",
+  "bubble small-l",
+] as const;
+
 const Bubbles: FunctionComponent = () => {
+  const [leftPositions] = useState(() =>
+    BUBBLE_CLASSES.map(() => `${Math.random() * 70 + 15}%`),
+  );
+
   return (
     <Wrapper>
-      <div
-        className="bubble small"
-        style={{
-          left: Math.random() * 70 + 15 + "%",
-        }}
-      />
-      <div
-        className="bubble small"
-        style={{
-          left: Math.random() * 70 + 15 + "%",
-        }}
-      />
-      <div
-        className="bubble s-medium"
-        style={{
-          left: Math.random() * 70 + 15 + "%",
-        }}
-      />
-      <div
-        className="bubble medium"
-        style={{
-          left: Math.random() * 70 + 15 + "%",
-        }}
-      />
-      <div
-        className="bubble large"
-        style={{
-          left: Math.random() * 70 + 15 + "%",
-        }}
-      />
-      <div
-        className="bubble small-l"
-        style={{
-          left: Math.random() * 70 + 15 + "%",
-        }}
-      />
+      {BUBBLE_CLASSES.map((className, index) => (
+        <div
+          key={index}
+          className={className}
+          style={{
+            left: leftPositions[index],
+          }}
+        />
+      ))}
     </Wrapper>
   );
 };

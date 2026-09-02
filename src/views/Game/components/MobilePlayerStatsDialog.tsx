@@ -50,7 +50,7 @@ const MobilePlayerStatsDialog: FunctionComponent<
     if (props.open && isRemote) {
       sendRemote({ event: "GET_DNF_STATE" });
     }
-  }, [props.open, isRemote]);
+  }, [props.open, isRemote, sendRemote]);
 
   if (!player) {
     return null;
@@ -83,9 +83,9 @@ const MobilePlayerStatsDialog: FunctionComponent<
   };
 
   const stats: [string, ReactNode][] = [
-    ["Total sips", <Base14Sips value={metrics.totalSips} />],
-    ["Max sips", <Base14Sips value={metrics.maxSips} />],
-    ["Min sips", <Base14Sips value={metrics.minSips} />],
+    ["Total sips", <Base14Sips key="total-sips" value={metrics.totalSips} />],
+    ["Max sips", <Base14Sips key="max-sips" value={metrics.maxSips} />],
+    ["Min sips", <Base14Sips key="min-sips" value={metrics.minSips} />],
     ["Total time", secondsToHHMMSS(metrics.totalTime)],
     ["Beers", metrics.numberOfBeers.toString()],
     ["Chugs", metrics.numberOfChugs.toString()],

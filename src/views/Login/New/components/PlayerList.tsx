@@ -3,7 +3,7 @@ import { FunctionComponent } from "react";
 import { useNewGame } from "../contexts/newGame";
 import PlayerItem from "./PlayerItem";
 
-const PlayerList: FunctionComponent = (props) => {
+const PlayerList: FunctionComponent = () => {
   const newGame = useNewGame();
 
   return (

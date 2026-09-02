@@ -40,7 +40,7 @@ const Chart: FunctionComponent = () => {
     });
 
     return data;
-  }, [playerMetrics, theme.palette.mode]);
+  }, [playerMetrics, game.players, theme.player]);
 
   return (
     <Box

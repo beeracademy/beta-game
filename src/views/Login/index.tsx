@@ -1,5 +1,5 @@
 import { Box, Container } from "@mui/material";
-import { FunctionComponent, memo } from "react";
+import { FunctionComponent, memo, useState } from "react";
 import { Outlet } from "react-router-dom";
 import TimeSynchronizationWarningDialog from "./components/TimeSynchronizationWarningDialog";
 import useLobbyMusic from "./hooks/useLobbyMusic";
@@ -35,6 +35,8 @@ const LoginView: FunctionComponent = () => {
 };
 
 const Wallpaper = memo(() => {
+  const [wallpaper] = useState(() => Math.floor(Math.random() * 5 + 1));
+
   return (
     <Box
       sx={{
@@ -46,8 +48,7 @@ const Wallpaper = memo(() => {
         opacity: 0.2,
         zIndex: -1,
         pointerEvents: "none",
-        backgroundImage:
-          "url(/wallpaper/" + Math.floor(Math.random() * 5 + 1) + ".png)",
+        backgroundImage: "url(/wallpaper/" + wallpaper + ".png)",
         backgroundSize: "cover",
         backgroundPosition: "center",
         backgroundRepeat: "no-repeat",

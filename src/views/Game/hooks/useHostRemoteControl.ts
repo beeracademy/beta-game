@@ -27,7 +27,7 @@ export const useHostRemoteControl = ({
     return () => {
       ws.close();
     };
-  }, [isRemote, remoteControl, remoteToken]);
+  }, [isRemote, remoteControl, remoteToken, ws]);
 
   // Handle incoming remote commands and broadcast host game state changes
   useEffect(() => {
@@ -211,7 +211,7 @@ export const useHostRemoteControl = ({
     return () => {
       unsubscribe();
     };
-  }, [isRemote, ws.ready, drawCard]);
+  }, [isRemote, ws, drawCard]);
 
   // Gracefully notify remotes when host disables remote control
   useEffect(() => {
@@ -225,7 +225,7 @@ export const useHostRemoteControl = ({
       });
       ws.close();
     }
-  }, [isRemote, remoteControl, ws.ready]);
+  }, [isRemote, remoteControl, ws]);
 
   return ws;
 };
