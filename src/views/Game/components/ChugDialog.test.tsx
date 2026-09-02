@@ -29,6 +29,15 @@ vi.mock("../../../hooks/sounds", () => ({
   }),
 }));
 
+const flashMock = vi.fn();
+
+vi.mock("../../../components/TextFlash", () => ({
+  useTextFlash: () => ({
+    flash: flashMock,
+    clear: vi.fn(),
+  }),
+}));
+
 describe("ChugDialog", () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -59,5 +68,36 @@ describe("ChugDialog", () => {
       expect(confetti).toHaveAttribute("data-width", "1600");
       expect(confetti).toHaveAttribute("data-height", "900");
     });
+  });
+
+  it("does not flash 'FINISH HIM!!' on the first chug", () => {
+    useGame.setState({
+      players: [{ id: 1, username: "Alice", token: "tok1" }],
+      draws: [{ value: 14, suit: "S", start_delta_ms: 0 }],
+      shuffleIndices: Array.from({ length: 12 }, (_, i) => i),
+    });
+
+    render(<ChugDialog open={true} />);
+
+    expect(flashMock).not.toHaveBeenCalledWith(
+      expect.stringMatching(/finish him/i),
+      expect.anything(),
+    );
+    expect(flashMock).not.toHaveBeenCalled();
+  });
+
+  it("flashes 'DOUBLE KILL!!' on the second chug", () => {
+    useGame.setState({
+      players: [{ id: 1, username: "Alice", token: "tok1" }],
+      draws: [
+        { value: 14, suit: "S", start_delta_ms: 0, chug_end_start_delta_ms: 1000 },
+        { value: 14, suit: "C", start_delta_ms: 2000 },
+      ],
+      shuffleIndices: Array.from({ length: 12 }, (_, i) => i),
+    });
+
+    render(<ChugDialog open={true} />);
+
+    expect(flashMock).toHaveBeenCalledWith("DOUBLE KILL!!", { variant: "kill" });
   });
 });

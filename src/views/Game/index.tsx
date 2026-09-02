@@ -106,18 +106,39 @@ const GameView: FunctionComponent = () => {
     }
   }, [isGameDone]);
 
-  // Tracks the previously announced King/Jester so a flash only fires on an actual change
+  // Tracks card count to ensure King/Jester flashes only fire on an actual card draw,
+  // and never during initial mount / tab reload.
+  const prevCardsCountRef = useRef(game.cards.length);
   const leaderboardRef = useRef<{ leader: number; jester: number }>({
-    leader: -1,
-    jester: -1,
+    leader: playerMetrics.findIndex((p) => p.isLeading),
+    jester: playerMetrics.findIndex((p) => p.isLast),
   });
 
   useEffect(() => {
     const leaderIndex = playerMetrics.findIndex((p) => p.isLeading);
     const jesterIndex = playerMetrics.findIndex((p) => p.isLast);
 
+    const cardsCount = game.cards.length;
+    const cardWasDrawn = cardsCount > prevCardsCountRef.current;
+    prevCardsCountRef.current = cardsCount;
+
     // Round 1 never has a King/Jester yet, just record the (empty) baseline
     if (gameMetrics.currentRound === 1 || playerMetrics.length === 0) {
+      leaderboardRef.current = { leader: leaderIndex, jester: jesterIndex };
+      return;
+    }
+
+    // Only announce King/Jester when an actual card draw caused the change
+    if (!cardWasDrawn) {
+      leaderboardRef.current = { leader: leaderIndex, jester: jesterIndex };
+      return;
+    }
+
+    // Do not announce King/Jester when chugging (e.g. Ace drawn / ChugDialog open)
+    if (
+      gameMetrics.chugging ||
+      game.cards[game.cards.length - 1]?.value === 14
+    ) {
       leaderboardRef.current = { leader: leaderIndex, jester: jesterIndex };
       return;
     }
@@ -139,7 +160,14 @@ const GameView: FunctionComponent = () => {
     }
 
     leaderboardRef.current = { leader: leaderIndex, jester: jesterIndex };
-  }, [playerMetrics, gameMetrics.currentRound]);
+  }, [
+    playerMetrics,
+    gameMetrics.currentRound,
+    gameMetrics.chugging,
+    game.cards,
+    game.players,
+    textFlasher,
+  ]);
 
   const sounds = useSounds();
 

@@ -22,9 +22,8 @@ const JESTER_MESSAGES = (name: string) => [
   `${name} WEARS THE BELLS!`,
 ];
 
-// Mirrors the actual spoken phrase of the kill-streak sound played in ChugDialog
+// Mirrors the actual spoken phrase of the kill-streak sound played in ChugDialog (streaks start at 2)
 const KILL_STREAK_MESSAGES: Record<number, string> = {
-  1: "FINISH HIM!!",
   2: "DOUBLE KILL!!",
   3: "TRIPLE KILL!!",
   4: "ULTRA KILL!!",
