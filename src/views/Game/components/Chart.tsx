@@ -3,7 +3,7 @@ import { FunctionComponent, useCallback } from "react";
 import ApexChart from "react-apexcharts";
 import type { ApexAxisChartSeries } from "apexcharts";
 import useGame from "../../../stores/game";
-import { usePlayerMetrics } from "../../../stores/metrics";
+import { useGameMetrics, usePlayerMetrics } from "../../../stores/metrics";
 import { useShallow } from "zustand/react/shallow";
 
 const Chart: FunctionComponent = () => {
@@ -18,6 +18,9 @@ const Chart: FunctionComponent = () => {
   );
 
   const playerMetrics = usePlayerMetrics();
+  const gameMetrics = useGameMetrics();
+  const activePlayerIndex =
+    !gameMetrics.done ? gameMetrics.activePlayerIndex : -1;
 
   const datasets = useCallback(() => {
     const data: ApexAxisChartSeries = playerMetrics.map((pm, i) => {
@@ -66,11 +69,19 @@ const Chart: FunctionComponent = () => {
             fontFamily: "AUPassata",
             background: "transparent",
           },
+          stroke: {
+            curve: "straight",
+            width: game.players.map((_, i) =>
+              activePlayerIndex >= 0 && i === activePlayerIndex ? 5 : 2,
+            ),
+          },
           grid: {
             borderColor: theme.palette.divider,
           },
           markers: {
-            size: 4,
+            size: game.players.map((_, i) =>
+              activePlayerIndex >= 0 && i === activePlayerIndex ? 6 : 3,
+            ),
             strokeColors: Object.values(theme.player),
             hover: {
               size: 8,
