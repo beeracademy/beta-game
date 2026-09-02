@@ -21,7 +21,9 @@ const Base14Sips: FunctionComponent<Base14SipsProps> = ({
       <sub
         style={{
           opacity: denotationOpacity,
-          ...(denotationFontSize !== undefined ? { fontSize: denotationFontSize } : {}),
+          ...(denotationFontSize !== undefined
+            ? { fontSize: denotationFontSize }
+            : {}),
           ...denotationStyle,
         }}
       >

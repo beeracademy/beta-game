@@ -1,4 +1,9 @@
-import { createContext, type FunctionComponent, type ReactNode, useContext } from "react";
+import {
+  createContext,
+  type FunctionComponent,
+  type ReactNode,
+  useContext,
+} from "react";
 
 export interface SharedControlContextValue {
   /** True when this app instance is connected as a shared-control client (not the host). */

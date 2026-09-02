@@ -5,12 +5,7 @@ import NumberOfPlayersSelector from "./NumberOfPlayersSelector";
 describe("NumberOfPlayersSelector component", () => {
   it("renders buttons for the given min/max range", () => {
     render(
-      <NumberOfPlayersSelector
-        min={2}
-        max={6}
-        value={4}
-        onChange={vi.fn()}
-      />,
+      <NumberOfPlayersSelector min={2} max={6} value={4} onChange={vi.fn()} />,
     );
 
     for (let i = 2; i <= 6; i++) {
@@ -21,12 +16,7 @@ describe("NumberOfPlayersSelector component", () => {
   it("calls onChange when selecting another count", () => {
     const onChange = vi.fn();
     render(
-      <NumberOfPlayersSelector
-        min={2}
-        max={6}
-        value={2}
-        onChange={onChange}
-      />,
+      <NumberOfPlayersSelector min={2} max={6} value={2} onChange={onChange} />,
     );
 
     fireEvent.click(screen.getByRole("button", { name: "5" }));

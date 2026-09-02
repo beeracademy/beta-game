@@ -19,8 +19,9 @@ const Chart: FunctionComponent = () => {
 
   const playerMetrics = usePlayerMetrics();
   const gameMetrics = useGameMetrics();
-  const activePlayerIndex =
-    !gameMetrics.done ? gameMetrics.activePlayerIndex : -1;
+  const activePlayerIndex = !gameMetrics.done
+    ? gameMetrics.activePlayerIndex
+    : -1;
 
   const datasets = useCallback(() => {
     const data: ApexAxisChartSeries = playerMetrics.map((pm, i) => {

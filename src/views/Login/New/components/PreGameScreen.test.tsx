@@ -28,8 +28,12 @@ describe("PreGameScreen component", () => {
 
     expect(screen.getByText("Alice")).toBeInTheDocument();
     expect(screen.getByText("Bob")).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: /Shuffle 'em!/i })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: /Keep order/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: /Shuffle 'em!/i }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: /Keep order/i }),
+    ).toBeInTheDocument();
   });
 
   it("calls onStart with current players when clicking Keep order", () => {

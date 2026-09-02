@@ -75,7 +75,7 @@ export const NewGameProvider: React.FC<NewGameProviderProps> = ({
     setNumberOfPlayers(number);
 
     if (number < players.length) {
-      setPlayers([...players.slice(0, number)]);
+      setPlayers(players.slice(0, number));
     } else {
       setPlayers([...players, ...new Array(number - players.length).fill({})]);
     }
@@ -85,26 +85,26 @@ export const NewGameProvider: React.FC<NewGameProviderProps> = ({
     setOffline(offline);
 
     if (offline) {
-      setPlayers([
-        ...players.map((player, i) => {
+      setPlayers(
+        players.map((player, i) => {
           return {
             id: i,
             username: player.username,
             ready: !!player.username,
           };
         }),
-      ]);
+      );
     }
 
     if (!offline) {
-      setPlayers([
-        ...players.map((player) => {
+      setPlayers(
+        players.map((player) => {
           return {
             username: player.username,
             ready: false,
           };
         }),
-      ]);
+      );
     }
   };
 

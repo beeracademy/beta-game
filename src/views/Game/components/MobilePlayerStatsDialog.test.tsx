@@ -41,9 +41,7 @@ describe("MobilePlayerStatsDialog", () => {
   it("calls SetPlayerDNF on host when clicking DNF button", () => {
     const setPlayerDNFSpy = vi.spyOn(useGame.getState(), "SetPlayerDNF");
 
-    render(
-      <MobilePlayerStatsDialog open={true} index={0} onClose={vi.fn()} />,
-    );
+    render(<MobilePlayerStatsDialog open={true} index={0} onClose={vi.fn()} />);
 
     const dnfBtn = screen.getByRole("button", { name: /did not finish/i });
     fireEvent.click(dnfBtn);

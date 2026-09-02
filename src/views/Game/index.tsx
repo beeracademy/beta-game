@@ -1,11 +1,11 @@
+import { Box, Button, Card, CardContent, useTheme } from "@mui/material";
 import {
-  Box,
-  Button,
-  Card,
-  CardContent,
-  useTheme,
-} from "@mui/material";
-import { type FunctionComponent, useCallback, useEffect, useRef, useState } from "react";
+  type FunctionComponent,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import { Helmet } from "react-helmet-async";
 import { BsThreeDotsVertical } from "react-icons/bs";
 import { useNavigate } from "react-router-dom";

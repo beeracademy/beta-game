@@ -58,9 +58,7 @@ const MobilePlayerStatsDialog: FunctionComponent<
 
   const playerColors = (theme.player ?? {}) as Record<number, string>;
   const color =
-    playerColors[props.index] ??
-    playerColors[0] ??
-    theme.palette.primary.main;
+    playerColors[props.index] ?? playerColors[0] ?? theme.palette.primary.main;
 
   const toggleDNF = () => {
     const nextDNF = !isDNF;

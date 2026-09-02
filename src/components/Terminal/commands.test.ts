@@ -24,7 +24,9 @@ describe("Terminal custom commands", () => {
 
     it("displays usage when no arguments provided", () => {
       gameCmd.execute([], mockBuffer);
-      expect(mockBuffer.write).toHaveBeenCalledWith("Usage: game <i>command</i>");
+      expect(mockBuffer.write).toHaveBeenCalledWith(
+        "Usage: game <i>command</i>",
+      );
     });
 
     it("draws a card when 'draw' subcommand is executed", () => {
@@ -43,7 +45,9 @@ describe("Terminal custom commands", () => {
 
     it("displays usage when no arguments provided", () => {
       soundCmd.execute([], mockBuffer);
-      expect(mockBuffer.write).toHaveBeenCalledWith("Usage: sound <i>command</i>");
+      expect(mockBuffer.write).toHaveBeenCalledWith(
+        "Usage: sound <i>command</i>",
+      );
     });
 
     it("plays sound when 'play' subcommand is executed", () => {

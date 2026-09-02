@@ -19,6 +19,12 @@ declare module "@mui/material/styles" {
       5: string;
     };
   }
+  interface TypographyVariants {
+    fontFamilyMonospace: string;
+  }
+  interface TypographyVariantsOptions {
+    fontFamilyMonospace?: string;
+  }
 }
 
 export {};

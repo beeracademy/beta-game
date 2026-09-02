@@ -203,7 +203,7 @@ const Terminal: FunctionComponent<TerminalProps> = (props) => {
             <Typography
               variant="body1"
               sx={{
-                fontFamily: "monospace",
+                fontFamily: theme.typography.fontFamilyMonospace,
                 margin: 0,
                 padding: 0,
                 whiteSpace: "pre-wrap",
@@ -221,7 +221,7 @@ const Terminal: FunctionComponent<TerminalProps> = (props) => {
           inputRef={inputRef}
           sx={{
             display: showInput ? "block" : "none",
-            fontFamily: "monospace",
+            fontFamily: theme.typography.fontFamilyMonospace,
             "& .MuiInputBase-root": {
               color: "inherit",
               backgroundColor: "inherit",

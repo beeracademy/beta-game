@@ -1,4 +1,6 @@
 @use "@fontsource/noto-sans-symbols-2";
+@use "@fontsource/jetbrains-mono";
+@use "@fontsource/jetbrains-mono/700.css" as *;
 
 @font-face {
   font-family: AUPassata;
@@ -64,4 +66,11 @@ body,
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   -webkit-text-size-adjust: 100%;
+}
+
+code,
+kbd,
+samp,
+pre {
+  font-family: "JetBrains Mono", monospace;
 }

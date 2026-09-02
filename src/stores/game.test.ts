@@ -101,7 +101,9 @@ describe("useGame store", () => {
     expect(lastCardAfterStop.chug_end_start_delta_ms).toBeDefined();
 
     // Cannot stop again
-    expect(() => useGame.getState().StopChug()).toThrow("Chug has already ended");
+    expect(() => useGame.getState().StopChug()).toThrow(
+      "Chug has already ended",
+    );
   });
 
   it("toggles and sets player DNF status", async () => {

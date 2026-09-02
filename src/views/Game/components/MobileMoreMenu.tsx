@@ -189,14 +189,9 @@ export const MobileMoreMenu: FunctionComponent<MobileMoreMenuProps> = ({
                   border: "none",
                   borderRadius: 4,
                   cursor: "pointer",
-                  color:
-                    themeMode === mode
-                      ? "text.primary"
-                      : "text.disabled",
+                  color: themeMode === mode ? "text.primary" : "text.disabled",
                   backgroundColor:
-                    themeMode === mode
-                      ? "background.paper"
-                      : "transparent",
+                    themeMode === mode ? "background.paper" : "transparent",
                   boxShadow:
                     themeMode === mode
                       ? "0 1px 2px rgba(0, 0, 0, 0.2)"

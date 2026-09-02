@@ -1,5 +1,4 @@
 import {
-  Box,
   Button,
   Dialog,
   DialogActions,
@@ -11,10 +10,7 @@ import {
   useMediaQuery,
   useTheme,
 } from "@mui/material";
-import { detect } from "detect-browser";
 import { type FunctionComponent, useEffect, useRef, useState } from "react";
-import ReactConfetti from "react-confetti";
-import { useWindowSize } from "react-use";
 import {
   getUserStats,
   type UserStatsResponse,
@@ -23,14 +19,12 @@ import { useTextFlash } from "../../../components/TextFlash";
 import { pickKillStreakMessage } from "../../../components/TextFlash/messages";
 import { useSounds } from "../../../hooks/sounds";
 import { default as useGame } from "../../../stores/game";
-import { useSharedControl } from "../../../stores/sharedControl";
 import {
   useGameMetrics,
   usePlayerMetricsByIndex,
 } from "../../../stores/metrics";
+import { useSharedControl } from "../../../stores/sharedControl";
 import { millisecondsToMMSSsss } from "../../../utilities/time";
-
-const browser = detect();
 
 interface PersonalBest {
   durationMs: number;
@@ -71,7 +65,6 @@ const ChugDialog: FunctionComponent<ChugDialogProps> = (props) => {
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const sounds = useSounds();
   const textFlasher = useTextFlash();
-  const { width, height } = useWindowSize();
 
   const game = useGame();
   const { isRemote, send: sendRemote } = useSharedControl();
@@ -285,114 +278,153 @@ const ChugDialog: FunctionComponent<ChugDialogProps> = (props) => {
     }
   }, [props.open]);
 
-  return (
-    <>
-      {/* 
-        Firefox lags with confetti, don't know why, so we disable it for now
-      */}
-      {props.open && browser?.name !== "firefox" && (
-        <Box
-          sx={{
-            [theme.breakpoints.down("sm")]: {
-              display: "none",
-            },
-          }}
-        >
-          <ReactConfetti width={width} height={height} />
-        </Box>
-      )}
+  // Target duration from Season PB, or previous chug in this game
+  const target = (() => {
+    if (personalBest !== null) {
+      return {
+        durationMs: personalBest.durationMs,
+        seasonNumber: personalBest.seasonNumber,
+      };
+    }
 
-      <Dialog
-        {...props}
-        fullWidth
-        fullScreen={isMobile}
-        maxWidth="xs"
-        onClose={() => {
-          buttonRef.current?.focus();
-        }}
-        onClick={() => {
-          buttonRef.current?.focus();
+    // Fallback: check if player has any completed chug in this game
+    let bestGameChug: number | null = null;
+    game.draws.forEach((draw, i) => {
+      const pIdx = i % (game.players.length || 1);
+      if (
+        pIdx === metrics.activePlayerIndex &&
+        draw.value === 14 &&
+        draw.chug_start_start_delta_ms !== undefined &&
+        draw.chug_end_start_delta_ms !== undefined
+      ) {
+        const duration =
+          draw.chug_end_start_delta_ms - draw.chug_start_start_delta_ms;
+        if (bestGameChug === null || duration < bestGameChug) {
+          bestGameChug = duration;
+        }
+      }
+    });
+
+    if (bestGameChug !== null) {
+      return {
+        durationMs: bestGameChug,
+        seasonNumber: 0,
+      };
+    }
+
+    return null;
+  })();
+
+  const isAhead = target !== null ? elapsedTime < target.durationMs : true;
+
+  return (
+    <Dialog
+      {...props}
+      fullWidth
+      fullScreen={isMobile}
+      maxWidth="sm"
+      onClose={() => {
+        buttonRef.current?.focus();
+      }}
+      onClick={() => {
+        buttonRef.current?.focus();
+      }}
+    >
+      <DialogTitle sx={{ textAlign: "center", pt: 1, pb: 4 }}>
+        Chug time!
+      </DialogTitle>
+
+      <DialogContent
+        sx={{
+          textAlign: "center",
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "center",
+          flex: 1,
+          py: { xs: 2, sm: 3.5 },
         }}
       >
-        <DialogTitle>Chug time!</DialogTitle>
-
-        <DialogContent
+        <Stack
           sx={{
-            textAlign: "center",
-            display: "flex",
-            flexDirection: "column",
-            justifyContent: "center",
-            flex: 1,
+            width: "100%",
+            alignItems: "center",
           }}
         >
-          <Stack
-            spacing={1}
+          <Typography
             sx={{
-              width: "100%",
-              alignItems: "center",
+              overflow: "hidden",
+              whiteSpace: "nowrap",
+              textOverflow: "ellipsis",
+              fontSize: 34,
+              lineHeight: 1,
+              fontWeight: 600,
+              [theme.breakpoints.down("sm")]: {
+                fontSize: 24,
+              },
             }}
           >
-            <Typography
-              sx={{
-                overflow: "hidden",
-                whiteSpace: "nowrap",
-                textOverflow: "ellipsis",
-                fontSize: 34,
-                fontWeight: 600,
-                [theme.breakpoints.down("sm")]: {
-                  fontSize: 24,
-                },
-              }}
-            >
-              {player?.username || ""}
-            </Typography>
+            {player?.username || ""}
+          </Typography>
 
-            <Typography
-              sx={{
-                fontSize: 88,
-                fontWeight: 700,
-                [theme.breakpoints.down("sm")]: {
-                  fontSize: 64,
-                },
-              }}
-            >
-              {millisecondsToMMSSsss(elapsedTime)}
-            </Typography>
-
-            {personalBest !== null && (
-              <Typography color="text.secondary">
-                Personal best {millisecondsToMMSSsss(personalBest.durationMs)}{" "}
-                from season {personalBest.seasonNumber}
-              </Typography>
-            )}
-          </Stack>
-        </DialogContent>
-
-        <DialogActions>
-          <Button
-            disableRipple
-            ref={buttonRef}
-            variant="contained"
-            color="primary"
-            fullWidth
+          <Typography
+            data-testid="chug-timer"
             sx={{
-              height: 52,
-              fontSize: 24,
-              fontWeight: "bold",
+              fontSize: 100,
+              fontWeight: 700,
+              fontVariantNumeric: "tabular-nums",
+              [theme.breakpoints.down("sm")]: {
+                fontSize: 66,
+              },
             }}
-            onKeyDownCapture={(e) => {
-              if (e.code === "Space") {
-                e.preventDefault();
-                e.stopPropagation();
+          >
+            {millisecondsToMMSSsss(elapsedTime)}
+          </Typography>
 
-                if (started) {
-                  stop();
-                } else {
-                  start();
-                }
-              }
-            }}
-            onClick={(e) => {
+          {target !== null && (
+            <Typography
+              data-testid="chug-split-text"
+              sx={{
+                color:
+                  !started && elapsedTime === 0
+                    ? "text.secondary"
+                    : isAhead
+                      ? theme.palette.mode === "dark"
+                        ? "rgba(129, 199, 132, 0.85)"
+                        : "rgba(46, 125, 50, 0.85)"
+                      : theme.palette.mode === "dark"
+                        ? "rgba(229, 115, 115, 0.85)"
+                        : "rgba(211, 47, 47, 0.85)",
+                transition: "color 150ms ease",
+                fontVariantNumeric: "tabular-nums",
+              }}
+            >
+              {!started && elapsedTime === 0
+                ? target.seasonNumber > 0
+                  ? `Personal best ${millisecondsToMMSSsss(target.durationMs)} from season ${target.seasonNumber}`
+                  : `Personal best ${millisecondsToMMSSsss(target.durationMs)}`
+                : isAhead
+                  ? `-${millisecondsToMMSSsss(target.durationMs - elapsedTime)} on personal best`
+                  : `+${millisecondsToMMSSsss(elapsedTime - target.durationMs)} on personal best`}
+            </Typography>
+          )}
+        </Stack>
+      </DialogContent>
+
+      <DialogActions>
+        <Button
+          disableRipple
+          ref={buttonRef}
+          variant="contained"
+          color="primary"
+          fullWidth
+          sx={{
+            height: 52,
+            fontSize: 24,
+            fontWeight: "bold",
+          }}
+          onKeyDownCapture={(e) => {
+            if (e.code === "Space") {
+              e.preventDefault();
               e.stopPropagation();
 
               if (started) {
@@ -400,13 +432,22 @@ const ChugDialog: FunctionComponent<ChugDialogProps> = (props) => {
               } else {
                 start();
               }
-            }}
-          >
-            {started ? "Stop" : "Start"}
-          </Button>
-        </DialogActions>
-      </Dialog>
-    </>
+            }
+          }}
+          onClick={(e) => {
+            e.stopPropagation();
+
+            if (started) {
+              stop();
+            } else {
+              start();
+            }
+          }}
+        >
+          {started ? "Stop" : "Start"}
+        </Button>
+      </DialogActions>
+    </Dialog>
   );
 };
 

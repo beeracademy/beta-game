@@ -41,7 +41,7 @@ Academy is an interactive web-based drinking card game designed for lively game 
   - `location`: Geolocation store for official game submission
   - `gamesPlayed`: Local counter for games played
 - **Audio Engine**: [Howler.js](https://howlerjs.com/) for sound effects and lobby music
-- **Animations & Visuals**: [Framer Motion](https://www.framer.com/motion/), [React Confetti](https://github.com/alampros/react-confetti)
+- **Animations & Visuals**: [Framer Motion](https://www.framer.com/motion/)
 - **Testing**: [Vitest](https://vitest.dev/) and [@testing-library/react](https://testing-library.com/)
 - **Quality & Linting**: [Oxlint](https://oxc.rs/docs/guide/usage/linter.html), [Knip](https://knip.dev/), [Prettier](https://prettier.io/)
 
