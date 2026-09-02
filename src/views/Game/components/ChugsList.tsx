@@ -35,10 +35,11 @@ const ChugsList: FunctionComponent = () => {
 			spacing={2}
 			sx={{
 				alignItems: "center",
-				justifyContent: "center",
-				height: 75,
+				justifyContent: { xs: "flex-start", sm: "center" },
+				height: { xs: 65, sm: 75 },
 				userSelect: "none",
 				flexShrink: 0,
+				overflowX: "auto",
 			}}
 		>
 			{chugs.map((c, i) => {
@@ -49,7 +50,8 @@ const ChugsList: FunctionComponent = () => {
 					<Card
 						sx={{
 							height: "100%",
-							width: 200,
+							width: { xs: 160, sm: 200 },
+							flexShrink: 0,
 							position: "relative",
 							borderRadius: 4,
 						}}
@@ -109,7 +111,8 @@ const ChugsList: FunctionComponent = () => {
 				<Card
 					sx={{
 						height: "100%",
-						width: 200,
+						width: { xs: 160, sm: 200 },
+						flexShrink: 0,
 						opacity: 0.5,
 						display: "flex",
 						justifyContent: "center",
