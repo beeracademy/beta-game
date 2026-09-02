@@ -1,14 +1,14 @@
 import {
-    alpha,
-    Box,
-    Button,
-    Card,
-    CardContent,
-    Divider,
-    Menu,
-    Stack,
-    Typography,
-    useTheme,
+  alpha,
+  Box,
+  Button,
+  Card,
+  CardContent,
+  Divider,
+  Menu,
+  Stack,
+  Typography,
+  useTheme,
 } from "@mui/material";
 import { type FunctionComponent, useEffect, useState } from "react";
 import { Helmet } from "react-helmet-async";
@@ -16,9 +16,9 @@ import { BsMoonStarsFill, BsThreeDotsVertical } from "react-icons/bs";
 import { GiBeerBottle } from "react-icons/gi";
 import { IoLogoGameControllerB } from "react-icons/io";
 import {
-    IoColorPaletteOutline,
-    IoDesktopOutline,
-    IoExitOutline,
+  IoColorPaletteOutline,
+  IoDesktopOutline,
+  IoExitOutline,
 } from "react-icons/io5";
 import { MdWbSunny } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
@@ -418,7 +418,17 @@ const GameView: FunctionComponent = () => {
                 fullWidth
                 variant="text"
                 color="inherit"
-                startIcon={<GiBeerBottle size={18} />}
+                startIcon={
+                  <Box
+                    sx={{
+                      width: 16,
+                      display: "flex",
+                      justifyContent: "center",
+                    }}
+                  >
+                    <GiBeerBottle size={18} />
+                  </Box>
+                }
                 onClick={() => {
                   setMobileMenuAnchor(null);
                   setMobileChugsDialogOpen(true);
@@ -430,6 +440,10 @@ const GameView: FunctionComponent = () => {
                   paddingY: 1.5,
                   fontSize: 15,
                   fontWeight: 600,
+                  "& .MuiButton-startIcon": {
+                    marginLeft: 0,
+                    marginRight: 1.75,
+                  },
                 }}
               >
                 Chugs
@@ -439,7 +453,17 @@ const GameView: FunctionComponent = () => {
                 fullWidth
                 variant="text"
                 color="inherit"
-                startIcon={<IoLogoGameControllerB size={18} />}
+                startIcon={
+                  <Box
+                    sx={{
+                      width: 16,
+                      display: "flex",
+                      justifyContent: "center",
+                    }}
+                  >
+                    <IoLogoGameControllerB size={18} />
+                  </Box>
+                }
                 onClick={() => {
                   setMobileMenuAnchor(null);
                   setMobileRemoteDialogOpen(true);
@@ -451,6 +475,10 @@ const GameView: FunctionComponent = () => {
                   paddingY: 1.5,
                   fontSize: 15,
                   fontWeight: 600,
+                  "& .MuiButton-startIcon": {
+                    marginLeft: 0,
+                    marginRight: 1.75,
+                  },
                 }}
               >
                 Game remote
@@ -466,7 +494,15 @@ const GameView: FunctionComponent = () => {
                 }}
               >
                 <Stack direction="row" sx={{ alignItems: "center", gap: 1.75 }}>
-                  <IoColorPaletteOutline size={16} />
+                  <Box
+                    sx={{
+                      width: 16,
+                      display: "flex",
+                      justifyContent: "center",
+                    }}
+                  >
+                    <IoColorPaletteOutline size={16} />
+                  </Box>
                   <Typography sx={{ fontSize: 15, fontWeight: 600 }}>
                     Theme
                   </Typography>
@@ -530,7 +566,17 @@ const GameView: FunctionComponent = () => {
                 fullWidth
                 variant="text"
                 color="error"
-                startIcon={<IoExitOutline size={18} />}
+                startIcon={
+                  <Box
+                    sx={{
+                      width: 16,
+                      display: "flex",
+                      justifyContent: "center",
+                    }}
+                  >
+                    <IoExitOutline size={18} />
+                  </Box>
+                }
                 onClick={showMobileExitDialog}
                 sx={{
                   justifyContent: "flex-start",
@@ -540,6 +586,10 @@ const GameView: FunctionComponent = () => {
                   marginTop: 0.5,
                   fontSize: 15,
                   fontWeight: 600,
+                  "& .MuiButton-startIcon": {
+                    marginLeft: 0,
+                    marginRight: 1.75,
+                  },
                   backgroundColor: (t) => alpha(t.palette.error.main, 0.08),
                   "&:hover": {
                     backgroundColor: (t) => alpha(t.palette.error.main, 0.16),
