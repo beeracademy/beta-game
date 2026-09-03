@@ -1,60 +1,63 @@
 import { Box, Container } from "@mui/material";
-import { FunctionComponent, memo, useState } from "react";
+import { type FunctionComponent, memo, useState } from "react";
 import { Outlet } from "react-router-dom";
 import TimeSynchronizationWarningDialog from "./components/TimeSynchronizationWarningDialog";
 import useLobbyMusic from "./hooks/useLobbyMusic";
 
 const LoginView: FunctionComponent = () => {
-  // Ensure lobby music is played and responds to mute/unmute
-  useLobbyMusic();
+	// Ensure lobby music is played and responds to mute/unmute
+	useLobbyMusic();
 
-  return (
-    <>
-      <Container
-        maxWidth="lg"
-        sx={{
-          display: "flex",
-          flexDirection: "column",
-          justifyContent: "center",
-          alignItems: "center",
-          minHeight: "100%",
-          height: "100%",
-          px: { xs: 0, sm: 2, md: 3 },
-          py: { xs: 0, md: 3 },
-          overflowY: "auto",
-        }}
-      >
-        <Outlet />
+	return (
+		<>
+			<Container
+				maxWidth="lg"
+				sx={{
+					display: "flex",
+					flexDirection: "column",
+					justifyContent: "center",
+					alignItems: "center",
+					minHeight: "100%",
+					height: "100%",
+					px: { xs: 0, sm: 2, md: 3 },
+					py: { xs: 0, md: 3 },
+					overflowY: "auto",
+				}}
+			>
+				<Outlet />
 
-        <Wallpaper />
-      </Container>
+				<Wallpaper />
+			</Container>
 
-      <TimeSynchronizationWarningDialog />
-    </>
-  );
+			<TimeSynchronizationWarningDialog />
+		</>
+	);
 };
 
 const Wallpaper = memo(() => {
-  const [wallpaper] = useState(() => Math.floor(Math.random() * 5 + 1));
+	const min = 1;
+	const max = 6;
 
-  return (
-    <Box
-      sx={{
-        position: "fixed",
-        top: 0,
-        left: 0,
-        width: "100%",
-        height: "100%",
-        opacity: 0.2,
-        zIndex: -1,
-        pointerEvents: "none",
-        backgroundImage: "url(/wallpaper/" + wallpaper + ".png)",
-        backgroundSize: "cover",
-        backgroundPosition: "center",
-        backgroundRepeat: "no-repeat",
-      }}
-    />
-  );
+	const [wallpaper] = useState(() => Math.floor(Math.random() * max + min));
+
+	return (
+		<Box
+			sx={{
+				position: "fixed",
+				top: 0,
+				left: 0,
+				width: "100%",
+				height: "100%",
+				opacity: 0.2,
+				zIndex: -1,
+				pointerEvents: "none",
+				backgroundImage: "url(/wallpaper/" + wallpaper + ".png)",
+				backgroundSize: "cover",
+				backgroundPosition: "center",
+				backgroundRepeat: "no-repeat",
+			}}
+		/>
+	);
 });
 
 export default LoginView;
