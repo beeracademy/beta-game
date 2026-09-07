@@ -22,16 +22,18 @@
 
 .game-chat-drawer {
   position: fixed;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  width: min(400px, 100vw);
+  top: 12px;
+  right: 12px;
+  bottom: 12px;
+  width: min(400px, calc(100vw - 24px));
   background: #1c1c1f;
-  border-left: 1px solid rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 16px;
+  overflow: hidden;
   display: flex;
   flex-direction: column;
   z-index: 1301;
-  transform: translateX(100%);
+  transform: translateX(calc(100% + 24px));
   transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
   box-shadow: -8px 0 32px rgba(0, 0, 0, 0.4);
 }
@@ -42,7 +44,11 @@
 
 @media (max-width: 599.98px) {
   .game-chat-drawer {
-    width: 100vw;
+    top: 8px;
+    right: 8px;
+    bottom: 8px;
+    width: calc(100vw - 16px);
+    border-radius: 12px;
   }
 }
 
