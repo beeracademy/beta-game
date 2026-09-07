@@ -44,7 +44,6 @@ const dark = createTheme({
   },
   typography: {
     fontFamily: "AUPassata, Noto Sans Symbols 2",
-    fontFamilyMonospace: '"JetBrains Mono", monospace',
   },
   player: {
     0: "#daaf57",

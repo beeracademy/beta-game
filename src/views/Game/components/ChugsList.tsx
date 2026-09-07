@@ -44,7 +44,7 @@ const ChugsList: FunctionComponent = () => {
     >
       {chugs.map((c, i) => {
         const cardSymbol = getCardASCIISymbol(c);
-        const symbolColor = alpha(getCardSuitColor(c, theme.palette.mode), 0.1);
+        const symbolColor = alpha(getCardSuitColor(c, theme.palette.mode), 0.12);
 
         return (
           <Card
@@ -53,7 +53,13 @@ const ChugsList: FunctionComponent = () => {
               width: { xs: 160, sm: 200 },
               flexShrink: 0,
               position: "relative",
-              borderRadius: 4,
+              borderRadius: 2,
+              border: "1px solid",
+              borderColor: (t) =>
+                t.palette.mode === "dark"
+                  ? "rgba(255, 255, 255, 0.14)"
+                  : "rgba(0, 0, 0, 0.12)",
+              boxShadow: "none",
             }}
             variant="outlined"
             key={i}
@@ -67,7 +73,7 @@ const ChugsList: FunctionComponent = () => {
                 position: "relative",
                 zIndex: 1,
                 fontSize: 18,
-                gap: 1,
+                gap: 0.5,
               }}
             >
               <Box
@@ -92,11 +98,11 @@ const ChugsList: FunctionComponent = () => {
                 width: "100%",
                 height: "100%",
                 display: "grid",
-                layout: "row",
                 gridTemplateColumns: "repeat(6, 1fr)",
                 textAlign: "center",
                 color: symbolColor,
                 zIndex: 0,
+                alignItems: "center",
               }}
             >
               {new Array(18).fill(0).map((_, i) => (
@@ -113,12 +119,17 @@ const ChugsList: FunctionComponent = () => {
             height: "100%",
             width: { xs: 160, sm: 200 },
             flexShrink: 0,
-            opacity: 0.5,
+            opacity: 0.45,
             display: "flex",
             justifyContent: "center",
             alignItems: "center",
-            fontWeight: "bold",
-            borderRadius: 4,
+            fontWeight: 700,
+            borderRadius: 3,
+            borderStyle: "dashed",
+            borderWidth: 1.5,
+            letterSpacing: "0.04em",
+            textTransform: "lowercase",
+            fontSize: 14,
           }}
           variant="outlined"
           key={i}

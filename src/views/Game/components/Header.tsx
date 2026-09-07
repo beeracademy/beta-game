@@ -156,6 +156,9 @@ const Header: FunctionComponent = () => {
           padding: 1,
           paddingLeft: 2,
           paddingRight: 2,
+          borderRadius: 2,
+          border: "1px solid rgba(255, 255, 255, 0.12)",
+          boxShadow: "none",
           flexShrink: 0,
           display: "flex",
           userSelect: "none",
@@ -168,7 +171,7 @@ const Header: FunctionComponent = () => {
             display: "flex",
             justifyContent: "flex-start",
             alignItems: "center",
-            gap: 2,
+            gap: 1.5,
 
             [theme.breakpoints.down("sm")]: {
               display: "none",
@@ -179,9 +182,22 @@ const Header: FunctionComponent = () => {
             <IconButton
               sx={{
                 fontSize: 12,
-                width: 42,
-                height: 42,
+                fontWeight: 800,
+                letterSpacing: "0.04em",
+                width: 38,
+                height: 38,
                 color: "primary.contrastText",
+                backgroundColor: "rgba(255, 255, 255, 0.08)",
+                border: "1px solid rgba(255, 255, 255, 0.12)",
+                borderRadius: "10px",
+                transition: "transform 0.15s ease, background-color 0.15s ease",
+                "&:hover": {
+                  backgroundColor: "rgba(255, 255, 255, 0.18)",
+                  transform: "translateY(-1px)",
+                },
+                "&:active": {
+                  transform: "translateY(1px) scale(0.96)",
+                },
               }}
               onClick={() => setDNFDialogOpen(true)}
             >
@@ -194,12 +210,25 @@ const Header: FunctionComponent = () => {
               <IconButton
                 sx={{
                   color: "primary.contrastText",
+                  backgroundColor: "rgba(255, 255, 255, 0.08)",
+                  border: "1px solid rgba(255, 255, 255, 0.12)",
+                  borderRadius: "10px",
+                  width: 38,
+                  height: 38,
+                  transition: "transform 0.15s ease, background-color 0.15s ease",
+                  "&:hover": {
+                    backgroundColor: "rgba(255, 255, 255, 0.18)",
+                    transform: "translateY(-1px)",
+                  },
+                  "&:active": {
+                    transform: "translateY(1px) scale(0.96)",
+                  },
                 }}
                 onClick={() => {
                   setSharedControlDialogOpen(true);
                 }}
               >
-                <IoLogoGameControllerB />
+                <IoLogoGameControllerB size={20} />
               </IconButton>
             </Tooltip>
           )}
@@ -220,6 +249,19 @@ const Header: FunctionComponent = () => {
                 <IconButton
                   sx={{
                     color: "primary.contrastText",
+                    backgroundColor: "rgba(255, 255, 255, 0.08)",
+                    border: "1px solid rgba(255, 255, 255, 0.12)",
+                    borderRadius: "10px",
+                    width: 38,
+                    height: 38,
+                    transition: "transform 0.15s ease, background-color 0.15s ease",
+                    "&:hover": {
+                      backgroundColor: "rgba(255, 255, 255, 0.18)",
+                      transform: "translateY(-1px)",
+                    },
+                    "&:active": {
+                      transform: "translateY(1px) scale(0.96)",
+                    },
                   }}
                   onClick={() => {
                     sound.play("click");
@@ -228,11 +270,11 @@ const Header: FunctionComponent = () => {
                   aria-label={`Theme: ${themeTitle[settings.themeMode]}. Switch to ${themeTitle[nextThemeMode]} theme.`}
                 >
                   {settings.themeMode === "system" ? (
-                    <IoDesktopOutline size={20} />
+                    <IoDesktopOutline size={18} />
                   ) : settings.themeMode === "dark" ? (
-                    <BsMoonStarsFill size={20} />
+                    <BsMoonStarsFill size={17} />
                   ) : (
-                    <MdWbSunny size={24} />
+                    <MdWbSunny size={20} />
                   )}
                 </IconButton>
               </Tooltip>
@@ -257,30 +299,32 @@ const Header: FunctionComponent = () => {
               },
             }}
           >
-            Round {gameMetrics.currentRound.toString().padStart(2, "0")}/
-            {game.numberOfRounds}
+            Round {gameMetrics.currentRound}/{game.numberOfRounds}
           </Typography>
 
           <Stack
             sx={{
               textAlign: "center",
-              marginLeft: 8,
-              marginRight: 8,
+              marginLeft: { xs: 2, sm: 6 },
+              marginRight: { xs: 2, sm: 6 },
             }}
           >
             <Typography
               ref={turnTimeRef}
               sx={{
-                fontSize: 36,
+                fontSize: { xs: 24, sm: 32 },
                 fontWeight: 600,
                 lineHeight: 1,
-
-                [theme.breakpoints.down("sm")]: {
-                  fontSize: 24,
-                },
               }}
             />
-            <Typography ref={gameTimeRef} />
+            <Typography
+              ref={gameTimeRef}
+              sx={{
+                fontSize: { xs: 11, sm: 13 },
+                opacity: 0.8,
+                mt: 0.25,
+              }}
+            />
           </Stack>
 
           <Typography
@@ -291,8 +335,7 @@ const Header: FunctionComponent = () => {
               },
             }}
           >
-            Card {gameMetrics.numberOfCardsDrawn.toString().padStart(2, "0")}/
-            {gameMetrics.numberOfCards}
+            Card {gameMetrics.numberOfCardsDrawn}/{gameMetrics.numberOfCards}
           </Typography>
         </Stack>
 
@@ -303,7 +346,7 @@ const Header: FunctionComponent = () => {
             display: "flex",
             justifyContent: "flex-end",
             alignItems: "center",
-            gap: 2,
+            gap: 1.5,
 
             [theme.breakpoints.down("sm")]: {
               display: "none",
@@ -317,13 +360,26 @@ const Header: FunctionComponent = () => {
             <IconButton
               sx={{
                 color: "primary.contrastText",
+                backgroundColor: "rgba(255, 255, 255, 0.08)",
+                border: "1px solid rgba(255, 255, 255, 0.12)",
+                borderRadius: "10px",
+                width: 38,
+                height: 38,
+                transition: "transform 0.15s ease, background-color 0.15s ease",
+                "&:hover": {
+                  backgroundColor: "rgba(255, 255, 255, 0.18)",
+                  transform: "translateY(-1px)",
+                },
+                "&:active": {
+                  transform: "translateY(1px) scale(0.96)",
+                },
               }}
               onClick={toggleFullscreen}
             >
               {isFullscreen ? (
-                <AiOutlineFullscreenExit />
+                <AiOutlineFullscreenExit size={20} />
               ) : (
-                <AiOutlineFullscreen />
+                <AiOutlineFullscreen size={20} />
               )}
             </IconButton>
           </Tooltip>
@@ -336,10 +392,23 @@ const Header: FunctionComponent = () => {
               <IconButton
                 sx={{
                   color: "primary.contrastText",
+                  backgroundColor: "rgba(255, 255, 255, 0.08)",
+                  border: "1px solid rgba(255, 255, 255, 0.12)",
+                  borderRadius: "10px",
+                  width: 38,
+                  height: 38,
+                  transition: "transform 0.15s ease, background-color 0.15s ease",
+                  "&:hover": {
+                    backgroundColor: "rgba(255, 255, 255, 0.18)",
+                    transform: "translateY(-1px)",
+                  },
+                  "&:active": {
+                    transform: "translateY(1px) scale(0.96)",
+                  },
                 }}
                 onClick={showExitGameDialog}
               >
-                <IoExitOutline />
+                <IoExitOutline size={20} />
               </IconButton>
             </Tooltip>
           )}
@@ -348,6 +417,19 @@ const Header: FunctionComponent = () => {
             <ChatToggleButton
               sx={{
                 color: "primary.contrastText",
+                backgroundColor: "rgba(255, 255, 255, 0.08)",
+                border: "1px solid rgba(255, 255, 255, 0.12)",
+                borderRadius: "10px",
+                width: 38,
+                height: 38,
+                transition: "transform 0.15s ease, background-color 0.15s ease",
+                "&:hover": {
+                  backgroundColor: "rgba(255, 255, 255, 0.18)",
+                  transform: "translateY(-1px)",
+                },
+                "&:active": {
+                  transform: "translateY(1px) scale(0.96)",
+                },
               }}
             />
           )}

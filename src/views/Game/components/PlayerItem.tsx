@@ -124,13 +124,23 @@ const PlayerItem: FunctionComponent<PlayerItemProps> = (props) => {
 
       <Box
         sx={{
-          zIndex: 2,
+          zIndex: 4,
           position: "absolute",
+          top: 30,
+          left: 0,
         }}
       >
         {playerMetrics.isLeading && !isFirstRound && (
           <Grow in={true} timeout={500}>
-            <Box>
+            <Box
+              sx={{
+                "@keyframes hatBob": {
+                  "0%, 100%": { transform: "translateY(0)" },
+                  "50%": { transform: "translateY(-2px)" },
+                },
+                animation: "hatBob 4s ease-in-out infinite",
+              }}
+            >
               <Crown
                 style={{
                   height: 64,
@@ -146,12 +156,21 @@ const PlayerItem: FunctionComponent<PlayerItemProps> = (props) => {
 
         {playerMetrics.isLast && !isFirstRound && (
           <Grow in={true} timeout={500}>
-            <Box>
+            <Box
+              sx={{
+                "@keyframes hatBob": {
+                  "0%, 100%": { transform: "translateY(0)" },
+                  "50%": { transform: "translateY(-2px)" },
+                },
+                animation: "hatBob 4s ease-in-out infinite",
+              }}
+            >
               <Jester
                 style={{
                   height: 60,
                   marginTop: -42,
                   marginLeft: -36,
+                  position: "absolute",
                   transform: "rotate(-30deg)",
                 }}
               />
@@ -171,6 +190,12 @@ const PlayerItem: FunctionComponent<PlayerItemProps> = (props) => {
           backgroundColor: color(),
           color: "white",
           userSelect: "none",
+          borderRadius: 2,
+          border: props.active
+            ? "2px solid rgba(255, 255, 255, 0.8)"
+            : "1px solid rgba(255, 255, 255, 0.2)",
+          boxShadow: "none",
+          transition: "transform 200ms ease, border-color 200ms ease",
         }}
         onClick={() => {
           sound.play("click");
@@ -205,15 +230,15 @@ const PlayerItem: FunctionComponent<PlayerItemProps> = (props) => {
         >
           <Stack
             sx={{
-              padding: 2,
+              padding: 1.75,
             }}
           >
             <Typography
               align="center"
               sx={{
-                fontSize: 20,
+                fontSize: 19,
                 fontWeight: 900,
-                marginBottom: 2,
+                marginBottom: 1.5,
                 maxWidth: "100%",
                 overflow: "hidden",
                 textOverflow: "ellipsis",

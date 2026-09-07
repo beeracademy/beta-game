@@ -308,9 +308,17 @@ const GameView: FunctionComponent = () => {
           display: "flex",
           flexDirection: "row",
           width: "100vw",
+          minHeight: "100vh",
           backgroundColor: "background.default",
+          backgroundImage: (t) =>
+            t.palette.mode === "dark"
+              ? "linear-gradient(180deg, rgba(0, 0, 0, 0.18) 0%, transparent 12%, transparent 88%, rgba(0, 0, 0, 0.22) 100%), radial-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px)"
+              : "linear-gradient(180deg, rgba(0, 0, 0, 0.03) 0%, transparent 12%, transparent 88%, rgba(0, 0, 0, 0.04) 100%), radial-gradient(rgba(0, 0, 0, 0.05) 1px, transparent 1px)",
+          backgroundSize: "100% 100%, 24px 24px",
+          backgroundRepeat: "no-repeat, repeat",
+          backgroundAttachment: "fixed",
           overflow: "auto",
-          padding: 1,
+          padding: { xs: 1, sm: 1.5 },
           gap: 2,
         }}
       >
@@ -341,6 +349,14 @@ const GameView: FunctionComponent = () => {
               minHeight: "400px",
               display: "flex",
               flexDirection: "column",
+              borderRadius: 2,
+              borderColor: "divider",
+              backgroundColor: (t) =>
+                t.palette.mode === "dark"
+                  ? "rgba(36, 36, 36, 0.75)"
+                  : "rgba(255, 255, 255, 0.75)",
+              backdropFilter: "blur(6px)",
+              boxShadow: "none",
             }}
           >
             <CardContent

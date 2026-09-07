@@ -61,12 +61,23 @@ const DNFDialog: FunctionComponent<DNFDialogProps> = (props) => {
   };
 
   return (
-    <Dialog {...props} fullWidth sx={{ width: "100%" }}>
+    <Dialog
+      {...props}
+      maxWidth={false}
+      PaperProps={{
+        sx: {
+          width: "fit-content",
+          minWidth: { xs: "calc(100vw - 32px)", sm: 400 },
+          maxWidth: "calc(100vw - 48px)",
+        },
+      }}
+    >
       <DialogTitle>Did not finish?</DialogTitle>
 
       <DialogContent
         sx={{
           textAlign: "center",
+          overflowX: "hidden",
         }}
       >
         <DialogContentText>
@@ -76,8 +87,10 @@ const DNFDialog: FunctionComponent<DNFDialogProps> = (props) => {
         <Stack
           direction="row"
           spacing={2}
+          useFlexGap
           sx={{
             justifyContent: "center",
+            flexWrap: "wrap",
             marginTop: 4,
           }}
         >
@@ -107,7 +120,7 @@ const DNFDialog: FunctionComponent<DNFDialogProps> = (props) => {
                   key={player.id}
                   variant="caption"
                   sx={{
-                    maxWidth: 64,
+                    maxWidth: 94,
                     overflow: "hidden",
                     textOverflow: "ellipsis",
                     fontSize: "1rem",

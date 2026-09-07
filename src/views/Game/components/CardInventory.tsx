@@ -6,13 +6,15 @@ import { useShallow } from "zustand/react/shallow";
 import useGame from "../../../stores/game";
 import { useGameMetrics } from "../../../stores/metrics";
 
-// Lifts the card up slightly with a crisper shadow on hover.
+// Lifts the card up slightly with a tactile press on active
 const liftHoverSx: SxProps<Theme> = {
-  transition: "transform 0.2s ease, box-shadow 0.2s ease",
+  transition: "transform 0.15s ease",
   "&:hover": {
-    transform: "translateY(-1px)",
-    boxShadow: "0 4px 8px rgba(0, 0, 0, 0.15)",
-    zIndex: 2,
+    transform: "translateY(-2px)",
+    zIndex: 10,
+  },
+  "&:active": {
+    transform: "translateY(1px) scale(0.98)",
   },
 };
 
@@ -43,7 +45,7 @@ const CardInventory: FunctionComponent<CardInventoryProps> = ({
   return (
     <Stack
       direction="row"
-      spacing={2}
+      spacing={1.5}
       sx={{
         justifyContent: "center",
       }}
@@ -90,7 +92,17 @@ const CardInventoryCard: FunctionComponent<CardInventoryCardProps> = (
             zIndex: 1,
             width: 78,
             height: 106,
+            borderRadius: 2,
+            border: "1px solid",
+            borderColor: (t) =>
+              t.palette.mode === "dark"
+                ? "rgba(255, 255, 255, 0.16)"
+                : "rgba(0, 0, 0, 0.12)",
+            boxShadow: "none",
             flexShrink: 0,
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "space-between",
             textAlign: "center",
             position: "relative",
             userSelect: "none",
@@ -98,7 +110,8 @@ const CardInventoryCard: FunctionComponent<CardInventoryCardProps> = (
             ...(props.value > 0 && liftHoverSx),
 
             ...(props.value <= 0 && {
-              opacity: 0.5,
+              opacity: 0.35,
+              borderStyle: "dashed",
               background: (t) =>
                 t.palette.mode === "dark"
                   ? "url('/whiteheart.svg')"
@@ -114,10 +127,11 @@ const CardInventoryCard: FunctionComponent<CardInventoryCardProps> = (
               <Typography
                 sx={{
                   fontSize: 14,
-                  fontWeight: 800,
+                  fontWeight: 900,
                   textAlign: "left",
-                  paddingLeft: "8px",
-                  paddingTop: "8px",
+                  paddingLeft: "7px",
+                  paddingTop: "5px",
+                  lineHeight: 1,
                   zIndex: 989,
                 }}
               >
@@ -126,7 +140,7 @@ const CardInventoryCard: FunctionComponent<CardInventoryCardProps> = (
 
               <motion.div
                 animate={{
-                  scale: [1, 1.5, 1],
+                  scale: [1, 1.4, 1],
                   color: [
                     theme.palette.text.primary,
                     theme.palette.primary.light,
@@ -135,22 +149,37 @@ const CardInventoryCard: FunctionComponent<CardInventoryCardProps> = (
                 }}
                 key={props.value}
                 transition={{
-                  duration: 0.5,
+                  duration: 0.45,
                   ease: "easeInOut",
                 }}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  flex: 1,
+                }}
               >
-                <Typography sx={{ fontSize: 32 }}>{props.value}</Typography>
+                <Typography
+                  sx={{
+                    fontSize: 32,
+                    fontWeight: 800,
+                    lineHeight: 1,
+                  }}
+                >
+                  {props.value}
+                </Typography>
               </motion.div>
 
               <Typography
                 sx={{
                   fontSize: 14,
-                  fontWeight: 800,
+                  fontWeight: 900,
                   textAlign: "left",
-                  paddingLeft: "8px",
-                  paddingTop: "8px",
+                  paddingLeft: "7px",
+                  paddingTop: "5px",
                   transform: "rotate(180deg)",
                   color: "primary.main",
+                  lineHeight: 1,
                 }}
               >
                 {props.kind}
@@ -177,6 +206,9 @@ const CardStack = memo((props: { size: number }) => {
             top: 0,
             width: 78,
             height: 106,
+            borderRadius: 2,
+            border: "1px solid rgba(255, 255, 255, 0.08)",
+            boxShadow: "none",
             flexShrink: 0,
             opacity: 0.75,
             backgroundColor: (t) =>

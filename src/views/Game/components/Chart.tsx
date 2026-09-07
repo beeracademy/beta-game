@@ -52,91 +52,86 @@ const Chart: FunctionComponent = () => {
     >
       <ApexChart
         options={{
-          chart: {
-            animations: {
-              enabled: false,
+            chart: {
+              animations: {
+                enabled: false,
+              },
+              zoom: {
+                enabled: false,
+              },
+              toolbar: {
+                show: false,
+              },
+              selection: {
+                enabled: false,
+              },
+              redrawOnParentResize: true,
+              redrawOnWindowResize: true,
+              fontFamily: "AUPassata",
+              background: "transparent",
             },
-            zoom: {
-              enabled: false,
+            stroke: {
+              curve: "straight",
+              width: game.players.map((_, i) =>
+                activePlayerIndex >= 0 && i === activePlayerIndex ? 5 : 2,
+              ),
             },
-            toolbar: {
+            grid: {
+              borderColor: theme.palette.divider,
+            },
+            markers: {
+              size: game.players.map((_, i) =>
+                activePlayerIndex >= 0 && i === activePlayerIndex ? 6 : 3,
+              ),
+              strokeColors: Object.values(theme.player),
+              hover: {
+                size: 8,
+              },
+              showNullDataPoints: false,
+            },
+            yaxis: {
+              title: {
+                text: "Sips",
+              },
+              min: 0,
+              opposite: true,
+              forceNiceScale: true,
+              labels: {
+                style: {
+                  colors: theme.palette.text.primary,
+                },
+              },
+            },
+            xaxis: {
+              title: {
+                text: "Round",
+              },
+              min: 1,
+              max: game.numberOfRounds + 1,
+              labels: {
+                style: {
+                  colors: theme.palette.text.primary,
+                },
+                formatter: (val: string) => {
+                  return `${parseInt(val) - 1}`;
+                },
+              },
+              axisBorder: {
+                show: false,
+              },
+            },
+            legend: {
               show: false,
             },
-            selection: {
-              enabled: false,
+            theme: {
+              mode: theme.palette.mode,
             },
-            redrawOnParentResize: true,
-            redrawOnWindowResize: true,
-            fontFamily: "AUPassata",
-            background: "transparent",
-          },
-          stroke: {
-            curve: "straight",
-            width: game.players.map((_, i) =>
-              activePlayerIndex >= 0 && i === activePlayerIndex ? 5 : 2,
-            ),
-          },
-          grid: {
-            borderColor: theme.palette.divider,
-          },
-          markers: {
-            size: game.players.map((_, i) =>
-              activePlayerIndex >= 0 && i === activePlayerIndex ? 6 : 3,
-            ),
-            strokeColors: Object.values(theme.player),
-            hover: {
-              size: 8,
-            },
-            showNullDataPoints: false,
-          },
-          yaxis: {
-            title: {
-              text: "Sips",
-            },
-            min: 0,
-            opposite: true,
-            forceNiceScale: true,
-            labels: {
-              style: {
-                colors: theme.palette.text.primary,
-              },
-            },
-          },
-          xaxis: {
-            title: {
-              text: "Round",
-            },
-            min: 1,
-            max: game.numberOfRounds + 1,
-            labels: {
-              style: {
-                colors: theme.palette.text.primary,
-              },
-              formatter: (val: string) => {
-                return `${parseInt(val) - 1}`;
-              },
-            },
-            axisBorder: {
-              show: false,
-            },
-          },
-          legend: {
-            show: true,
-            position: "bottom",
-            horizontalAlign: "center",
-            labels: {
-              colors: theme.palette.text.primary,
-            },
-          },
-          theme: {
-            mode: theme.palette.mode,
-          },
-        }}
-        series={datasets()}
-        type="line"
-        width="100%"
-        height="100%"
-      />
+          }}
+          series={datasets()}
+          type="line"
+          width="100%"
+          height="100%"
+        />
     </Box>
   );
 };
