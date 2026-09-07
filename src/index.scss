@@ -74,3 +74,16 @@ samp,
 pre {
   font-family: "JetBrains Mono", monospace;
 }
+
+html {
+  transition: transform 0.5s ease-in-out;
+}
+
+html.old,
+body.old {
+  filter: grayscale(100%);
+}
+
+html.downunder {
+  transform: rotate(180deg);
+}

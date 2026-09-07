@@ -1,7 +1,7 @@
 import * as sounds from "../../hooks/sounds";
 import { getCardSuitName } from "../../models/card";
 import useGame from "../../stores/game";
-import { Buffer, Command } from "./models";
+import type { Buffer, Command } from "./models";
 
 export const customCommands: Command[] = [
   {
@@ -71,6 +71,51 @@ export const customCommands: Command[] = [
   },
   {
     name: "important",
+    execute: (_args: string[], buffer: Buffer) => {
+      buffer.write("yee...");
+
+      setTimeout(() => {
+        window.open(
+          "https://www.youtube.com/watch?v=q6EoRBvdVPQ&list=PLFsQleAWXsj_4yDeebiIADdH5FMayBiJo",
+          "_blank",
+        );
+      }, 1000);
+    },
+  },
+  {
+    name: "olderenneger",
+    execute: (_args: string[], buffer: Buffer) => {
+      const isEnabled = document.documentElement.classList.toggle("old");
+      document.body.classList.toggle("old");
+      if (isEnabled) {
+        buffer.write("Hula bula!");
+        sounds.play("old");
+      }
+    },
+  },
+  {
+    name: "old",
+    execute: (_args: string[], buffer: Buffer) => {
+      const isEnabled = document.documentElement.classList.toggle("old");
+      document.body.classList.toggle("old");
+      if (isEnabled) {
+        buffer.write("Hula bula!");
+        sounds.play("old");
+      }
+    },
+  },
+  {
+    name: "downunder",
+    execute: (_args: string[], buffer: Buffer) => {
+      const isEnabled = document.documentElement.classList.toggle("downunder");
+      if (isEnabled) {
+        buffer.write("G'day mate! Welcome to the land Down Under! 🦘");
+        sounds.play("downunder");
+      }
+    },
+  },
+  {
+    name: "yee",
     execute: (_args: string[], buffer: Buffer) => {
       buffer.write("yee...");
 

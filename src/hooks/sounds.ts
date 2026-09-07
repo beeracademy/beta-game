@@ -14,6 +14,7 @@ const SoundNames = [
   "crown",
   "dick",
   "doublekill",
+  "downunder",
   "homosangen_fuve",
   "humiliation",
   "loser",

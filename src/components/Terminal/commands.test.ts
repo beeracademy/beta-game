@@ -68,4 +68,55 @@ describe("Terminal custom commands", () => {
       expect(mockBuffer.write).toHaveBeenCalledWith("click, pop, doublekill");
     });
   });
+
+  describe("old command", () => {
+    const oldCmd = customCommands.find((c) => c.name === "old")!;
+
+    it("plays sound, writes message only when toggling on, and toggles grayscale class", () => {
+      document.body.classList.remove("old");
+      document.documentElement.classList.remove("old");
+
+      oldCmd.execute([], mockBuffer);
+      expect(mockBuffer.write).toHaveBeenCalledTimes(1);
+      expect(mockBuffer.write).toHaveBeenCalledWith("Hula bula!");
+      expect(sounds.play).toHaveBeenCalledTimes(1);
+      expect(sounds.play).toHaveBeenCalledWith("old");
+      expect(document.body.classList.contains("old")).toBe(true);
+      expect(document.documentElement.classList.contains("old")).toBe(true);
+
+      // Toggle off
+      oldCmd.execute([], mockBuffer);
+      expect(mockBuffer.write).toHaveBeenCalledTimes(1);
+      expect(sounds.play).toHaveBeenCalledTimes(1);
+      expect(document.body.classList.contains("old")).toBe(false);
+      expect(document.documentElement.classList.contains("old")).toBe(false);
+    });
+  });
+
+  describe("downunder command", () => {
+    const downunderCmd = customCommands.find((c) => c.name === "downunder")!;
+
+    it("plays sound, writes greeting only when toggling on, and toggles downunder class", () => {
+      document.documentElement.classList.remove("downunder");
+
+      downunderCmd.execute([], mockBuffer);
+      expect(mockBuffer.write).toHaveBeenCalledTimes(1);
+      expect(mockBuffer.write).toHaveBeenCalledWith(
+        "G'day mate! Welcome to the land Down Under! 🦘",
+      );
+      expect(sounds.play).toHaveBeenCalledTimes(1);
+      expect(sounds.play).toHaveBeenCalledWith("downunder");
+      expect(document.documentElement.classList.contains("downunder")).toBe(
+        true,
+      );
+
+      // Toggle off
+      downunderCmd.execute([], mockBuffer);
+      expect(mockBuffer.write).toHaveBeenCalledTimes(1);
+      expect(sounds.play).toHaveBeenCalledTimes(1);
+      expect(document.documentElement.classList.contains("downunder")).toBe(
+        false,
+      );
+    });
+  });
 });
