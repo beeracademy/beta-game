@@ -1,5 +1,6 @@
 import {
   alpha,
+  Badge,
   Box,
   Button,
   Divider,
@@ -9,6 +10,7 @@ import {
 } from "@mui/material";
 import type { FunctionComponent } from "react";
 import { BsMoonStarsFill } from "react-icons/bs";
+import { FaCommentDots } from "react-icons/fa";
 import { GiBeerBottle } from "react-icons/gi";
 import { IoLogoGameControllerB } from "react-icons/io";
 import {
@@ -17,7 +19,9 @@ import {
   IoExitOutline,
 } from "react-icons/io5";
 import { MdWbSunny } from "react-icons/md";
+import { useShallow } from "zustand/react/shallow";
 import { useSounds } from "../../../hooks/sounds";
+import useChat from "../../../stores/chat";
 import type { ThemeMode } from "../../../stores/settings";
 
 interface MobileMoreMenuProps {
@@ -25,6 +29,7 @@ interface MobileMoreMenuProps {
   onClose: () => void;
   onOpenChugs: () => void;
   onOpenSharedControl: () => void;
+  onOpenChat: () => void;
   onExitGame: () => void;
   isRemote: boolean;
   isGameDone: boolean;
@@ -37,6 +42,7 @@ export const MobileMoreMenu: FunctionComponent<MobileMoreMenuProps> = ({
   onClose,
   onOpenChugs,
   onOpenSharedControl,
+  onOpenChat,
   onExitGame,
   isRemote,
   isGameDone,
@@ -44,6 +50,9 @@ export const MobileMoreMenu: FunctionComponent<MobileMoreMenuProps> = ({
   onSetThemeMode,
 }) => {
   const sounds = useSounds();
+  const chat = useChat(
+    useShallow((s) => ({ gameId: s.gameId, unreadCount: s.unreadCount })),
+  );
 
   return (
     <Menu
@@ -65,6 +74,47 @@ export const MobileMoreMenu: FunctionComponent<MobileMoreMenuProps> = ({
       }}
     >
       <Stack divider={<Divider />}>
+        {!!chat.gameId && (
+          <Button
+            fullWidth
+            variant="text"
+            color="inherit"
+            startIcon={
+              <Box
+                sx={{
+                  width: 16,
+                  display: "flex",
+                  justifyContent: "center",
+                }}
+              >
+                <Badge
+                  badgeContent={chat.unreadCount}
+                  max={99}
+                  color="error"
+                  overlap="circular"
+                >
+                  <FaCommentDots size={18} />
+                </Badge>
+              </Box>
+            }
+            onClick={onOpenChat}
+            sx={{
+              justifyContent: "flex-start",
+              borderRadius: 2,
+              paddingX: 1.5,
+              paddingY: 1.5,
+              fontSize: 15,
+              fontWeight: 600,
+              "& .MuiButton-startIcon": {
+                marginLeft: 0,
+                marginRight: 1.75,
+              },
+            }}
+          >
+            Chat
+          </Button>
+        )}
+
         <Button
           fullWidth
           variant="text"
@@ -96,6 +146,7 @@ export const MobileMoreMenu: FunctionComponent<MobileMoreMenuProps> = ({
         >
           Chugs
         </Button>
+
 
         {!isRemote && (
           <Button

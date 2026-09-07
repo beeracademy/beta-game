@@ -3,7 +3,6 @@ import {
   Button,
   Card,
   CardContent,
-  Stack,
   useTheme,
 } from "@mui/material";
 import {
@@ -18,7 +17,7 @@ import { BsThreeDotsVertical } from "react-icons/bs";
 import { useNavigate } from "react-router-dom";
 import { useShallow } from "zustand/react/shallow";
 import { useCardFlash } from "../../components/CardFlash";
-import { ChatToggleButton, GameChat } from "../../components/GameChat";
+import { GameChat } from "../../components/GameChat";
 import MemeDialog from "../../components/MemeDialog";
 import Terminal from "../../components/Terminal";
 import { useTextFlash } from "../../components/TextFlash";
@@ -425,29 +424,16 @@ const GameView: FunctionComponent = () => {
             Draw card
           </Button>
 
-          <Stack direction="row" sx={{ gap: 1 }}>
-            <Button
-              variant="text"
-              color="inherit"
-              fullWidth
-              sx={{ height: 40, color: "text.secondary" }}
-              onClick={(e) => setMobileMenuAnchor(e.currentTarget)}
-            >
-              <BsThreeDotsVertical size={18} style={{ marginRight: 8 }} />
-              More options
-            </Button>
-
-            <ChatToggleButton
-              sx={{
-                height: 40,
-                width: 40,
-                color: "text.secondary",
-                border: "1px solid",
-                borderColor: "divider",
-                borderRadius: 50,
-              }}
-            />
-          </Stack>
+          <Button
+            variant="text"
+            color="inherit"
+            fullWidth
+            sx={{ height: 40, color: "text.secondary" }}
+            onClick={(e) => setMobileMenuAnchor(e.currentTarget)}
+          >
+            <BsThreeDotsVertical size={18} style={{ marginRight: 8 }} />
+            More options
+          </Button>
 
           <MobileMoreMenu
             anchorEl={mobileMenuAnchor}
@@ -459,6 +445,10 @@ const GameView: FunctionComponent = () => {
             onOpenSharedControl={() => {
               setMobileMenuAnchor(null);
               setMobileSharedControlDialogOpen(true);
+            }}
+            onOpenChat={() => {
+              setMobileMenuAnchor(null);
+              useChat.getState().Open();
             }}
             onExitGame={showMobileExitDialog}
             isRemote={isRemote}
