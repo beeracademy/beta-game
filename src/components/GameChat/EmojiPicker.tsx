@@ -6,7 +6,20 @@ import {
   useRef,
   useState,
 } from "react";
-import { FaSearch, FaThLarge, FaTimes } from "react-icons/fa";
+import {
+  FaBeer,
+  FaGamepad,
+  FaLightbulb,
+  FaPaw,
+  FaPlane,
+  FaRegFlag,
+  FaRegHeart,
+  FaRegSmile,
+  FaRegUser,
+  FaSearch,
+  FaThLarge,
+  FaTimes,
+} from "react-icons/fa";
 import {
   type EmojiCategory,
   type EmojiItem,
@@ -17,6 +30,22 @@ interface EmojiPickerProps {
   onSelect: (emoji: string) => void;
   onClose: () => void;
 }
+
+// The website renders category tab icons via Font Awesome CSS classes
+// (e.g. "far fa-smile"), which isn't loaded in the game. Map each category
+// to the equivalent react-icons component instead.
+const categoryIcons: Record<string, FunctionComponent> = {
+  smileys: FaRegSmile,
+  people: FaRegUser,
+  animals: FaPaw,
+  food: FaBeer,
+  travel: FaPlane,
+  activities: FaGamepad,
+  objects: FaLightbulb,
+  symbols: FaRegHeart,
+  flags: FaRegFlag,
+};
+
 
 const EmojiPicker: FunctionComponent<EmojiPickerProps> = ({
   onSelect,
@@ -118,18 +147,21 @@ const EmojiPicker: FunctionComponent<EmojiPickerProps> = ({
           >
             <FaThLarge />
           </button>
-          {categories.map((cat) => (
-            <button
-              key={cat.id}
-              type="button"
-              className={`chat-emoji-cat-tab${selectedCategory === cat.id ? " active" : ""}`}
-              onClick={() => setSelectedCategory(cat.id)}
-              title={cat.name}
-              aria-label={cat.name}
-            >
-              <i className={cat.icon}></i>
-            </button>
-          ))}
+          {categories.map((cat) => {
+            const Icon = categoryIcons[cat.id];
+            return (
+              <button
+                key={cat.id}
+                type="button"
+                className={`chat-emoji-cat-tab${selectedCategory === cat.id ? " active" : ""}`}
+                onClick={() => setSelectedCategory(cat.id)}
+                title={cat.name}
+                aria-label={cat.name}
+              >
+                {Icon && <Icon />}
+              </button>
+            );
+          })}
         </div>
       )}
 

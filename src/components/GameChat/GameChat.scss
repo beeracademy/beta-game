@@ -1,6 +1,17 @@
 // Ported from the website's GameChat.svelte styling, simplified to always be
 // an overlay drawer (this app never has room to push content aside).
 
+// The game's base font stack (AUPassata / Noto Sans Symbols 2) doesn't
+// include a color emoji font, so emoji glyphs would otherwise render as
+// flat monochrome symbols. Mirror the website's --font-emoji stack for any
+// element that displays emoji characters.
+$font-emoji:
+  "Noto Color Emoji",
+  "Apple Color Emoji",
+  "Segoe UI Emoji",
+  "Segoe UI Symbol",
+  sans-serif;
+
 .game-chat-backdrop {
   position: fixed;
   inset: 0;
@@ -362,6 +373,11 @@
   line-height: 1.45;
   color: #f4f4f5;
   white-space: pre-wrap;
+  // Keep the game's pixel font for regular text, but fall back to a color
+  // emoji font (ahead of Noto Sans Symbols 2, which only has monochrome
+  // placeholder glyphs for emoji codepoints) so emoji in messages render
+  // in color.
+  font-family: "AUPassata", #{$font-emoji}, "Noto Sans Symbols 2";
 }
 
 // Emoji picker
@@ -528,6 +544,7 @@
   border: 1px solid transparent;
   border-radius: 6px;
   font-size: 1.3rem;
+  font-family: $font-emoji;
   padding: 0.2rem;
   cursor: pointer;
   display: flex;
@@ -560,6 +577,7 @@
 .chat-preview-emoji {
   font-size: 1.1rem;
   line-height: 1;
+  font-family: $font-emoji;
 }
 
 .chat-preview-name {
@@ -634,7 +652,7 @@
   color: #ffffff;
   font-size: 0.88rem;
   padding: 0.3rem 0;
-  font-family: inherit;
+  font-family: "AUPassata", #{$font-emoji}, "Noto Sans Symbols 2";
   min-width: 0;
 
   &::placeholder {
