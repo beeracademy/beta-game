@@ -30,6 +30,7 @@ import {
 import useSettings from "../../../stores/settings";
 import Base14Sips from "../../../components/Base14Sips";
 import { secondsToHHMMSS } from "../../../utilities/time";
+import { useSounds } from "../../../hooks/sounds";
 
 interface PlayerItemProps {
   player: Player;
@@ -52,6 +53,7 @@ const PlayerItem: FunctionComponent<PlayerItemProps> = (props) => {
 
   const simpleCardsMode = useSettings((state) => state.simpleCardsMode);
   const SetSimpleCardsMode = useSettings((state) => state.SetSimpleCardsMode);
+  const sound = useSounds();
 
   const [elapsedTurnTime, setElapsedTurnTime] = useState(0);
 
@@ -162,7 +164,10 @@ const PlayerItem: FunctionComponent<PlayerItemProps> = (props) => {
           color: "white",
           userSelect: "none",
         }}
-        onClick={() => SetSimpleCardsMode(!simpleCardsMode)}
+        onClick={() => {
+          sound.play("click");
+          SetSimpleCardsMode(!simpleCardsMode);
+        }}
       >
         <Conditional value={isDNF}>
           <Box
