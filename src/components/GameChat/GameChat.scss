@@ -52,6 +52,20 @@ $font-emoji:
   transform: translateX(0);
 }
 
+// Full-screen on mobile — there's no room for a floating panel, and it
+// matches how the website's chat behaves on small screens.
+@media (max-width: 599.98px) {
+  .game-chat-drawer {
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    border-radius: 0;
+    border: none;
+  }
+}
+
 .chat-drawer-header {
   display: flex;
   align-items: center;
@@ -73,11 +87,7 @@ $font-emoji:
   width: 40px;
   height: 40px;
   border-radius: 10px;
-  background: linear-gradient(
-    135deg,
-    rgba(165, 56, 59, 0.3) 0%,
-    rgba(165, 56, 59, 0.1) 100%
-  );
+  background: rgba(165, 56, 59, 0.18);
   border: 1px solid rgba(165, 56, 59, 0.4);
   display: flex;
   align-items: center;
@@ -155,7 +165,6 @@ $font-emoji:
   width: 220px;
   max-width: calc(100vw - 32px);
   background: #242428;
-  border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 8px;
   z-index: 1302;
   padding: 0.6rem;
@@ -312,16 +321,10 @@ $font-emoji:
   padding: 0.65rem 0.9rem;
   border-radius: 12px;
   background: #242428;
-  border: 1px solid rgba(255, 255, 255, 0.07);
   word-break: break-word;
 
   &.mine {
-    background: linear-gradient(
-      135deg,
-      rgba(165, 56, 59, 0.35) 0%,
-      rgba(135, 45, 48, 0.2) 100%
-    );
-    border-color: rgba(165, 56, 59, 0.45);
+    background: rgba(165, 56, 59, 0.28);
   }
 }
 
@@ -378,7 +381,6 @@ $font-emoji:
 // Emoji picker
 .chat-emoji-picker-container {
   background: #202024;
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
   height: 300px;
   max-height: 45vh;
   display: flex;
