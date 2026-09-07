@@ -145,6 +145,20 @@ const Header: FunctionComponent = () => {
             },
           }}
         >
+          <Tooltip title="Mark players as 'Did not finish'" placement="bottom">
+            <IconButton
+              sx={{
+                fontSize: 12,
+                width: 42,
+                height: 42,
+                color: "primary.contrastText",
+              }}
+              onClick={() => setDNFDialogOpen(true)}
+            >
+              DNF
+            </IconButton>
+          </Tooltip>
+
           {!isRemote && (
             <Tooltip title="Shared control settings" placement="bottom">
               <IconButton
@@ -158,14 +172,6 @@ const Header: FunctionComponent = () => {
                 <IoLogoGameControllerB />
               </IconButton>
             </Tooltip>
-          )}
-
-          {!isRemote && (
-            <ChatToggleButton
-              sx={{
-                color: "primary.contrastText",
-              }}
-            />
           )}
 
           {(() => {
@@ -275,20 +281,6 @@ const Header: FunctionComponent = () => {
             },
           }}
         >
-          <Tooltip title="Mark players as 'Did not finish'" placement="bottom">
-            <IconButton
-              sx={{
-                fontSize: 12,
-                width: 42,
-                height: 42,
-                color: "primary.contrastText",
-              }}
-              onClick={() => setDNFDialogOpen(true)}
-            >
-              DNF
-            </IconButton>
-          </Tooltip>
-
           <Tooltip
             title={isFullscreen ? "Exit fullscreen" : "Enter fullscreen"}
             placement="bottom"
@@ -321,6 +313,14 @@ const Header: FunctionComponent = () => {
                 <IoExitOutline />
               </IconButton>
             </Tooltip>
+          )}
+
+          {!isRemote && (
+            <ChatToggleButton
+              sx={{
+                color: "primary.contrastText",
+              }}
+            />
           )}
         </Box>
       </Card>
