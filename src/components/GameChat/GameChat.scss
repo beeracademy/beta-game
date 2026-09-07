@@ -46,7 +46,6 @@ $font-emoji:
   z-index: 1301;
   transform: translateX(calc(100% + 16px));
   transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-  box-shadow: -8px 0 32px rgba(0, 0, 0, 0.4);
 }
 
 .game-chat-drawer.open {
@@ -114,7 +113,6 @@ $font-emoji:
 
   &.online {
     background: #10b981;
-    box-shadow: 0 0 6px #10b981;
   }
 
   &.pending {
@@ -159,7 +157,6 @@ $font-emoji:
   background: #242428;
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 8px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
   z-index: 1302;
   padding: 0.6rem;
 }
@@ -316,7 +313,6 @@ $font-emoji:
   border-radius: 12px;
   background: #242428;
   border: 1px solid rgba(255, 255, 255, 0.07);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
   word-break: break-word;
 
   &.mine {
@@ -326,7 +322,6 @@ $font-emoji:
       rgba(135, 45, 48, 0.2) 100%
     );
     border-color: rgba(165, 56, 59, 0.45);
-    box-shadow: 0 2px 10px rgba(165, 56, 59, 0.15);
   }
 }
 
@@ -384,7 +379,6 @@ $font-emoji:
 .chat-emoji-picker-container {
   background: #202024;
   border-top: 1px solid rgba(255, 255, 255, 0.1);
-  box-shadow: 0 -8px 24px rgba(0, 0, 0, 0.4);
   height: 300px;
   max-height: 45vh;
   display: flex;
