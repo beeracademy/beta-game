@@ -21,6 +21,7 @@ import Bottle from "../../../components/Bottle";
 import Bubbles from "../../../components/Bubbles";
 import Conditional from "../../../components/Conditional";
 import { Crown, Jester } from "../../../components/Hats";
+import { useAnimationFrame } from "../../../hooks/animationFrame";
 import { Player } from "../../../models/player";
 import useGame from "../../../stores/game";
 import {
@@ -57,16 +58,23 @@ const PlayerItem: FunctionComponent<PlayerItemProps> = (props) => {
 
   const [elapsedTurnTime, setElapsedTurnTime] = useState(0);
 
+  const isActiveTurn = gameMetrics.activePlayerIndex === props.index;
+
   useEffect(() => {
     setElapsedTurnTime(0);
-
-    if (gameMetrics.activePlayerIndex === props.index) {
-      const interval = setInterval(() => {
-        setElapsedTurnTime(gameMetrics.GetElapsedTurnTime());
-      }, 1);
-      return () => clearInterval(interval);
-    }
   }, [gameMetrics, props.index]);
+
+  useAnimationFrame(isActiveTurn, () => {
+    const elapsed = gameMetrics.GetElapsedTurnTime();
+
+    // The turn time is only displayed with second precision, so avoid
+    // re-rendering until the displayed value actually changes.
+    setElapsedTurnTime((previous) =>
+      Math.floor(previous / 1000) === Math.floor(elapsed / 1000)
+        ? previous
+        : elapsed,
+    );
+  });
 
   const color = useCallback(() => {
     if (props.index < Object.keys(theme.player).length && props.index > 0) {

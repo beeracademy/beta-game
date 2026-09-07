@@ -23,6 +23,7 @@ import {
 } from "../../../api/endpoints/stats";
 import { useTextFlash } from "../../../components/TextFlash";
 import { pickKillStreakMessage } from "../../../components/TextFlash/messages";
+import { useAnimationFrame } from "../../../hooks/animationFrame";
 import { useSounds } from "../../../hooks/sounds";
 import { default as useGame } from "../../../stores/game";
 import {
@@ -87,7 +88,6 @@ const ChugDialog: FunctionComponent<ChugDialogProps> = (props) => {
   );
 
   const buttonRef = useRef<HTMLButtonElement>(null);
-  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const openedRef = useRef(false);
 
   const chugStartDelta = card?.chug_start_start_delta_ms;
@@ -186,10 +186,6 @@ const ChugDialog: FunctionComponent<ChugDialogProps> = (props) => {
   useEffect(() => {
     if (!props.open) {
       openedRef.current = false;
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current);
-        intervalRef.current = null;
-      }
       sounds.stop("bubbi_fuve");
       return;
     }
@@ -219,29 +215,21 @@ const ChugDialog: FunctionComponent<ChugDialogProps> = (props) => {
     sounds,
   ]);
 
-  useEffect(() => {
-    if (intervalRef.current) {
-      clearInterval(intervalRef.current);
-      intervalRef.current = null;
-    }
+  useAnimationFrame(started && props.open, () => {
+    setElapsedTime(calculateCurrentElapsedTime());
+  });
 
+  useEffect(() => {
     if (!started) {
       sounds.stop("bubbi_fuve");
     } else {
-      intervalRef.current = setInterval(() => {
-        setElapsedTime(calculateCurrentElapsedTime());
-      }, 10);
       sounds.play("bubbi_fuve");
     }
 
     return () => {
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current);
-        intervalRef.current = null;
-      }
       sounds.stop("bubbi_fuve");
     };
-  }, [started, calculateCurrentElapsedTime, sounds]);
+  }, [started, sounds]);
 
   const start = () => {
     if (started) {

@@ -1,4 +1,3 @@
-import { Fireworks, type FireworksHandlers } from "@fireworks-js/react";
 import {
   Box,
   Button,
@@ -43,8 +42,6 @@ interface GameFinishedDialogProps extends DialogProps {
 const GameFinishedDialog: FunctionComponent<GameFinishedDialogProps> = (
   props,
 ) => {
-  const ref = useRef<FireworksHandlers>(null);
-
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
@@ -147,44 +144,6 @@ const GameFinishedDialog: FunctionComponent<GameFinishedDialogProps> = (
 
   return (
     <>
-      {props.open && (
-        <Fireworks
-          ref={ref}
-          options={{
-            acceleration: 1,
-            autoresize: true,
-            intensity: 20,
-            lineWidth: {
-              explosion: {
-                min: 1,
-                max: 8,
-              },
-              trace: {
-                min: 0.1,
-                max: 5,
-              },
-            },
-            rocketsPoint: {
-              min: 0,
-              max: 100,
-            },
-            sound: {
-              enabled: true,
-              files: ["sounds/firework.mp3"],
-            },
-          }}
-          style={{
-            top: 0,
-            left: 0,
-            width: "100%",
-            height: "100%",
-            position: "fixed",
-            zIndex: 1300,
-            pointerEvents: "none",
-          }}
-        />
-      )}
-
       <Dialog
         {...props}
         onClose={(_event, reason) => {

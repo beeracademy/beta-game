@@ -3,10 +3,6 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import useGame from "../../../stores/game";
 import GameFinishedDialog from "./GameFinishedDialog";
 
-vi.mock("@fireworks-js/react", () => ({
-  Fireworks: () => <div data-testid="fireworks-mock" />,
-}));
-
 vi.mock("../../../hooks/sounds", () => ({
   useSounds: () => ({
     play: vi.fn(),

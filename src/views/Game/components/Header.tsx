@@ -7,7 +7,13 @@ import {
   Typography,
   useTheme,
 } from "@mui/material";
-import { type FunctionComponent, useEffect, useRef, useState } from "react";
+import {
+  type FunctionComponent,
+  useCallback,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from "react";
 import { AiOutlineFullscreen, AiOutlineFullscreenExit } from "react-icons/ai";
 import { BsMoonStarsFill } from "react-icons/bs";
 import { IoLogoGameControllerB } from "react-icons/io";
@@ -17,6 +23,7 @@ import { useNavigate } from "react-router-dom";
 import { useFullscreen, useToggle } from "react-use";
 import { useShallow } from "zustand/react/shallow";
 import { ChatToggleButton } from "../../../components/GameChat";
+import { useAnimationFrame } from "../../../hooks/animationFrame";
 import { useSounds } from "../../../hooks/sounds";
 import useGame from "../../../stores/game";
 import { useGameMetrics } from "../../../stores/metrics";
@@ -29,6 +36,28 @@ import { secondsToHHMMSS, secondsToHHMMSSsss } from "../../../utilities/time";
 import DNFDialog from "./DNFDialog";
 import ExitGameDialog from "./ExitGameDialog";
 import SharedControlDialog from "./SharedControlDialog";
+
+/**
+ * Updates the text of an element in place. Reusing the existing text node
+ * avoids tearing down and recreating one on every animation frame.
+ */
+const setTextContent = (element: HTMLElement | null, value: string) => {
+  if (!element) {
+    return;
+  }
+
+  const node = element.firstChild;
+
+  if (node && node.nodeType === Node.TEXT_NODE) {
+    if (node.nodeValue !== value) {
+      node.nodeValue = value;
+    }
+
+    return;
+  }
+
+  element.textContent = value;
+};
 
 const Header: FunctionComponent = () => {
   const theme = useTheme();
@@ -95,26 +124,27 @@ const Header: FunctionComponent = () => {
     }
   };
 
-  const [elapsedGameTime, setElapsedGameTime] = useState(0);
-  const [elapsedTurnTime, setElapsedTurnTime] = useState(0);
+  const turnTimeRef = useRef<HTMLElement>(null);
+  const gameTimeRef = useRef<HTMLElement>(null);
 
-  useEffect(() => {
-    const updateTimes = () => {
-      setElapsedGameTime(gameMetrics.GetElapsedGameTime());
+  // The clocks are written straight to the DOM instead of through state: they
+  // tick every frame and re-rendering the whole header that often is wasteful.
+  const updateTimes = useCallback(() => {
+    setTextContent(
+      turnTimeRef.current,
+      secondsToHHMMSSsss(
+        gameMetrics.done ? 0 : gameMetrics.GetElapsedTurnTime(),
+      ),
+    );
 
-      if (gameMetrics.done) {
-        setElapsedTurnTime(0);
-      } else {
-        setElapsedTurnTime(gameMetrics.GetElapsedTurnTime());
-      }
-    };
+    setTextContent(
+      gameTimeRef.current,
+      secondsToHHMMSS(gameMetrics.GetElapsedGameTime()),
+    );
+  }, [gameMetrics]);
 
-    updateTimes();
-
-    const interval = setInterval(updateTimes, 1);
-
-    return () => clearInterval(interval);
-  }, [gameMetrics, game.gameStartTimestamp, game.turnStartTimestamp]);
+  useLayoutEffect(updateTimes, [updateTimes]);
+  useAnimationFrame(true, updateTimes);
 
   return (
     <>
@@ -239,6 +269,7 @@ const Header: FunctionComponent = () => {
             }}
           >
             <Typography
+              ref={turnTimeRef}
               sx={{
                 fontSize: 36,
                 fontWeight: 600,
@@ -248,10 +279,8 @@ const Header: FunctionComponent = () => {
                   fontSize: 24,
                 },
               }}
-            >
-              {secondsToHHMMSSsss(elapsedTurnTime)}
-            </Typography>
-            <Typography>{secondsToHHMMSS(elapsedGameTime)}</Typography>
+            />
+            <Typography ref={gameTimeRef} />
           </Stack>
 
           <Typography

@@ -36,7 +36,6 @@ const SoundNames = [
   "tryk_paa_den_lange_tast",
   "ultrakill",
   "wicked",
-  "firework",
   "camera_shutter",
   "wilhelm_scream",
 ] as const;
@@ -52,7 +51,6 @@ SoundNames.forEach((soundName) => {
     preload: true,
   });
 });
-
 
 interface playOptions {
   loop?: boolean;
