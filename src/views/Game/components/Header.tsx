@@ -16,6 +16,7 @@ import { MdWbSunny } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
 import { useFullscreen, useToggle } from "react-use";
 import { useShallow } from "zustand/react/shallow";
+import { ChatToggleButton } from "../../../components/GameChat";
 import { useSounds } from "../../../hooks/sounds";
 import useGame from "../../../stores/game";
 import { useGameMetrics } from "../../../stores/metrics";
@@ -157,6 +158,14 @@ const Header: FunctionComponent = () => {
                 <IoLogoGameControllerB />
               </IconButton>
             </Tooltip>
+          )}
+
+          {!isRemote && (
+            <ChatToggleButton
+              sx={{
+                color: "primary.contrastText",
+              }}
+            />
           )}
 
           {(() => {

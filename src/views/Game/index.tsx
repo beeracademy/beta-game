@@ -1,4 +1,11 @@
-import { Box, Button, Card, CardContent, useTheme } from "@mui/material";
+import {
+  Box,
+  Button,
+  Card,
+  CardContent,
+  Stack,
+  useTheme,
+} from "@mui/material";
 import {
   type FunctionComponent,
   useCallback,
@@ -11,12 +18,14 @@ import { BsThreeDotsVertical } from "react-icons/bs";
 import { useNavigate } from "react-router-dom";
 import { useShallow } from "zustand/react/shallow";
 import { useCardFlash } from "../../components/CardFlash";
+import { ChatToggleButton, GameChat } from "../../components/GameChat";
 import MemeDialog from "../../components/MemeDialog";
 import Terminal from "../../components/Terminal";
 import { useTextFlash } from "../../components/TextFlash";
 import { pickHypeMessage } from "../../components/TextFlash/messages";
 import useIdleTimer from "../../hooks/idleTimer";
 import { useSounds } from "../../hooks/sounds";
+import useChat from "../../stores/chat";
 import useGame from "../../stores/game";
 import {
   MetricsStore,
@@ -63,6 +72,7 @@ const GameView: FunctionComponent = () => {
 
   const game = useGame(
     useShallow((state) => ({
+      id: state.id,
       DrawCard: state.DrawCard,
       cards: state.draws,
       offline: state.offline,
@@ -70,6 +80,19 @@ const GameView: FunctionComponent = () => {
       players: state.players,
     })),
   );
+
+  // Connect to the website's live game chat whenever we have an online game.
+  useEffect(() => {
+    if (!game.offline && game.id) {
+      useChat.getState().Connect(game.id);
+    } else {
+      useChat.getState().Disconnect();
+    }
+
+    return () => {
+      useChat.getState().Disconnect();
+    };
+  }, [game.offline, game.id]);
 
   const settings = useSettings(
     useShallow((state) => ({
@@ -402,16 +425,29 @@ const GameView: FunctionComponent = () => {
             Draw card
           </Button>
 
-          <Button
-            variant="text"
-            color="inherit"
-            fullWidth
-            sx={{ height: 40, color: "text.secondary" }}
-            onClick={(e) => setMobileMenuAnchor(e.currentTarget)}
-          >
-            <BsThreeDotsVertical size={18} style={{ marginRight: 8 }} />
-            More options
-          </Button>
+          <Stack direction="row" sx={{ gap: 1 }}>
+            <Button
+              variant="text"
+              color="inherit"
+              fullWidth
+              sx={{ height: 40, color: "text.secondary" }}
+              onClick={(e) => setMobileMenuAnchor(e.currentTarget)}
+            >
+              <BsThreeDotsVertical size={18} style={{ marginRight: 8 }} />
+              More options
+            </Button>
+
+            <ChatToggleButton
+              sx={{
+                height: 40,
+                width: 40,
+                color: "text.secondary",
+                border: "1px solid",
+                borderColor: "divider",
+                borderRadius: 50,
+              }}
+            />
+          </Stack>
 
           <MobileMoreMenu
             anchorEl={mobileMenuAnchor}
@@ -455,6 +491,8 @@ const GameView: FunctionComponent = () => {
         open={isGameDone && finishedDialogOpen && !isRemote}
         onClose={() => setFinishedDialogOpen(false)}
       />
+
+      {!isRemote && <GameChat />}
     </>
   );
 };
