@@ -215,7 +215,8 @@ const Header: FunctionComponent = () => {
                   borderRadius: "10px",
                   width: 38,
                   height: 38,
-                  transition: "transform 0.15s ease, background-color 0.15s ease",
+                  transition:
+                    "transform 0.15s ease, background-color 0.15s ease",
                   "&:hover": {
                     backgroundColor: "rgba(255, 255, 255, 0.18)",
                     transform: "translateY(-1px)",
@@ -254,7 +255,8 @@ const Header: FunctionComponent = () => {
                     borderRadius: "10px",
                     width: 38,
                     height: 38,
-                    transition: "transform 0.15s ease, background-color 0.15s ease",
+                    transition:
+                      "transform 0.15s ease, background-color 0.15s ease",
                     "&:hover": {
                       backgroundColor: "rgba(255, 255, 255, 0.18)",
                       transform: "translateY(-1px)",
@@ -397,7 +399,8 @@ const Header: FunctionComponent = () => {
                   borderRadius: "10px",
                   width: 38,
                   height: 38,
-                  transition: "transform 0.15s ease, background-color 0.15s ease",
+                  transition:
+                    "transform 0.15s ease, background-color 0.15s ease",
                   "&:hover": {
                     backgroundColor: "rgba(255, 255, 255, 0.18)",
                     transform: "translateY(-1px)",

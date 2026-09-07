@@ -7,12 +7,7 @@ interface ChatUser {
 
 interface ChatMessage {
   event:
-    | "message"
-    | "connect"
-    | "disconnect"
-    | "chat_id"
-    | "presence"
-    | "history";
+    "message" | "connect" | "disconnect" | "chat_id" | "presence" | "history";
   message?: string;
   datetime?: string;
   chat_id?: string;

@@ -64,11 +64,13 @@ const DNFDialog: FunctionComponent<DNFDialogProps> = (props) => {
     <Dialog
       {...props}
       maxWidth={false}
-      PaperProps={{
-        sx: {
-          width: "fit-content",
-          minWidth: { xs: "calc(100vw - 32px)", sm: 400 },
-          maxWidth: "calc(100vw - 48px)",
+      slotProps={{
+        paper: {
+          sx: {
+            width: "fit-content",
+            minWidth: { xs: "calc(100vw - 32px)", sm: 400 },
+            maxWidth: "calc(100vw - 48px)",
+          },
         },
       }}
     >

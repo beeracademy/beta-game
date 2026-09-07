@@ -116,7 +116,7 @@ const GameChat: FunctionComponent = () => {
         isPlayer: true,
         index,
         name: players[index].username,
-        color: theme.player[index % 6 as keyof typeof theme.player],
+        color: theme.player[(index % 6) as keyof typeof theme.player],
       };
     }
 
@@ -355,7 +355,9 @@ const GameChat: FunctionComponent = () => {
                     className={`chat-message-row${mine ? " mine" : ""}`}
                     key={i}
                   >
-                    <div className={`chat-message-bubble${mine ? " mine" : ""}`}>
+                    <div
+                      className={`chat-message-bubble${mine ? " mine" : ""}`}
+                    >
                       <div className="chat-message-header">
                         <span
                           className="chat-message-sender"

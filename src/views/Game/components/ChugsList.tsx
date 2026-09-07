@@ -44,7 +44,10 @@ const ChugsList: FunctionComponent = () => {
     >
       {chugs.map((c, i) => {
         const cardSymbol = getCardASCIISymbol(c);
-        const symbolColor = alpha(getCardSuitColor(c, theme.palette.mode), 0.12);
+        const symbolColor = alpha(
+          getCardSuitColor(c, theme.palette.mode),
+          0.12,
+        );
 
         return (
           <Card

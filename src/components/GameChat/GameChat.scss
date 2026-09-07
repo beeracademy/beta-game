@@ -6,10 +6,7 @@
 // flat monochrome symbols. Mirror the website's --font-emoji stack for any
 // element that displays emoji characters.
 $font-emoji:
-  "Noto Color Emoji",
-  "Apple Color Emoji",
-  "Segoe UI Emoji",
-  "Segoe UI Symbol",
+  "Noto Color Emoji", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol",
   sans-serif;
 
 .game-chat-backdrop {
@@ -375,7 +372,10 @@ $font-emoji:
   // emoji font (ahead of Noto Sans Symbols 2, which only has monochrome
   // placeholder glyphs for emoji codepoints) so emoji in messages render
   // in color.
-  font-family: "AUPassata", #{$font-emoji}, "Noto Sans Symbols 2";
+  font-family:
+    "AUPassata",
+    #{$font-emoji},
+    "Noto Sans Symbols 2";
 }
 
 // Emoji picker
@@ -648,7 +648,10 @@ $font-emoji:
   color: #ffffff;
   font-size: 0.88rem;
   padding: 0.3rem 0;
-  font-family: "AUPassata", #{$font-emoji}, "Noto Sans Symbols 2";
+  font-family:
+    "AUPassata",
+    #{$font-emoji},
+    "Noto Sans Symbols 2";
   min-width: 0;
 
   &::placeholder {

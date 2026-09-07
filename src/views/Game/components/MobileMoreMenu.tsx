@@ -147,7 +147,6 @@ export const MobileMoreMenu: FunctionComponent<MobileMoreMenuProps> = ({
           Chugs
         </Button>
 
-
         {!isRemote && (
           <Button
             fullWidth

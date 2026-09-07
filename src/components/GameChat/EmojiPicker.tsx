@@ -46,7 +46,6 @@ const categoryIcons: Record<string, FunctionComponent> = {
   flags: FaRegFlag,
 };
 
-
 const EmojiPicker: FunctionComponent<EmojiPickerProps> = ({
   onSelect,
   onClose,
@@ -166,7 +165,9 @@ const EmojiPicker: FunctionComponent<EmojiPickerProps> = ({
       )}
 
       <div className="chat-emoji-picker-body">
-        {!loaded && <div className="chat-emoji-cat-title">Loading emojis...</div>}
+        {!loaded && (
+          <div className="chat-emoji-cat-title">Loading emojis...</div>
+        )}
 
         {loaded && isSearching && (
           <>

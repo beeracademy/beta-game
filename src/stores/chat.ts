@@ -114,11 +114,14 @@ const useChat = create<ChatState & ChatActions>((set, get) => ({
                   : state.onlineUsers;
 
               const shouldLog =
-                data.username || (data.chat_id && data.chat_id !== state.myChatId);
+                data.username ||
+                (data.chat_id && data.chat_id !== state.myChatId);
 
               set({
                 onlineUsers: nextOnline,
-                messages: shouldLog ? [...state.messages, data] : state.messages,
+                messages: shouldLog
+                  ? [...state.messages, data]
+                  : state.messages,
               });
             } else if (data.event === "disconnect") {
               const nextOnline = data.chat_id
@@ -126,11 +129,14 @@ const useChat = create<ChatState & ChatActions>((set, get) => ({
                 : state.onlineUsers;
 
               const shouldLog =
-                data.username || (data.chat_id && data.chat_id !== state.myChatId);
+                data.username ||
+                (data.chat_id && data.chat_id !== state.myChatId);
 
               set({
                 onlineUsers: nextOnline,
-                messages: shouldLog ? [...state.messages, data] : state.messages,
+                messages: shouldLog
+                  ? [...state.messages, data]
+                  : state.messages,
               });
             }
           } catch (e) {
@@ -174,7 +180,10 @@ const useChat = create<ChatState & ChatActions>((set, get) => ({
   Open: () => set({ isOpen: true, unreadCount: 0 }),
   Close: () => set({ isOpen: false }),
   Toggle: () =>
-    set((s) => ({ isOpen: !s.isOpen, unreadCount: s.isOpen ? s.unreadCount : 0 })),
+    set((s) => ({
+      isOpen: !s.isOpen,
+      unreadCount: s.isOpen ? s.unreadCount : 0,
+    })),
 
   SendMessage: (text) => {
     const message = text.trim();

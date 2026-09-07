@@ -1,10 +1,4 @@
-import {
-  Box,
-  Button,
-  Card,
-  CardContent,
-  useTheme,
-} from "@mui/material";
+import { Box, Button, Card, CardContent, useTheme } from "@mui/material";
 import {
   type FunctionComponent,
   useCallback,
