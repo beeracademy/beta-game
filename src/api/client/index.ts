@@ -16,6 +16,13 @@ mockInstance.interceptors.request.use((request) => {
 
 const realInstance = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL,
+  // Django's CSRF middleware reads the token from the "csrftoken" cookie and
+  // expects it echoed back in the "X-CSRFToken" header. Axios only does this
+  // automatically for its own default cookie/header names (XSRF-TOKEN /
+  // X-XSRF-TOKEN), so we need to point it at Django's names explicitly.
+  withCredentials: true,
+  xsrfCookieName: "csrftoken",
+  xsrfHeaderName: "X-CSRFToken",
 });
 
 TokenInterceptor(realInstance);
