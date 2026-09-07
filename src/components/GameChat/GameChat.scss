@@ -22,34 +22,24 @@
 
 .game-chat-drawer {
   position: fixed;
-  top: 12px;
-  right: 12px;
-  bottom: 12px;
-  width: min(400px, calc(100vw - 24px));
+  top: 8px;
+  right: 8px;
+  bottom: 8px;
+  width: min(400px, calc(100vw - 16px));
   background: #1c1c1f;
   border: 1px solid rgba(255, 255, 255, 0.12);
-  border-radius: 16px;
+  border-radius: 12px;
   overflow: hidden;
   display: flex;
   flex-direction: column;
   z-index: 1301;
-  transform: translateX(calc(100% + 24px));
+  transform: translateX(calc(100% + 16px));
   transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
   box-shadow: -8px 0 32px rgba(0, 0, 0, 0.4);
 }
 
 .game-chat-drawer.open {
   transform: translateX(0);
-}
-
-@media (max-width: 599.98px) {
-  .game-chat-drawer {
-    top: 8px;
-    right: 8px;
-    bottom: 8px;
-    width: calc(100vw - 16px);
-    border-radius: 12px;
-  }
 }
 
 .chat-drawer-header {
