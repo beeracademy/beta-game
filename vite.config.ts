@@ -15,18 +15,6 @@ export default defineConfig({
         target: backendTarget,
         secure: false,
         changeOrigin: true,
-        // changeOrigin only rewrites the outgoing Host header — Django's
-        // CSRF middleware checks the Origin header instead, so without also
-        // rewriting that we get "CSRF Failed: Origin checking failed" when
-        // the dev server runs on a different scheme/port than the backend
-        // (e.g. https://localhost:5173).
-        configure: (proxy: any) => {
-          proxy.on("proxyReq", (proxyReq: import("http").ClientRequest) => {
-            if (proxyReq.getHeader("origin")) {
-              proxyReq.setHeader("origin", backendTarget);
-            }
-          });
-        },
       },
       "/ws": {
         target: backendTarget,
