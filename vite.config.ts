@@ -13,6 +13,11 @@ export default defineConfig({
         target: "http://localhost:8000",
         secure: false,
       },
+      "/ws": {
+        target: "http://localhost:8000",
+        secure: false,
+        ws: true,
+      },
     },
   },
 });
