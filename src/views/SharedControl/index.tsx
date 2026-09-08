@@ -9,6 +9,7 @@ import {
 import { GiBeerBottle } from "react-icons/gi";
 import { useSearchParam } from "react-use";
 import useWebSocket from "../../api/websocket";
+import { getWsBaseUrl } from "../../api/websocket/url";
 import useGame from "../../stores/game";
 import { SharedControlProvider } from "../../stores/sharedControl";
 import GameView from "../Game";
@@ -251,7 +252,7 @@ const SharedControlView: FunctionComponent<SharedControlViewProps> = () => {
 
   useEffect(() => {
     if (!token) return;
-    ws.connect(`wss://academy.beer/ws/remote/${token}/`);
+    ws.connect(`${getWsBaseUrl()}/ws/remote/${token}/`);
     return () => {
       ws.close();
     };
@@ -277,7 +278,7 @@ const SharedControlView: FunctionComponent<SharedControlViewProps> = () => {
 
     reconnectTimerRef.current = setTimeout(() => {
       if (!token) return;
-      wsRef.current.connect(`wss://academy.beer/ws/remote/${token}/`);
+      wsRef.current.connect(`${getWsBaseUrl()}/ws/remote/${token}/`);
     }, RECONNECT_DELAY_MS);
 
     return () => {

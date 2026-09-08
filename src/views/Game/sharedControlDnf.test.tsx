@@ -8,6 +8,7 @@ import GameView from "./index";
 let mockWsCallbacks: {
   receiveCb?: (data: any) => void;
   sendMock: ReturnType<typeof vi.fn>;
+  connectMock: ReturnType<typeof vi.fn>;
   ready: boolean;
 };
 
@@ -15,7 +16,7 @@ vi.mock("../../api/websocket", () => ({
   default: () => ({
     ready: mockWsCallbacks.ready,
     error: false,
-    connect: vi.fn(),
+    connect: mockWsCallbacks.connectMock,
     close: vi.fn(),
     send: mockWsCallbacks.sendMock,
     receive: (cb: (data: any) => void) => {
@@ -83,6 +84,7 @@ describe("GameView Shared Control DNF sync", () => {
     vi.clearAllMocks();
     mockWsCallbacks = {
       sendMock: vi.fn(),
+      connectMock: vi.fn(),
       ready: true,
     };
     useSettings.setState({
@@ -97,10 +99,35 @@ describe("GameView Shared Control DNF sync", () => {
       dnf_player_indexes: [],
       draws: [],
       numberOfRounds: 1,
-      offline: true, // keep offline to prevent real API calls
+      offline: false,
       gameStartTimestamp: Date.now(),
       turnStartTimestamp: Date.now(),
     });
+  });
+
+  it("does not connect WebSocket when in offline mode even if remoteControl is enabled", () => {
+    useGame.setState({ offline: true });
+
+    render(
+      <MemoryRouter>
+        <GameView />
+      </MemoryRouter>,
+    );
+
+    expect(mockWsCallbacks.connectMock).not.toHaveBeenCalled();
+  });
+
+  it("connects WebSocket using base URL when in online mode", () => {
+    render(
+      <MemoryRouter>
+        <GameView />
+      </MemoryRouter>,
+    );
+
+    expect(mockWsCallbacks.connectMock).toHaveBeenCalledTimes(1);
+    expect(mockWsCallbacks.connectMock).toHaveBeenCalledWith(
+      expect.stringMatching(/^wss?:\/\/.*\/ws\/remote\/host-token-123\/$/),
+    );
   });
 
   it("emits DNF_STATE upon receiving GET_DNF_STATE", () => {

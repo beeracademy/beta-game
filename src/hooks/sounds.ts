@@ -39,19 +39,13 @@ const SoundNames = [
   "wicked",
   "camera_shutter",
   "wilhelm_scream",
+  "firework",
 ] as const;
 
 type SoundName = (typeof SoundNames)[number];
 
 const activeSounds = new Map<SoundName, Howl[]>();
 const mutedSounds = new Set<SoundName>();
-
-SoundNames.forEach((soundName) => {
-  new Howl({
-    src: [`/sounds/${soundName}.mp3`, `/sounds/${soundName}.ogg`],
-    preload: true,
-  });
-});
 
 interface playOptions {
   loop?: boolean;
@@ -73,7 +67,7 @@ const play = (
   }
 
   const sound = new Howl({
-    src: [`/sounds/${soundName}.mp3`, `/sounds/${soundName}.ogg`],
+    src: [`/sounds/${soundName}.ogg`, `/sounds/${soundName}.mp3`],
     loop: options.loop,
     mute: mutedSounds.has(soundName),
   });

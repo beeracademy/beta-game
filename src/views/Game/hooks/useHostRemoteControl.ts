@@ -1,37 +1,42 @@
 import { useEffect } from "react";
 import useWebSocket from "../../../api/websocket";
+import { getWsBaseUrl } from "../../../api/websocket/url";
 import useGame from "../../../stores/game";
 import useSettings from "../../../stores/settings";
 
 interface UseHostRemoteControlOptions {
   isRemote: boolean;
   drawCard: () => void;
+  isOffline?: boolean;
 }
 
 export const useHostRemoteControl = ({
   isRemote,
   drawCard,
+  isOffline: isOfflineProp,
 }: UseHostRemoteControlOptions) => {
   const ws = useWebSocket();
+  const storeOffline = useGame((state) => state.offline);
+  const isOffline = isOfflineProp ?? storeOffline;
   const remoteControl = useSettings((state) => state.remoteControl);
   const remoteToken = useSettings((state) => state.remoteToken);
 
   // Connect WebSocket when remote control is enabled on host
   useEffect(() => {
-    if (isRemote || !remoteControl || !remoteToken) {
+    if (isRemote || isOffline || !remoteControl || !remoteToken) {
       return;
     }
 
-    ws.connect(`wss://academy.beer/ws/remote/${remoteToken}/`);
+    ws.connect(`${getWsBaseUrl()}/ws/remote/${remoteToken}/`);
 
     return () => {
       ws.close();
     };
-  }, [isRemote, remoteControl, remoteToken, ws]);
+  }, [isRemote, isOffline, remoteControl, remoteToken, ws]);
 
   // Handle incoming remote commands and broadcast host game state changes
   useEffect(() => {
-    if (isRemote || !ws.ready) {
+    if (isRemote || isOffline || !ws.ready) {
       return;
     }
 
@@ -211,11 +216,11 @@ export const useHostRemoteControl = ({
     return () => {
       unsubscribe();
     };
-  }, [isRemote, ws, drawCard]);
+  }, [isRemote, isOffline, ws, drawCard]);
 
   // Gracefully notify remotes when host disables remote control
   useEffect(() => {
-    if (isRemote || !ws.ready) {
+    if (isRemote || isOffline || !ws.ready) {
       return;
     }
 
@@ -225,7 +230,7 @@ export const useHostRemoteControl = ({
       });
       ws.close();
     }
-  }, [isRemote, remoteControl, ws]);
+  }, [isRemote, isOffline, remoteControl, ws]);
 
   return ws;
 };

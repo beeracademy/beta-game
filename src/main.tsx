@@ -7,10 +7,14 @@ import { TextFlashProvider } from "./components/TextFlash";
 import "./index.scss";
 import Routes from "./routes";
 import useLocation from "./stores/location";
+import { registerServiceWorker } from "./serviceWorkerRegistration";
 import ThemeProvider from "./theme/provider";
 
 // Log all environment variables
 console.table(import.meta.env);
+
+// Register service worker in background to preload assets and support offline play
+registerServiceWorker();
 
 // Prompt for location access up front so it's available when submitting a game
 useLocation.getState().RequestLocation();

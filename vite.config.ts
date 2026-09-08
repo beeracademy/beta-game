@@ -1,13 +1,35 @@
+import fs from "node:fs";
+import path from "node:path";
 import basicSsl from "@vitejs/plugin-basic-ssl";
 import react from "@vitejs/plugin-react";
-import { defineConfig } from "vite";
+import { defineConfig, type Plugin } from "vite";
 
 const backendTarget = "http://localhost:8000";
+
+function swVersionPlugin(): Plugin {
+  return {
+    name: "sw-version-stamp",
+    apply: "build",
+    closeBundle() {
+      const distSwPath = path.resolve(import.meta.dirname, "dist/sw.js");
+      if (fs.existsSync(distSwPath)) {
+        let content = fs.readFileSync(distSwPath, "utf-8");
+        const buildVersion = Date.now().toString(36);
+        content = content.replace(/__BUILD_HASH__/g, buildVersion);
+        fs.writeFileSync(distSwPath, content, "utf-8");
+      }
+    },
+  };
+}
 
 // https://vitejs.dev/config/
 export default defineConfig({
   // HTTPS is required by browsers to grant camera access to non-localhost origins (e.g. testing on your phone)
-  plugins: [react(), ...(process.env.HTTPS === "true" ? [basicSsl()] : [])],
+  plugins: [
+    react(),
+    swVersionPlugin(),
+    ...(process.env.HTTPS === "true" ? [basicSsl()] : []),
+  ],
   server: {
     host: true,
     proxy: {

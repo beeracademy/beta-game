@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import type { ChatMessage, ChatUser } from "../models/chat";
 import { play } from "../hooks/sounds";
+import { getWsBaseUrl } from "../api/websocket/url";
 
 /*
     Connects to the same chat backend the website's game detail page uses
@@ -31,15 +32,6 @@ interface ChatActions {
 let socket: WebSocket | null = null;
 let reconnectTimer: ReturnType<typeof setTimeout> | null = null;
 let isDestroyed = false;
-
-const getWsBaseUrl = (): string => {
-  const apiBase = import.meta.env.VITE_API_BASE_URL;
-  if (apiBase) {
-    return apiBase.replace(/^http/, "ws").replace(/\/$/, "");
-  }
-  const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
-  return `${protocol}//${window.location.host}`;
-};
 
 const initialState: ChatState = {
   gameId: undefined,

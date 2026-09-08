@@ -175,7 +175,7 @@ describe("ChugDialog", () => {
   it("never renders personal best difference in offline mode even if previous chugs exist", () => {
     useGame.setState({
       offline: true,
-      players: [{ id: 0, username: "Alice", ready: true }],
+      players: [{ id: 0, username: "Alice" }],
       draws: [
         {
           value: 14,
@@ -204,7 +204,7 @@ describe("ChugDialog", () => {
     useGame.setState({
       offline: true,
       gameStartTimestamp: now - 5000,
-      players: [{ id: 0, username: "Alice", ready: true }],
+      players: [{ id: 0, username: "Alice" }],
       draws: [
         {
           value: 14,
