@@ -216,7 +216,7 @@ export const useHostRemoteControl = ({
     return () => {
       unsubscribe();
     };
-  }, [isRemote, isOffline, ws, drawCard]);
+  }, [isRemote, isOffline, ws, ws.ready, drawCard]);
 
   // Gracefully notify remotes when host disables remote control
   useEffect(() => {
@@ -230,7 +230,7 @@ export const useHostRemoteControl = ({
       });
       ws.close();
     }
-  }, [isRemote, isOffline, remoteControl, ws]);
+  }, [isRemote, isOffline, remoteControl, ws, ws.ready]);
 
   return ws;
 };

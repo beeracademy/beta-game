@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import * as GameAPI from "../api/endpoints/game";
+import type { Game } from "../api/models/game";
 import { Card, CardValues } from "../models/card";
 import { Player } from "../models/player";
 import { GenerateShuffleIndices, GetCardN } from "../utilities/deck";
@@ -62,6 +63,8 @@ interface GameActions {
 
   Submit: (options?: { description?: string }) => Promise<void>;
   PlayAgain: () => Promise<void>;
+
+  ExportGameData: (options?: { description?: string }) => Game;
 
   Exit: (options?: { dnf: boolean; description?: string }) => void;
 
@@ -171,7 +174,9 @@ const useGame = create<GameState & GameActions>()(
             shuffleIndices = resp.shuffle_indices;
           } catch (error) {
             console.error("[Game]", "Failed to start game", error);
-            return;
+
+            // Let the caller decide how to recover (e.g. keep the dialog open)
+            throw error;
           }
         }
 
@@ -399,20 +404,59 @@ const useGame = create<GameState & GameActions>()(
               "Failed to update game state on submit",
               error,
             );
+
+            // Let the caller offer a retry and/or an offline copy of the game
+            throw error;
           }
         }
 
         set({ submitted: true });
       },
 
+      ExportGameData: (options?: { description?: string }): Game => {
+        const state: GameState = useGame.getState();
+
+        return mapToRemote(state, {
+          dnf: false,
+          has_ended: true,
+          description: options?.description ?? state.description,
+        });
+      },
+
       PlayAgain: async () => {
         console.debug("[Game]", "Playing again with same players");
         const state = useGame.getState();
+
+        // Close out the finished game before starting a new one, so it isn't
+        // left dangling on the server (e.g. if the upload was skipped)
+        if (!state.offline && !state.submitted && state.token) {
+          try {
+            await GameAPI.postUpdate(
+              state.token,
+              mapToRemote(state, {
+                dnf: false,
+                has_ended: true,
+                description: state.description,
+              }),
+            );
+          } catch (error) {
+            console.error(
+              "[Game]",
+              "Failed to finalize previous game before playing again",
+              error,
+            );
+          }
+        }
+
+        // Start() replaces the whole state, so nothing from the previous game
+        // (draws, dnfs, description, image, submitted, ...) carries over
         await state.Start(state.players, {
           sipsInABeer: state.sipsInABeer,
           numberOfRounds: state.numberOfRounds,
           offline: state.offline,
         });
+
+        useGamesPlayed.getState().incrementCompleted();
       },
 
       Exit: (options?: { dnf?: boolean; description?: string }) => {

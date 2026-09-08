@@ -1,4 +1,5 @@
 import {
+  Alert,
   alpha,
   Box,
   Button,
@@ -33,6 +34,7 @@ const NewGameForm: FunctionComponent<NewGameFormProps> = () => {
   const newGame = useNewGame();
 
   const [preGameOpen, setPreGameOpen] = useState(false);
+  const [startError, setStartError] = useState<string | null>(null);
 
   const openPreGame = () => {
     if (!newGame.ready) {
@@ -40,22 +42,33 @@ const NewGameForm: FunctionComponent<NewGameFormProps> = () => {
     }
 
     play("click");
+    setStartError(null);
     newGame.setTitle("Shuffle player order?");
     newGame.setWide(newGame.players.length > 5);
     setPreGameOpen(true);
   };
 
-  const startGame = (players: Player[]) => {
+  const startGame = async (players: Player[]) => {
     setPreGameOpen(false);
-
-    StartGame(players, {
-      offline: newGame.offline,
-      numberOfRounds: NUMBER_OF_ROUNDS,
-      sipsInABeer: SIP_IN_A_BEER,
-    });
 
     stopAll();
     play("baladada");
+
+    try {
+      await StartGame(players, {
+        offline: newGame.offline,
+        numberOfRounds: NUMBER_OF_ROUNDS,
+        sipsInABeer: SIP_IN_A_BEER,
+      });
+    } catch (error) {
+      console.error("[NewGameForm] Failed to start game:", error);
+
+      stopAll();
+      play("wilhelm_scream");
+      setStartError(
+        "Could not start the game. Check your internet connection and try again.",
+      );
+    }
   };
 
   const changeGameMode = (offline: boolean) => {
@@ -76,6 +89,12 @@ const NewGameForm: FunctionComponent<NewGameFormProps> = () => {
 
   return (
     <Stack spacing={2}>
+      {startError && (
+        <Alert severity="error" variant="outlined">
+          {startError}
+        </Alert>
+      )}
+
       <Stack spacing={1}>
         <Tooltip
           title="Offline games will not be visible on the website and stats will not be collected."

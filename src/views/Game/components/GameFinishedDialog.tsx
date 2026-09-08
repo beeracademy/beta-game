@@ -1,4 +1,5 @@
 import {
+  Alert,
   Box,
   Button,
   CircularProgress,
@@ -31,6 +32,7 @@ import { addPhoto } from "../../../api/endpoints/game";
 import { useVideoDevices } from "../../../hooks/camera";
 import { useSounds } from "../../../hooks/sounds";
 import useGame from "../../../stores/game";
+import RetryUploadDialog from "./RetryUploadDialog";
 
 // Matches the backend's description length constraint
 const MAX_DESCRIPTION_LENGTH = 1000;
@@ -70,6 +72,8 @@ const GameFinishedDialog: FunctionComponent<GameFinishedDialogProps> = (
   const [description, setMessage] = useState(savedDescription || "");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isRestarting, setIsRestarting] = useState(false);
+  const [playAgainError, setPlayAgainError] = useState<string | null>(null);
+  const [showRetryUpload, setShowRetryUpload] = useState(false);
 
   // Offline games have no image/description to submit, so skip straight to choices
   const isDirectToChoices = Boolean(submitted) || offline;
@@ -110,20 +114,42 @@ const GameFinishedDialog: FunctionComponent<GameFinishedDialogProps> = (
       setStep("choices");
     } catch (error) {
       console.error("[GameFinishedDialog] Failed to submit:", error);
+      // Let the user retry the upload or download an offline copy of the game
+      setShowRetryUpload(true);
     } finally {
       setIsSubmitting(false);
     }
   };
 
+  const handleUploaded = useCallback(() => {
+    setShowRetryUpload(false);
+    setStep("choices");
+  }, []);
+
+  const handleDismissRetryUpload = useCallback(() => {
+    setShowRetryUpload(false);
+    setStep("choices");
+  }, []);
+
   const handlePlayAgain = async () => {
     setIsRestarting(true);
+    setPlayAgainError(null);
     try {
       sounds.stopAll();
       sounds.play("baladada");
       await PlayAgain();
-      props.onClose?.();
+      // No onClose() here: the new game closes the dialog on its own, and
+      // dismissing would suppress the dialog for the game we just started
+      setIsRestarting(false);
     } catch (error) {
       console.error("[GameFinishedDialog] Failed to play again:", error);
+
+      // Keep the dialog open so the user can retry once they are back online
+      sounds.stopAll();
+      sounds.play("wilhelm_scream");
+      setPlayAgainError(
+        "Could not start a new game. Check your internet connection and try again.",
+      );
       setIsRestarting(false);
     }
   };
@@ -360,6 +386,12 @@ const GameFinishedDialog: FunctionComponent<GameFinishedDialogProps> = (
             }}
           >
             <Stack spacing={2} sx={{ width: "100%", maxWidth: 440 }}>
+              {playAgainError && (
+                <Alert severity="error" variant="outlined">
+                  {playAgainError}
+                </Alert>
+              )}
+
               <Button
                 fullWidth
                 variant="contained"
@@ -394,6 +426,13 @@ const GameFinishedDialog: FunctionComponent<GameFinishedDialogProps> = (
           </DialogContent>
         )}
       </Dialog>
+
+      <RetryUploadDialog
+        open={showRetryUpload}
+        description={description.trim() || undefined}
+        onUploaded={handleUploaded}
+        onDismiss={handleDismissRetryUpload}
+      />
     </>
   );
 };

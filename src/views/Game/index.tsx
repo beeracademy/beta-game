@@ -71,12 +71,14 @@ const GameView: FunctionComponent = () => {
       offline: state.offline,
       ExitGame: state.Exit,
       players: state.players,
+      startTimestamp: state.gameStartTimestamp,
     })),
   );
 
   // Connect to the website's live game chat whenever we have an online game.
+  // Remotes never show the chat, so they must not open a chat socket either.
   useEffect(() => {
-    if (!game.offline && game.id) {
+    if (!isRemote && !game.offline && game.id) {
       useChat.getState().Connect(game.id);
     } else {
       useChat.getState().Disconnect();
@@ -85,7 +87,7 @@ const GameView: FunctionComponent = () => {
     return () => {
       useChat.getState().Disconnect();
     };
-  }, [game.offline, game.id]);
+  }, [isRemote, game.offline, game.id]);
 
   const settings = useSettings(
     useShallow((state) => ({
@@ -97,13 +99,13 @@ const GameView: FunctionComponent = () => {
   const gameMetrics = useGameMetrics();
   const playerMetrics = usePlayerMetrics();
   const isGameDone = gameMetrics.done && !gameMetrics.chugging;
-  const [finishedDialogOpen, setFinishedDialogOpen] = useState(true);
 
-  useEffect(() => {
-    if (!isGameDone) {
-      setFinishedDialogOpen(true);
-    }
-  }, [isGameDone]);
+  // Tracks which game the dialog was dismissed for, rather than a plain boolean
+  // that has to be re-armed after every game. A new game (e.g. "play again")
+  // always gets a fresh dialog, with no ordering race between the restart and
+  // the dismissal.
+  const [dismissedForGame, setDismissedForGame] = useState<number | null>(null);
+  const finishedDialogOpen = dismissedForGame !== game.startTimestamp;
 
   // King / Jester text flash announcer
   useLeaderboardAnnouncer({
@@ -489,9 +491,14 @@ const GameView: FunctionComponent = () => {
       {/* Shared Dialogs */}
       <ChugDialog open={gameMetrics.chugging} />
 
+      {/* Keyed by the game so "play again" mounts a fresh dialog instead of
+			    reusing the previous game's local state (step, description, photo, ...) */}
       <GameFinishedDialog
+        key={game.startTimestamp}
         open={isGameDone && finishedDialogOpen && !isRemote}
-        onClose={() => setFinishedDialogOpen(false)}
+        onClose={() =>
+          setDismissedForGame(useGame.getState().gameStartTimestamp)
+        }
       />
 
       {!isRemote && <GameChat />}

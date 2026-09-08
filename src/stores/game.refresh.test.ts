@@ -291,16 +291,23 @@ describe("Game state derivation & refresh resilience", () => {
       }));
 
       useGame.setState({
+        id: 42,
+        token: "old-game-token",
         offline: true,
         players: samplePlayers,
         shuffleIndices: GenerateShuffleIndices(samplePlayers.length),
         draws,
+        dnf_player_indexes: [1],
         description: "Old victory message",
+        image: "data:image/png;base64,old",
+        gameEndTimestamp: 1234,
         submitted: true,
       });
 
       MetricsStore.getState().Update();
       expect(MetricsStore.getState().game.done).toBe(true);
+
+      const previousStartTimestamp = useGame.getState().gameStartTimestamp;
 
       // Trigger PlayAgain
       await useGame.getState().PlayAgain();
@@ -312,6 +319,14 @@ describe("Game state derivation & refresh resilience", () => {
       expect(state.description).toBeUndefined();
       expect(state.submitted).toBe(false);
       expect(state.offline).toBe(true);
+
+      // Nothing from the previous game may carry over
+      expect(state.id).toBeUndefined();
+      expect(state.token).toBeUndefined();
+      expect(state.dnf_player_indexes).toEqual([]);
+      expect(state.image).toBeUndefined();
+      expect(state.gameEndTimestamp).toBe(0);
+      expect(state.gameStartTimestamp).not.toBe(previousStartTimestamp);
 
       MetricsStore.getState().Update();
       expect(MetricsStore.getState().game.done).toBe(false);

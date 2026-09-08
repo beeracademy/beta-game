@@ -126,6 +126,51 @@ describe("useGame store", () => {
     expect(state.description).toBe("Great game!");
   });
 
+  it("throws when the submit upload fails", async () => {
+    vi.mocked(GameAPI.postStart).mockResolvedValueOnce({
+      id: 42,
+      token: "game-token-123",
+      start_datetime: "2026-09-02T12:00:00Z",
+      shuffle_indices: Array.from({ length: 25 }, (_, i) => i % 5),
+    } as any);
+
+    await useGame.getState().Start(mockPlayers, {
+      ...defaultOptions,
+      offline: false,
+    });
+    useGame.setState({ token: "game-token-123", id: 42 });
+
+    vi.mocked(GameAPI.postUpdate).mockRejectedValueOnce(new Error("offline"));
+
+    await expect(
+      useGame.getState().Submit({ description: "Great game!" }),
+    ).rejects.toThrow("offline");
+
+    expect(useGame.getState().submitted).toBe(false);
+  });
+
+  it("exports the game data in the format expected by the backend", async () => {
+    await useGame.getState().Start(mockPlayers, defaultOptions);
+    useGame.setState({
+      id: 42,
+      token: "game-token-123",
+      gameStartDateString: "2026-09-02T12:00:00Z",
+    });
+
+    const game = useGame.getState().ExportGameData({ description: "gg" });
+
+    expect(game).toMatchObject({
+      id: 42,
+      token: "game-token-123",
+      start_datetime: "2026-09-02T12:00:00Z",
+      player_names: ["Alice", "Bob"],
+      player_ids: [1, 2],
+      has_ended: true,
+      dnf: false,
+      description: "gg",
+    });
+  });
+
   it("exits game and resets state", async () => {
     await useGame.getState().Start(mockPlayers, defaultOptions);
     useGame.getState().Exit({ dnf: true });

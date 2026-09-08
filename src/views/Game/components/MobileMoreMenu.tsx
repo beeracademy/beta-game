@@ -76,7 +76,7 @@ export const MobileMoreMenu: FunctionComponent<MobileMoreMenuProps> = ({
       }}
     >
       <Stack divider={<Divider />}>
-        {!!chat.gameId && (
+        {!isRemote && !!chat.gameId && (
           <Button
             fullWidth
             variant="text"

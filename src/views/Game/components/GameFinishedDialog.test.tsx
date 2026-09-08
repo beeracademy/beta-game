@@ -139,6 +139,41 @@ describe("GameFinishedDialog", () => {
     });
   });
 
+  it("shows the retry upload dialog when submitting fails, and dismissing shows the choices", async () => {
+    const submitSpy = vi.fn().mockRejectedValue(new Error("network down"));
+    useGame.setState({
+      offline: false,
+      submitted: false,
+      Submit: submitSpy,
+    });
+
+    render(<GameFinishedDialog open={true} />);
+
+    fireEvent.click(screen.getByRole("button", { name: "Submit" }));
+
+    await screen.findByText(/failed to upload game/i);
+
+    expect(
+      screen.getByRole("button", { name: /download game file/i }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: /retry upload now/i }),
+    ).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole("button", { name: /^dismiss$/i }));
+
+    await waitFor(() => {
+      expect(
+        screen.queryByText(/failed to upload game/i),
+      ).not.toBeInTheDocument();
+      expect(
+        screen.getByRole("button", {
+          name: /play again with the same people/i,
+        }),
+      ).toBeInTheDocument();
+    });
+  });
+
   it("triggers PlayAgain on clicking 'Play again with the same people!'", async () => {
     const playAgainSpy = vi.fn().mockResolvedValue(undefined);
     const onCloseSpy = vi.fn();
@@ -158,7 +193,53 @@ describe("GameFinishedDialog", () => {
 
     await waitFor(() => {
       expect(playAgainSpy).toHaveBeenCalled();
-      expect(onCloseSpy).toHaveBeenCalled();
+    });
+
+    // The restarted game closes the dialog on its own; dismissing here would
+    // suppress the finished dialog for the game that was just started
+    expect(onCloseSpy).not.toHaveBeenCalled();
+
+    // The restart spinner must not stay stuck for the next game
+    expect(
+      screen.getByRole("button", { name: /play again with the same people/i }),
+    ).toBeEnabled();
+  });
+
+  it("keeps the dialog open and shows an error when PlayAgain fails", async () => {
+    const playAgainSpy = vi.fn().mockRejectedValue(new Error("offline"));
+    const onCloseSpy = vi.fn();
+
+    useGame.setState({
+      offline: true,
+      submitted: true,
+      PlayAgain: playAgainSpy,
+    });
+
+    render(<GameFinishedDialog open={true} onClose={onCloseSpy} />);
+
+    fireEvent.click(
+      screen.getByRole("button", {
+        name: /play again with the same people/i,
+      }),
+    );
+
+    await waitFor(() => {
+      expect(
+        screen.getByText(/could not start a new game/i),
+      ).toBeInTheDocument();
+    });
+
+    expect(onCloseSpy).not.toHaveBeenCalled();
+
+    // The button is re-enabled so the user can retry
+    const retryBtn = screen.getByRole("button", {
+      name: /play again with the same people/i,
+    });
+    expect(retryBtn).not.toBeDisabled();
+
+    fireEvent.click(retryBtn);
+    await waitFor(() => {
+      expect(playAgainSpy).toHaveBeenCalledTimes(2);
     });
   });
 

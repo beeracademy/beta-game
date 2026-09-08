@@ -2,6 +2,7 @@ import { create } from "zustand";
 import type { ChatMessage, ChatUser } from "../models/chat";
 import { play } from "../hooks/sounds";
 import { getWsBaseUrl } from "../api/websocket/url";
+import useGame from "./game";
 
 /*
     Connects to the same chat backend the website's game detail page uses
@@ -47,6 +48,14 @@ const useChat = create<ChatState & ChatActions>((set, get) => ({
   ...initialState,
 
   Connect: (gameId) => {
+    // Offline games exist only on this device — there is no server-side chat
+    // room to join, so never open a socket for them. Guarded here as well as at
+    // the call site so no caller can accidentally re-introduce the connection.
+    if (useGame.getState().offline || !Number.isFinite(gameId)) {
+      get().Disconnect();
+      return;
+    }
+
     if (get().gameId === gameId && socket) {
       // Already connected (or connecting) to this game's chat.
       return;

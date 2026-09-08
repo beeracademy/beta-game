@@ -206,8 +206,8 @@ const SharedControlView: FunctionComponent<SharedControlViewProps> = () => {
   const pingTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   // Periodic ping interval handle
   const pingIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
-  // Reconnect delay handle
-  const reconnectTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  // Reconnect retry handle
+  const reconnectTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   // True once we have received at least one GAME_STATE message and were actually live.
   // Prevents showing "reconnecting" if the game was never connected in the first place.
   const hasEverBeenLiveRef = useRef(false);
@@ -228,7 +228,7 @@ const SharedControlView: FunctionComponent<SharedControlViewProps> = () => {
 
   const clearReconnectTimer = useCallback(() => {
     if (reconnectTimerRef.current !== null) {
-      clearTimeout(reconnectTimerRef.current);
+      clearInterval(reconnectTimerRef.current);
       reconnectTimerRef.current = null;
     }
   }, []);
@@ -276,8 +276,12 @@ const SharedControlView: FunctionComponent<SharedControlViewProps> = () => {
       setPhase("reconnecting");
     }
 
-    reconnectTimerRef.current = setTimeout(() => {
+    // Keep retrying: a single attempt would leave us stuck offline forever if
+    // that attempt also fails. connect() is a no-op while a socket to the same
+    // URL is still connecting or open, so retrying on a timer is safe.
+    reconnectTimerRef.current = setInterval(() => {
       if (!token) return;
+      if (phaseRef.current === "unavailable") return;
       wsRef.current.connect(`${getWsBaseUrl()}/ws/remote/${token}/`);
     }, RECONNECT_DELAY_MS);
 
