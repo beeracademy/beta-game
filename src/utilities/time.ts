@@ -65,7 +65,10 @@ export const formatDurationCompact = (milliseconds: number): string => {
   return `${minutes}m ${secondsStr}s`;
 };
 
-export const formatRoundRate = (milliseconds: number): string => {
+export const formatUnitRate = (
+  milliseconds: number,
+  unit: string,
+): string => {
   const safeMs = Math.max(0, Math.floor(milliseconds || 0));
   if (safeMs === 0) {
     return "-";
@@ -74,7 +77,7 @@ export const formatRoundRate = (milliseconds: number): string => {
   const totalSeconds = Math.round(safeMs / 1000);
 
   if (totalSeconds < 60) {
-    return `${totalSeconds} s / round`;
+    return `${totalSeconds} s / ${unit}`;
   }
 
   const hours = Math.floor(totalSeconds / 3600);
@@ -89,15 +92,21 @@ export const formatRoundRate = (milliseconds: number): string => {
     if (seconds > 0) {
       parts.push(`${seconds}s`);
     }
-    return `${parts.join(" ")} / round`;
+    return `${parts.join(" ")} / ${unit}`;
   }
 
   if (seconds === 0) {
-    return `${minutes}m / round`;
+    return `${minutes}m / ${unit}`;
   }
 
-  return `${minutes}m ${seconds}s / round`;
+  return `${minutes}m ${seconds}s / ${unit}`;
 };
+
+export const formatRoundRate = (milliseconds: number): string =>
+  formatUnitRate(milliseconds, "round");
+
+export const formatCardRate = (milliseconds: number): string =>
+  formatUnitRate(milliseconds, "card");
 
 export const datetimeToddmmHHMMSS = (datetime: string): string => {
   const date = new Date(datetime);

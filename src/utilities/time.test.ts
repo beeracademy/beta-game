@@ -1,7 +1,9 @@
 import { describe, expect, it } from "vitest";
 import {
+  formatCardRate,
   formatDurationCompact,
   formatRoundRate,
+  formatUnitRate,
   millisecondsToMMSSsss,
   secondsToHHMMSS,
   secondsToHHMMSSsss,
@@ -135,6 +137,32 @@ describe("time utilities", () => {
       expect(formatRoundRate(3620000)).toBe("1h 20s / round");
       expect(formatRoundRate(3720000)).toBe("1h 2m / round");
       expect(formatRoundRate(3740000)).toBe("1h 2m 20s / round");
+    });
+  });
+
+  describe("formatCardRate", () => {
+    it("returns '-' for 0 or negative values", () => {
+      expect(formatCardRate(0)).toBe("-");
+      expect(formatCardRate(-5000)).toBe("-");
+      expect(formatCardRate(NaN)).toBe("-");
+    });
+
+    it("formats card rates under 60 seconds as 'x s / card'", () => {
+      expect(formatCardRate(5000)).toBe("5 s / card");
+      expect(formatCardRate(12000)).toBe("12 s / card");
+      expect(formatCardRate(30000)).toBe("30 s / card");
+    });
+
+    it("formats card rates over 1 minute as 'xm ys / card'", () => {
+      expect(formatCardRate(60000)).toBe("1m / card");
+      expect(formatCardRate(70000)).toBe("1m 10s / card");
+    });
+  });
+
+  describe("formatUnitRate", () => {
+    it("formats arbitrary units with spaced slash", () => {
+      expect(formatUnitRate(15000, "turn")).toBe("15 s / turn");
+      expect(formatUnitRate(75000, "drink")).toBe("1m 15s / drink");
     });
   });
 });

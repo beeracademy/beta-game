@@ -33,6 +33,7 @@ import useSettings, {
 } from "../../../stores/settings";
 import { useSharedControl } from "../../../stores/sharedControl";
 import {
+  formatCardRate,
   formatRoundRate,
   secondsToHHMMSS,
   secondsToHHMMSSsss,
@@ -131,7 +132,7 @@ const Header: FunctionComponent = () => {
   const turnTimeRef = useRef<HTMLElement>(null);
   const gameTimeRef = useRef<HTMLElement>(null);
   const avgRoundTimeRef = useRef<HTMLElement>(null);
-  const cardsPerMinRef = useRef<HTMLElement>(null);
+  const avgCardTimeRef = useRef<HTMLElement>(null);
 
   // The clocks are written straight to the DOM instead of through state: they
   // tick every frame and re-rendering the whole header that often is wasteful.
@@ -154,10 +155,10 @@ const Header: FunctionComponent = () => {
       avgRoundMs > 0 ? formatRoundRate(avgRoundMs) : "-",
     );
 
-    const cpm = gameMetrics.GetCardsPerMinute();
+    const avgCardMs = gameMetrics.GetAverageCardTime();
     setTextContent(
-      cardsPerMinRef.current,
-      cpm > 0 ? `${cpm.toFixed(1)} cards / min` : "-",
+      avgCardTimeRef.current,
+      avgCardMs > 0 ? formatCardRate(avgCardMs) : "-",
     );
   }, [gameMetrics]);
 
@@ -387,7 +388,7 @@ const Header: FunctionComponent = () => {
               Card {gameMetrics.numberOfCardsDrawn}/{gameMetrics.numberOfCards}
             </Typography>
             <Typography
-              ref={cardsPerMinRef}
+              ref={avgCardTimeRef}
               sx={{
                 fontSize: { xs: 11, sm: 13 },
                 opacity: 0.8,

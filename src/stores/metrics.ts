@@ -45,6 +45,7 @@ interface GameMetricActions {
   GetElapsedGameTime(): number;
   GetElapsedTurnTime(): number;
   GetAverageRoundTime(): number;
+  GetAverageCardTime(): number;
   GetCardsPerMinute(): number;
 }
 
@@ -69,6 +70,17 @@ const DEFAULT_PLAYER_METRICS: PlayerMetrics = {
   isLeading: false,
   isLast: false,
 };
+
+function calculateAverageCardTime(
+  cardsDrawn: number,
+  elapsedMilliseconds: number,
+): number {
+  if (cardsDrawn <= 0 || elapsedMilliseconds < 5000) {
+    return 0;
+  }
+
+  return elapsedMilliseconds / cardsDrawn;
+}
 
 function calculateCardsPerMinute(
   cardsDrawn: number,
@@ -145,6 +157,13 @@ const GetCardsPerMinute = (): number => {
   return calculateCardsPerMinute(metrics.game.numberOfCardsDrawn, elapsedMs);
 };
 
+const GetAverageCardTime = (): number => {
+  const metrics = MetricsStore.getState();
+  const elapsedMs = GetElapsedGameTime();
+
+  return calculateAverageCardTime(metrics.game.numberOfCardsDrawn, elapsedMs);
+};
+
 const GetAverageRoundTime = (): number => {
   const game = useGame.getState();
   const metrics = MetricsStore.getState();
@@ -179,6 +198,7 @@ const createInitialMetricsState = (): MetricsState => ({
     GetElapsedGameTime,
     GetElapsedTurnTime,
     GetAverageRoundTime,
+    GetAverageCardTime,
     GetCardsPerMinute,
   },
 });
@@ -503,6 +523,7 @@ const useGameMetrics = () => {
 };
 
 export {
+  calculateAverageCardTime,
   calculateAverageRoundTime,
   calculateCardsPerMinute,
   calculateCardsPerPlayer,

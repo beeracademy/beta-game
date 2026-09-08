@@ -3,6 +3,7 @@ import { Card } from "../models/card";
 import { Player } from "../models/player";
 import useGame from "./game";
 import {
+  calculateAverageCardTime,
   calculateAverageRoundTime,
   calculateCardsPerMinute,
   calculateLeaderboard,
@@ -237,8 +238,23 @@ describe("Metrics Store & Derivation", () => {
       });
     });
 
+    describe("calculateAverageCardTime", () => {
+      it("returns 0 when 0 cards drawn or elapsed time is under 5 seconds", () => {
+        expect(calculateAverageCardTime(0, 10000)).toBe(0);
+        expect(calculateAverageCardTime(5, 3000)).toBe(0);
+        expect(calculateAverageCardTime(0, 0)).toBe(0);
+      });
+
+      it("calculates average time per card correctly", () => {
+        // 4 cards in 60,000ms = 15,000ms/card
+        expect(calculateAverageCardTime(4, 60000)).toBe(15000);
+        // 10 cards in 50,000ms = 5,000ms/card
+        expect(calculateAverageCardTime(10, 50000)).toBe(5000);
+      });
+    });
+
     describe("Store action integration", () => {
-      it("provides live GetAverageRoundTime and GetCardsPerMinute", () => {
+      it("provides live GetAverageRoundTime, GetAverageCardTime, and GetCardsPerMinute", () => {
         const now = Date.now();
         useGame.setState({
           gameStartTimestamp: now - 60000, // 1 minute ago
@@ -256,6 +272,11 @@ describe("Metrics Store & Derivation", () => {
         // 4 cards in ~60,000ms = ~4 cards/min
         expect(cpm).toBeGreaterThan(3.9);
         expect(cpm).toBeLessThan(4.1);
+
+        const avgCard = MetricsStore.getState().game.GetAverageCardTime();
+        // 4 cards in ~60,000ms = ~15,000ms
+        expect(avgCard).toBeGreaterThan(14000);
+        expect(avgCard).toBeLessThan(16000);
 
         const avgRound = MetricsStore.getState().game.GetAverageRoundTime();
         // 2 rounds in ~60,000ms = ~30,000ms

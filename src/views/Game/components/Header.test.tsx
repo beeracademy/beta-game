@@ -111,7 +111,7 @@ describe("Header", () => {
     expect(placeholders.length).toBeGreaterThanOrEqual(2);
   });
 
-  it("displays calculated average round time and cards per minute", () => {
+  it("displays calculated average round time and card time rate", () => {
     const now = Date.now();
     const shuffle = Array.from({ length: 2 * 13 - 1 }, () => 0);
     useGame.setState({
@@ -136,8 +136,8 @@ describe("Header", () => {
       </MemoryRouter>,
     );
 
-    // 4 cards in 60 seconds = 4.0 cards / min
-    expect(screen.getByText(/4\.0 cards \/ min/)).toBeInTheDocument();
+    // 4 cards in 60 seconds = 15 s / card
+    expect(screen.getByText(/15 s \/ card/)).toBeInTheDocument();
     // 2 players, 4 cards = 2 rounds in 60 seconds -> 30 s / round
     expect(screen.getByText(/30 s \/ round/)).toBeInTheDocument();
   });
