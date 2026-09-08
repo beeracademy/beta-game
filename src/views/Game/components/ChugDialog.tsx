@@ -138,6 +138,11 @@ const ChugDialog: FunctionComponent<ChugDialogProps> = (props) => {
   const [personalBest, setPersonalBest] = useState<PersonalBest | null>(null);
 
   useEffect(() => {
+    if (game.offline) {
+      setPersonalBest(null);
+      return;
+    }
+
     const playerId = player?.id;
 
     if (!props.open || playerId === undefined) {
@@ -169,7 +174,7 @@ const ChugDialog: FunctionComponent<ChugDialogProps> = (props) => {
     return () => {
       cancelled = true;
     };
-  }, [props.open, player?.id]);
+  }, [props.open, player?.id, game.offline]);
 
   const reset = useCallback(() => {
     if (!chugStartDelta) {
@@ -273,6 +278,10 @@ const ChugDialog: FunctionComponent<ChugDialogProps> = (props) => {
 
   // Target duration from Season PB, or previous chug in this game
   const target = (() => {
+    if (game.offline) {
+      return null;
+    }
+
     if (personalBest !== null) {
       return {
         durationMs: personalBest.durationMs,
@@ -280,9 +289,9 @@ const ChugDialog: FunctionComponent<ChugDialogProps> = (props) => {
       };
     }
 
-    // Fallback: check if player has any completed chug in this game
+    // Fallback: check if player has any completed chug in this game (excluding the current one)
     let bestGameChug: number | null = null;
-    game.draws.forEach((draw, i) => {
+    game.draws.slice(0, -1).forEach((draw, i) => {
       const pIdx = i % (game.players.length || 1);
       if (
         pIdx === metrics.activePlayerIndex &&

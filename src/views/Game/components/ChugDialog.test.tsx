@@ -23,6 +23,12 @@ vi.mock("../../../components/TextFlash", () => ({
   }),
 }));
 
+const getUserStatsMock = vi.fn().mockResolvedValue([]);
+
+vi.mock("../../../api/endpoints/stats", () => ({
+  getUserStats: (...args: unknown[]) => getUserStatsMock(...args),
+}));
+
 describe("ChugDialog", () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -164,5 +170,76 @@ describe("ChugDialog", () => {
     expect(splitText).toBeInTheDocument();
     expect(splitText).toHaveTextContent(/\+.*on personal best/);
     expect(splitText).toHaveStyle({ color: "rgba(211, 47, 47, 0.85)" });
+  });
+
+  it("never renders personal best difference in offline mode even if previous chugs exist", () => {
+    useGame.setState({
+      offline: true,
+      players: [{ id: 0, username: "Alice", ready: true }],
+      draws: [
+        {
+          value: 14,
+          suit: "H",
+          start_delta_ms: 0,
+          chug_start_start_delta_ms: 1000,
+          chug_end_start_delta_ms: 4970,
+        },
+        {
+          value: 14,
+          suit: "S",
+          start_delta_ms: 6000,
+        },
+      ],
+      shuffleIndices: Array.from({ length: 12 }, (_, i) => i),
+    });
+
+    render(<ChugDialog open={true} />);
+
+    expect(screen.queryByTestId("chug-split-text")).not.toBeInTheDocument();
+    expect(getUserStatsMock).not.toHaveBeenCalled();
+  });
+
+  it("never renders personal best difference in offline mode when running or stopping a chug", () => {
+    const now = Date.now();
+    useGame.setState({
+      offline: true,
+      gameStartTimestamp: now - 5000,
+      players: [{ id: 0, username: "Alice", ready: true }],
+      draws: [
+        {
+          value: 14,
+          suit: "S",
+          start_delta_ms: 1000,
+          chug_start_start_delta_ms: 1000,
+          chug_end_start_delta_ms: 3000,
+        },
+      ],
+      shuffleIndices: Array.from({ length: 12 }, (_, i) => i),
+    });
+
+    render(<ChugDialog open={true} />);
+
+    expect(screen.queryByTestId("chug-split-text")).not.toBeInTheDocument();
+  });
+
+  it("does not compare a just-completed chug against itself in online mode when no previous chug exists", () => {
+    useGame.setState({
+      offline: false,
+      players: [{ id: 99, username: "Alice", token: "tok1" }],
+      draws: [
+        {
+          value: 14,
+          suit: "S",
+          start_delta_ms: 1000,
+          chug_start_start_delta_ms: 1000,
+          chug_end_start_delta_ms: 4000,
+        },
+      ],
+      shuffleIndices: Array.from({ length: 12 }, (_, i) => i),
+    });
+
+    render(<ChugDialog open={true} />);
+
+    expect(screen.queryByTestId("chug-split-text")).not.toBeInTheDocument();
   });
 });
