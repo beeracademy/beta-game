@@ -120,7 +120,7 @@ const GameView: FunctionComponent = () => {
 
   const resetIdleTimer = useIdleTimer(
     () => {
-      if (gameMetrics.chugging) {
+      if (gameMetrics.chugging || gameMetrics.done) {
         return;
       }
       setShowSleepyMeme(true);
@@ -386,6 +386,7 @@ const GameView: FunctionComponent = () => {
             open={showSleepyMeme}
             onClose={() => {
               setShowSleepyMeme(false);
+              resetIdleTimer();
             }}
             tag="sleepy boring snoring"
           />
@@ -463,6 +464,7 @@ const GameView: FunctionComponent = () => {
             onExitGame={showMobileExitDialog}
             isRemote={isRemote}
             isGameDone={isGameDone}
+            isOffline={game.offline}
             themeMode={settings.themeMode}
             onSetThemeMode={(mode) => settings.setThemeMode(mode)}
           />

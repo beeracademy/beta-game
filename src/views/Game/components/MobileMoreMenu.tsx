@@ -33,6 +33,7 @@ interface MobileMoreMenuProps {
   onExitGame: () => void;
   isRemote: boolean;
   isGameDone: boolean;
+  isOffline?: boolean;
   themeMode: ThemeMode;
   onSetThemeMode: (mode: ThemeMode) => void;
 }
@@ -46,6 +47,7 @@ export const MobileMoreMenu: FunctionComponent<MobileMoreMenuProps> = ({
   onExitGame,
   isRemote,
   isGameDone,
+  isOffline = false,
   themeMode,
   onSetThemeMode,
 }) => {
@@ -147,7 +149,7 @@ export const MobileMoreMenu: FunctionComponent<MobileMoreMenuProps> = ({
           Chugs
         </Button>
 
-        {!isRemote && (
+        {!isRemote && !isOffline && (
           <Button
             fullWidth
             variant="text"

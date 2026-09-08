@@ -205,7 +205,7 @@ const Header: FunctionComponent = () => {
             </IconButton>
           </Tooltip>
 
-          {!isRemote && (
+          {!isRemote && !game.offline && (
             <Tooltip title="Shared control settings" placement="bottom">
               <IconButton
                 sx={{

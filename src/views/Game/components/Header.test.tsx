@@ -74,4 +74,26 @@ describe("Header", () => {
       screen.getByRole("button", { name: /switch to/i }),
     ).toBeInTheDocument();
   });
+
+  it("does not render shared control button when playing in offline mode", () => {
+    useGame.setState({
+      offline: true,
+    });
+
+    render(
+      <MemoryRouter>
+        <Header />
+      </MemoryRouter>,
+    );
+
+    expect(
+      screen.queryByRole("button", { name: /shared control settings/i }),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: /abandon game|exit game/i }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: /mark players as 'did not finish'/i }),
+    ).toBeInTheDocument();
+  });
 });

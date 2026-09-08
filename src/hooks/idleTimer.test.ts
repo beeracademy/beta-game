@@ -53,4 +53,43 @@ describe("useIdleTimer hook", () => {
     });
     expect(onIdle).toHaveBeenCalledTimes(1);
   });
+
+  it("resets countdown on user activity events", () => {
+    const onIdle = vi.fn();
+    renderHook(() => useIdleTimer(onIdle, 1000));
+
+    act(() => {
+      vi.advanceTimersByTime(800);
+    });
+    expect(onIdle).not.toHaveBeenCalled();
+
+    // User moves mouse
+    act(() => {
+      window.dispatchEvent(new MouseEvent("mousemove"));
+    });
+
+    act(() => {
+      vi.advanceTimersByTime(800);
+    });
+    expect(onIdle).not.toHaveBeenCalled();
+
+    act(() => {
+      vi.advanceTimersByTime(200);
+    });
+    expect(onIdle).toHaveBeenCalledTimes(1);
+  });
+
+  it("cleans up event listeners and timer on unmount", () => {
+    const onIdle = vi.fn();
+    const { unmount } = renderHook(() => useIdleTimer(onIdle, 1000));
+
+    unmount();
+
+    act(() => {
+      window.dispatchEvent(new KeyboardEvent("keydown"));
+      vi.advanceTimersByTime(2000);
+    });
+
+    expect(onIdle).not.toHaveBeenCalled();
+  });
 });
