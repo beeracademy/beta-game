@@ -74,6 +74,36 @@ const getCardImageURI = (card?: Card): string => {
   return card ? `/cards/${card.suit}-${card.value}.png` : "";
 };
 
+const getCardValueName = (value: number): string => {
+  switch (value) {
+    case 11:
+      return "Jacks";
+    case 12:
+      return "Queens";
+    case 13:
+      return "Kings";
+    case 14:
+      return "Aces";
+    default:
+      return `${value}s`;
+  }
+};
+
+const getCardValueSymbol = (value: number): string => {
+  switch (value) {
+    case 11:
+      return "J";
+    case 12:
+      return "Q";
+    case 13:
+      return "K";
+    case 14:
+      return "A";
+    default:
+      return `${value}`;
+  }
+};
+
 export {
   CardSuits,
   CardValues,
@@ -81,5 +111,9 @@ export {
   getCardImageURI,
   getCardSuitColor,
   getCardSuitName,
+  getCardValueName,
+  getCardValueSymbol,
+  getCardValueName as valueToName,
+  getCardValueSymbol as valueToSymbol,
 };
 export type { Card, CardSuit, CardValue };

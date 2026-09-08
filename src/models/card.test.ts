@@ -7,6 +7,8 @@ import {
   getCardImageURI,
   getCardSuitColor,
   getCardSuitName,
+  getCardValueName,
+  getCardValueSymbol,
 } from "./card";
 
 describe("card model utilities", () => {
@@ -53,5 +55,21 @@ describe("card model utilities", () => {
   it("formats image URI correctly", () => {
     expect(getCardImageURI({ suit: "H", value: 14 })).toBe("/cards/H-14.png");
     expect(getCardImageURI(undefined)).toBe("");
+  });
+
+  it("returns human-readable value names and symbols", () => {
+    expect(getCardValueName(14)).toBe("Aces");
+    expect(getCardValueName(13)).toBe("Kings");
+    expect(getCardValueName(12)).toBe("Queens");
+    expect(getCardValueName(11)).toBe("Jacks");
+    expect(getCardValueName(10)).toBe("10s");
+    expect(getCardValueName(2)).toBe("2s");
+
+    expect(getCardValueSymbol(14)).toBe("A");
+    expect(getCardValueSymbol(13)).toBe("K");
+    expect(getCardValueSymbol(12)).toBe("Q");
+    expect(getCardValueSymbol(11)).toBe("J");
+    expect(getCardValueSymbol(10)).toBe("10");
+    expect(getCardValueSymbol(2)).toBe("2");
   });
 });

@@ -39,4 +39,16 @@ describe("CardInventory component", () => {
 
     expect(onCardClick).toHaveBeenCalledTimes(1);
   });
+
+  it("shows suit tooltip when hovering over a card column", async () => {
+    render(<CardInventory />);
+
+    const cardAce = screen.getAllByText("A")[0];
+    fireEvent.mouseOver(cardAce);
+
+    expect(
+      await screen.findByTestId("card-suit-tooltip-14"),
+    ).toBeInTheDocument();
+    expect(screen.getByText("Aces (A)")).toBeInTheDocument();
+  });
 });
