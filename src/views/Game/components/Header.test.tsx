@@ -96,4 +96,49 @@ describe("Header", () => {
       screen.getByRole("button", { name: /mark players as 'did not finish'/i }),
     ).toBeInTheDocument();
   });
+
+  it("renders round, cards counter and live secondary metrics placeholders initially", () => {
+    render(
+      <MemoryRouter>
+        <Header />
+      </MemoryRouter>,
+    );
+
+    expect(screen.getByText(/Round 1\/1/i)).toBeInTheDocument();
+    expect(screen.getByText(/Card 0\/0/i)).toBeInTheDocument();
+    // Initially when no cards are drawn, both secondary texts show "-"
+    const placeholders = screen.getAllByText("-");
+    expect(placeholders.length).toBeGreaterThanOrEqual(2);
+  });
+
+  it("displays calculated average round time and cards per minute", () => {
+    const now = Date.now();
+    const shuffle = Array.from({ length: 2 * 13 - 1 }, () => 0);
+    useGame.setState({
+      gameStartTimestamp: now - 60000,
+      numberOfRounds: 13,
+      shuffleIndices: shuffle,
+      players: [
+        { id: 1, username: "Alice", token: "tok1" },
+        { id: 2, username: "Bob", token: "tok2" },
+      ],
+      draws: [
+        { value: 5, suit: "S", start_delta_ms: 10000 },
+        { value: 8, suit: "H", start_delta_ms: 25000 },
+        { value: 9, suit: "D", start_delta_ms: 45000 },
+        { value: 10, suit: "C", start_delta_ms: 55000 },
+      ],
+    });
+
+    render(
+      <MemoryRouter>
+        <Header />
+      </MemoryRouter>,
+    );
+
+    // 4 cards in 60 seconds = 4.0 cards / min
+    expect(screen.getByText(/4\.0 cards \/ min/)).toBeInTheDocument();
+    // 2 players, 4 cards = 2 rounds in 60 seconds -> 30 s / round
+    expect(screen.getByText(/30 s \/ round/)).toBeInTheDocument();
+  });
 });

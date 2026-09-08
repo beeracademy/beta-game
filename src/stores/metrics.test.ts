@@ -3,6 +3,8 @@ import { Card } from "../models/card";
 import { Player } from "../models/player";
 import useGame from "./game";
 import {
+  calculateAverageRoundTime,
+  calculateCardsPerMinute,
   calculateLeaderboard,
   calculatePlayerChugs,
   calculatePlayerSips,
@@ -192,4 +194,75 @@ describe("Metrics Store & Derivation", () => {
       expect(MetricsStore.getState().game.numberOfPlayers).toBe(0);
     });
   });
+
+  describe("Cards per minute & Average round time derivation", () => {
+    describe("calculateCardsPerMinute", () => {
+      it("returns 0 when 0 cards drawn or elapsed time is under 5 seconds", () => {
+        expect(calculateCardsPerMinute(0, 10000)).toBe(0);
+        expect(calculateCardsPerMinute(5, 3000)).toBe(0);
+        expect(calculateCardsPerMinute(0, 0)).toBe(0);
+      });
+
+      it("calculates cards drawn per minute correctly", () => {
+        // 10 cards in 1 minute (60,000ms) = 10 cards/min
+        expect(calculateCardsPerMinute(10, 60000)).toBe(10);
+        // 15 cards in 2 minutes (120,000ms) = 7.5 cards/min
+        expect(calculateCardsPerMinute(15, 120000)).toBe(7.5);
+      });
+    });
+
+    describe("calculateAverageRoundTime", () => {
+      it("returns 0 if players <= 0 or elapsed time is under 5 seconds", () => {
+        expect(calculateAverageRoundTime(10, 0, 13, 60000, false)).toBe(0);
+        expect(calculateAverageRoundTime(10, 4, 13, 4000, false)).toBe(0);
+      });
+
+      it("returns 0 before at least one full round has been completed", () => {
+        // 4 players, only 3 cards drawn = incomplete round 1
+        expect(calculateAverageRoundTime(3, 4, 13, 30000, false)).toBe(0);
+      });
+
+      it("calculates average round time based on rounds played", () => {
+        // 4 players, 4 cards drawn (1 full round) in 60,000ms -> 60,000ms/round
+        expect(calculateAverageRoundTime(4, 4, 13, 60000, false)).toBe(60000);
+        // 4 players, 8 cards drawn (2 rounds) in 120,000ms -> 60,000ms/round
+        expect(calculateAverageRoundTime(8, 4, 13, 120000, false)).toBe(60000);
+        // 4 players, 6 cards drawn (1.5 rounds) in 90,000ms -> 60,000ms/round
+        expect(calculateAverageRoundTime(6, 4, 13, 90000, false)).toBe(60000);
+      });
+
+      it("calculates average round time when game is done", () => {
+        // 13 rounds, 260,000ms elapsed -> 20,000ms/round
+        expect(calculateAverageRoundTime(52, 4, 13, 260000, true)).toBe(20000);
+      });
+    });
+
+    describe("Store action integration", () => {
+      it("provides live GetAverageRoundTime and GetCardsPerMinute", () => {
+        const now = Date.now();
+        useGame.setState({
+          gameStartTimestamp: now - 60000, // 1 minute ago
+          players: samplePlayers, // 2 players
+        });
+        MetricsStore.setState((state) => ({
+          game: {
+            ...state.game,
+            numberOfCardsDrawn: 4, // 2 full rounds
+            numberOfPlayers: 2,
+          },
+        }));
+
+        const cpm = MetricsStore.getState().game.GetCardsPerMinute();
+        // 4 cards in ~60,000ms = ~4 cards/min
+        expect(cpm).toBeGreaterThan(3.9);
+        expect(cpm).toBeLessThan(4.1);
+
+        const avgRound = MetricsStore.getState().game.GetAverageRoundTime();
+        // 2 rounds in ~60,000ms = ~30,000ms
+        expect(avgRound).toBeGreaterThan(29000);
+        expect(avgRound).toBeLessThan(31000);
+      });
+    });
+  });
 });
+

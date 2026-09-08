@@ -1,5 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
+  formatDurationCompact,
+  formatRoundRate,
   millisecondsToMMSSsss,
   secondsToHHMMSS,
   secondsToHHMMSSsss,
@@ -78,4 +80,63 @@ describe("time utilities", () => {
       expect(millisecondsToMMSSsss(65 * 60 * 1000 + 123)).toBe("65:00.123");
     });
   });
+
+  describe("formatDurationCompact", () => {
+    it("should format times under 60 seconds as seconds only", () => {
+      expect(formatDurationCompact(0)).toBe("0s");
+      expect(formatDurationCompact(5000)).toBe("5s");
+      expect(formatDurationCompact(45000)).toBe("45s");
+      expect(formatDurationCompact(59400)).toBe("59s");
+    });
+
+    it("should format times between 1 minute and 1 hour as minutes and seconds", () => {
+      expect(formatDurationCompact(60000)).toBe("1m 00s");
+      expect(formatDurationCompact(72000)).toBe("1m 12s");
+      expect(formatDurationCompact(125000)).toBe("2m 05s");
+      expect(formatDurationCompact(59 * 60 * 1000 + 59 * 1000)).toBe("59m 59s");
+    });
+
+    it("should format times of 1 hour or more as hours and minutes", () => {
+      expect(formatDurationCompact(3600000)).toBe("1h 00m");
+      expect(formatDurationCompact((3600 + 60) * 1000)).toBe("1h 01m");
+      expect(formatDurationCompact((2 * 3600 + 15 * 60) * 1000)).toBe("2h 15m");
+    });
+
+    it("handles invalid or negative values gracefully", () => {
+      expect(formatDurationCompact(-1000)).toBe("0s");
+      expect(formatDurationCompact(NaN)).toBe("0s");
+    });
+  });
+
+  describe("formatRoundRate", () => {
+    it("returns '-' for 0 or negative values", () => {
+      expect(formatRoundRate(0)).toBe("-");
+      expect(formatRoundRate(-5000)).toBe("-");
+      expect(formatRoundRate(NaN)).toBe("-");
+    });
+
+    it("formats durations under 60 seconds as 'x s / round'", () => {
+      expect(formatRoundRate(5000)).toBe("5 s / round");
+      expect(formatRoundRate(10000)).toBe("10 s / round");
+      expect(formatRoundRate(30000)).toBe("30 s / round");
+      expect(formatRoundRate(45000)).toBe("45 s / round");
+    });
+
+    it("formats durations between 1 minute and 1 hour as 'xm ys / round'", () => {
+      expect(formatRoundRate(60000)).toBe("1m / round");
+      expect(formatRoundRate(80000)).toBe("1m 20s / round");
+      expect(formatRoundRate(90000)).toBe("1m 30s / round");
+      expect(formatRoundRate(120000)).toBe("2m / round");
+      expect(formatRoundRate(125000)).toBe("2m 5s / round");
+    });
+
+    it("formats durations of 1 hour or more", () => {
+      expect(formatRoundRate(3600000)).toBe("1h / round");
+      expect(formatRoundRate(3620000)).toBe("1h 20s / round");
+      expect(formatRoundRate(3720000)).toBe("1h 2m / round");
+      expect(formatRoundRate(3740000)).toBe("1h 2m 20s / round");
+    });
+  });
 });
+
+

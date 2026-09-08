@@ -44,6 +44,8 @@ interface GameMetrics {
 interface GameMetricActions {
   GetElapsedGameTime(): number;
   GetElapsedTurnTime(): number;
+  GetAverageRoundTime(): number;
+  GetCardsPerMinute(): number;
 }
 
 interface MetricsState {
@@ -67,6 +69,43 @@ const DEFAULT_PLAYER_METRICS: PlayerMetrics = {
   isLeading: false,
   isLast: false,
 };
+
+function calculateCardsPerMinute(
+  cardsDrawn: number,
+  elapsedMilliseconds: number,
+): number {
+  if (cardsDrawn <= 0 || elapsedMilliseconds < 5000) {
+    return 0;
+  }
+
+  const minutes = elapsedMilliseconds / 60000;
+  return minutes > 0 ? cardsDrawn / minutes : 0;
+}
+
+function calculateAverageRoundTime(
+  cardsDrawn: number,
+  numberOfPlayers: number,
+  numberOfRounds: number,
+  elapsedMilliseconds: number,
+  done: boolean,
+): number {
+  if (numberOfPlayers <= 0 || elapsedMilliseconds < 5000) {
+    return 0;
+  }
+
+  if (done) {
+    const rounds = numberOfRounds || 13;
+    return rounds > 0 ? elapsedMilliseconds / rounds : 0;
+  }
+
+  // Require at least one full round of draws before reporting average round time
+  if (cardsDrawn < numberOfPlayers) {
+    return 0;
+  }
+
+  const roundsPlayed = cardsDrawn / numberOfPlayers;
+  return roundsPlayed > 0 ? elapsedMilliseconds / roundsPlayed : 0;
+}
 
 // Stable across the app's lifetime so resetting the metrics state (e.g. when a new
 // game starts) never leaves the game slice with stale/no-op implementations.
@@ -99,6 +138,29 @@ const GetElapsedTurnTime = (): number => {
   return Math.max(0, Date.now() - game.turnStartTimestamp);
 };
 
+const GetCardsPerMinute = (): number => {
+  const metrics = MetricsStore.getState();
+  const elapsedMs = GetElapsedGameTime();
+
+  return calculateCardsPerMinute(metrics.game.numberOfCardsDrawn, elapsedMs);
+};
+
+const GetAverageRoundTime = (): number => {
+  const game = useGame.getState();
+  const metrics = MetricsStore.getState();
+  const elapsedMs = GetElapsedGameTime();
+  const numberOfPlayers = game.players.length || metrics.game.numberOfPlayers;
+  const numberOfRounds = game.numberOfRounds || 13;
+
+  return calculateAverageRoundTime(
+    metrics.game.numberOfCardsDrawn,
+    numberOfPlayers,
+    numberOfRounds,
+    elapsedMs,
+    metrics.game.done,
+  );
+};
+
 const createInitialMetricsState = (): MetricsState => ({
   players: [],
   game: {
@@ -116,6 +178,8 @@ const createInitialMetricsState = (): MetricsState => ({
 
     GetElapsedGameTime,
     GetElapsedTurnTime,
+    GetAverageRoundTime,
+    GetCardsPerMinute,
   },
 });
 
@@ -439,6 +503,8 @@ const useGameMetrics = () => {
 };
 
 export {
+  calculateAverageRoundTime,
+  calculateCardsPerMinute,
   calculateCardsPerPlayer,
   calculateLeaderboard,
   calculateMinMaxSips,

@@ -32,7 +32,11 @@ import useSettings, {
   type ThemeMode,
 } from "../../../stores/settings";
 import { useSharedControl } from "../../../stores/sharedControl";
-import { secondsToHHMMSS, secondsToHHMMSSsss } from "../../../utilities/time";
+import {
+  formatRoundRate,
+  secondsToHHMMSS,
+  secondsToHHMMSSsss,
+} from "../../../utilities/time";
 import DNFDialog from "./DNFDialog";
 import ExitGameDialog from "./ExitGameDialog";
 import SharedControlDialog from "./SharedControlDialog";
@@ -126,6 +130,8 @@ const Header: FunctionComponent = () => {
 
   const turnTimeRef = useRef<HTMLElement>(null);
   const gameTimeRef = useRef<HTMLElement>(null);
+  const avgRoundTimeRef = useRef<HTMLElement>(null);
+  const cardsPerMinRef = useRef<HTMLElement>(null);
 
   // The clocks are written straight to the DOM instead of through state: they
   // tick every frame and re-rendering the whole header that often is wasteful.
@@ -141,6 +147,18 @@ const Header: FunctionComponent = () => {
       gameTimeRef.current,
       secondsToHHMMSS(gameMetrics.GetElapsedGameTime()),
     );
+
+    const avgRoundMs = gameMetrics.GetAverageRoundTime();
+    setTextContent(
+      avgRoundTimeRef.current,
+      avgRoundMs > 0 ? formatRoundRate(avgRoundMs) : "-",
+    );
+
+    const cpm = gameMetrics.GetCardsPerMinute();
+    setTextContent(
+      cardsPerMinRef.current,
+      cpm > 0 ? `${cpm.toFixed(1)} cards / min` : "-",
+    );
   }, [gameMetrics]);
 
   useLayoutEffect(updateTimes, [updateTimes]);
@@ -154,8 +172,8 @@ const Header: FunctionComponent = () => {
           backgroundColor: "primary.main",
           color: "primary.contrastText",
           padding: 1,
-          paddingLeft: 2,
-          paddingRight: 2,
+          paddingLeft: { xs: 1.5, sm: 2 },
+          paddingRight: { xs: 1.5, sm: 2 },
           borderRadius: 2,
           border: "1px solid rgba(255, 255, 255, 0.12)",
           boxShadow: "none",
@@ -288,33 +306,54 @@ const Header: FunctionComponent = () => {
           direction="row"
           sx={{
             alignItems: "center",
+            justifyContent: { xs: "space-between", sm: "center" },
+            width: { xs: "100%", sm: "auto" },
             marginLeft: "auto",
             marginRight: "auto",
-            textAlign: "center",
           }}
         >
-          <Typography
-            variant="h5"
+          <Stack
             sx={{
-              [theme.breakpoints.down("sm")]: {
-                fontSize: 12,
-              },
+              textAlign: { xs: "left", sm: "center" },
+              alignItems: { xs: "flex-start", sm: "center" },
+              minWidth: 0,
             }}
           >
-            Round {gameMetrics.currentRound}/{game.numberOfRounds}
-          </Typography>
+            <Typography
+              variant="h5"
+              sx={{
+                fontSize: { xs: 14, sm: 24 },
+                fontWeight: { xs: 600, sm: "inherit" },
+                lineHeight: { xs: 1.2, sm: "inherit" },
+                whiteSpace: "nowrap",
+              }}
+            >
+              Round {gameMetrics.currentRound}/{game.numberOfRounds}
+            </Typography>
+            <Typography
+              ref={avgRoundTimeRef}
+              sx={{
+                fontSize: { xs: 11, sm: 13 },
+                opacity: 0.8,
+                mt: 0.25,
+                whiteSpace: "nowrap",
+              }}
+            />
+          </Stack>
 
           <Stack
             sx={{
               textAlign: "center",
-              marginLeft: { xs: 2, sm: 6 },
-              marginRight: { xs: 2, sm: 6 },
+              alignItems: "center",
+              marginLeft: { xs: 1, sm: 6 },
+              marginRight: { xs: 1, sm: 6 },
+              flexShrink: 0,
             }}
           >
             <Typography
               ref={turnTimeRef}
               sx={{
-                fontSize: { xs: 24, sm: 32 },
+                fontSize: { xs: 22, sm: 32 },
                 fontWeight: 600,
                 lineHeight: 1,
               }}
@@ -329,16 +368,34 @@ const Header: FunctionComponent = () => {
             />
           </Stack>
 
-          <Typography
-            variant="h5"
+          <Stack
             sx={{
-              [theme.breakpoints.down("sm")]: {
-                fontSize: 12,
-              },
+              textAlign: { xs: "right", sm: "center" },
+              alignItems: { xs: "flex-end", sm: "center" },
+              minWidth: 0,
             }}
           >
-            Card {gameMetrics.numberOfCardsDrawn}/{gameMetrics.numberOfCards}
-          </Typography>
+            <Typography
+              variant="h5"
+              sx={{
+                fontSize: { xs: 14, sm: 24 },
+                fontWeight: { xs: 600, sm: "inherit" },
+                lineHeight: { xs: 1.2, sm: "inherit" },
+                whiteSpace: "nowrap",
+              }}
+            >
+              Card {gameMetrics.numberOfCardsDrawn}/{gameMetrics.numberOfCards}
+            </Typography>
+            <Typography
+              ref={cardsPerMinRef}
+              sx={{
+                fontSize: { xs: 11, sm: 13 },
+                opacity: 0.8,
+                mt: 0.25,
+                whiteSpace: "nowrap",
+              }}
+            />
+          </Stack>
         </Stack>
 
         <Box

@@ -44,6 +44,61 @@ export const millisecondsToMMSSsss = (milliseconds: number): string => {
   return `${minutesStr}:${secondsStr}.${msStr}`;
 };
 
+export const formatDurationCompact = (milliseconds: number): string => {
+  const safeMs = Math.max(0, Math.floor(milliseconds || 0));
+  const totalSeconds = Math.round(safeMs / 1000);
+
+  if (totalSeconds < 60) {
+    return `${totalSeconds}s`;
+  }
+
+  const hours = Math.floor(totalSeconds / 3600);
+  const minutes = Math.floor((totalSeconds % 3600) / 60);
+  const seconds = totalSeconds % 60;
+
+  if (hours > 0) {
+    const minutesStr = minutes.toString().padStart(2, "0");
+    return `${hours}h ${minutesStr}m`;
+  }
+
+  const secondsStr = seconds.toString().padStart(2, "0");
+  return `${minutes}m ${secondsStr}s`;
+};
+
+export const formatRoundRate = (milliseconds: number): string => {
+  const safeMs = Math.max(0, Math.floor(milliseconds || 0));
+  if (safeMs === 0) {
+    return "-";
+  }
+
+  const totalSeconds = Math.round(safeMs / 1000);
+
+  if (totalSeconds < 60) {
+    return `${totalSeconds} s / round`;
+  }
+
+  const hours = Math.floor(totalSeconds / 3600);
+  const minutes = Math.floor((totalSeconds % 3600) / 60);
+  const seconds = totalSeconds % 60;
+
+  if (hours > 0) {
+    const parts: string[] = [`${hours}h`];
+    if (minutes > 0) {
+      parts.push(`${minutes}m`);
+    }
+    if (seconds > 0) {
+      parts.push(`${seconds}s`);
+    }
+    return `${parts.join(" ")} / round`;
+  }
+
+  if (seconds === 0) {
+    return `${minutes}m / round`;
+  }
+
+  return `${minutes}m ${seconds}s / round`;
+};
+
 export const datetimeToddmmHHMMSS = (datetime: string): string => {
   const date = new Date(datetime);
   return date.toLocaleDateString() + " " + date.toLocaleTimeString();
