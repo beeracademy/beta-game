@@ -14,13 +14,22 @@ mockInstance.interceptors.request.use((request) => {
   });
 });
 
+const baseURL = import.meta.env.VITE_API_BASE_URL;
+
+// In development the API is reached through the Vite proxy, i.e. same-origin,
+// where Django's session/CSRF cookies need to be sent along. In production the
+// API lives on a different origin which does not reply with
+// "Access-Control-Allow-Credentials", so sending credentials there makes every
+// request fail CORS.
+const isSameOrigin = !baseURL || baseURL.startsWith("/");
+
 const realInstance = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL,
+  baseURL,
   // Django's CSRF middleware reads the token from the "csrftoken" cookie and
   // expects it echoed back in the "X-CSRFToken" header. Axios only does this
   // automatically for its own default cookie/header names (XSRF-TOKEN /
   // X-XSRF-TOKEN), so we need to point it at Django's names explicitly.
-  withCredentials: true,
+  withCredentials: isSameOrigin,
   xsrfCookieName: "csrftoken",
   xsrfHeaderName: "X-CSRFToken",
 });
