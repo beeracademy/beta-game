@@ -232,7 +232,7 @@ const MobileStandings: FunctionComponent = () => {
 
               <LinearProgress
                 variant="determinate"
-                value={(sipsLeft / game.sipsInABeer) * 100}
+                value={(sipsIntoBeer / game.sipsInABeer) * 100}
                 sx={{
                   height: 8,
                   borderRadius: 4,
