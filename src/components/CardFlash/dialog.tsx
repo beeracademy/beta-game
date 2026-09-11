@@ -10,11 +10,13 @@ import { type Card, getCardImageURI } from "../../models/card";
 interface CardFlashDialogProps {
   open: boolean;
   card: Card;
+  rankedPhoto?: string;
 }
 
 const CardFlashDialog: FunctionComponent<CardFlashDialogProps> = ({
   open,
   card,
+  rankedPhoto,
 }) => {
   const [cardImageURI, setCardImageURI] = useState<string | undefined>(
     undefined,
@@ -87,6 +89,25 @@ const CardFlashDialog: FunctionComponent<CardFlashDialogProps> = ({
               },
             }}
           />
+          {rankedPhoto && (
+            // overlays the top-ranked player's avatar in the center of the face card,
+            // matching the card's own splash-in animation
+            <Box
+              component="img"
+              src={rankedPhoto}
+              sx={{
+                position: "absolute",
+                width: "60%",
+                height: "70%",
+                objectFit: "cover",
+                border: "1px solid #000",
+                borderRadius: "4px",
+                pointerEvents: "none",
+                animation:
+                  "cardSplashIn 0.45s cubic-bezier(0.34, 1.56, 0.64, 1)",
+              }}
+            />
+          )}
         </Box>
       )}
     </Dialog>

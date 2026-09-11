@@ -8,8 +8,13 @@ export interface RankedCardResponse {
   ranking_value: string;
 }
 
-export async function getRankedCards(): Promise<RankedCardResponse[]> {
-  const response = await client.get<RankedCardResponse[]>("/api/ranked_cards/");
+// Keyed by "<suit>-<value>", e.g. "H-14", matching the face card being drawn
+export async function getRankedCards(): Promise<
+  Record<string, RankedCardResponse>
+> {
+  const response = await client.get<Record<string, RankedCardResponse>>(
+    "/api/ranked_cards/",
+  );
   return response.data;
 }
 
