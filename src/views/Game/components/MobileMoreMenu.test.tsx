@@ -20,7 +20,6 @@ describe("MobileMoreMenu", () => {
   const defaultProps = {
     anchorEl: dummyAnchor,
     onClose: vi.fn(),
-    onOpenChugs: vi.fn(),
     onOpenSharedControl: vi.fn(),
     onOpenChat: vi.fn(),
     onExitGame: vi.fn(),

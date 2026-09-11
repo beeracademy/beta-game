@@ -21,6 +21,7 @@ const MobileNowDrawing: FunctionComponent = () => {
 				color: "text.secondary",
 				paddingX: 0.5,
 				textAlign: "center",
+				flexShrink: 0,
 			}}
 		>
 			waiting for <strong>{player.username}</strong>

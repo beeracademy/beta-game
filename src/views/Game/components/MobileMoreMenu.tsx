@@ -11,7 +11,6 @@ import {
 import type { FunctionComponent } from "react";
 import { BsMoonStarsFill } from "react-icons/bs";
 import { FaCommentDots } from "react-icons/fa";
-import { GiBeerBottle } from "react-icons/gi";
 import { IoLogoGameControllerB } from "react-icons/io";
 import {
   IoColorPaletteOutline,
@@ -27,7 +26,6 @@ import type { ThemeMode } from "../../../stores/settings";
 interface MobileMoreMenuProps {
   anchorEl: HTMLElement | null;
   onClose: () => void;
-  onOpenChugs: () => void;
   onOpenSharedControl: () => void;
   onOpenChat: () => void;
   onExitGame: () => void;
@@ -41,7 +39,6 @@ interface MobileMoreMenuProps {
 export const MobileMoreMenu: FunctionComponent<MobileMoreMenuProps> = ({
   anchorEl,
   onClose,
-  onOpenChugs,
   onOpenSharedControl,
   onOpenChat,
   onExitGame,
@@ -117,37 +114,6 @@ export const MobileMoreMenu: FunctionComponent<MobileMoreMenuProps> = ({
           </Button>
         )}
 
-        <Button
-          fullWidth
-          variant="text"
-          color="inherit"
-          startIcon={
-            <Box
-              sx={{
-                width: 16,
-                display: "flex",
-                justifyContent: "center",
-              }}
-            >
-              <GiBeerBottle size={18} />
-            </Box>
-          }
-          onClick={onOpenChugs}
-          sx={{
-            justifyContent: "flex-start",
-            borderRadius: 2,
-            paddingX: 1.5,
-            paddingY: 1.5,
-            fontSize: 15,
-            fontWeight: 600,
-            "& .MuiButton-startIcon": {
-              marginLeft: 0,
-              marginRight: 1.75,
-            },
-          }}
-        >
-          Chugs
-        </Button>
 
         {!isRemote && !isOffline && (
           <Button

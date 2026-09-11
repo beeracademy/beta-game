@@ -48,7 +48,7 @@ const MobileStandings: FunctionComponent = () => {
   const isFirstRound = gameMetrics.currentRound === 1;
 
   return (
-    <Stack spacing={1} sx={{ width: "100%" }}>
+    <Stack spacing={1} sx={{ width: "100%", pb: 1.5 }}>
       {game.players.map((player, index) => {
         const metrics = playerMetrics[index];
         const isDNF = game.dnf_player_indexes.includes(index);
@@ -90,6 +90,8 @@ const MobileStandings: FunctionComponent = () => {
               opacity: isDNF ? 0.5 : 1,
               textAlign: "left",
               justifyContent: "flex-start",
+              width: "100%",
+              flexShrink: 0,
             }}
           >
             {isActive && (

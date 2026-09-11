@@ -130,7 +130,7 @@ const PreGameScreen: FunctionComponent<PreGameScreenProps> = ({
             justifyContent: isMobile ? "flex-start" : "center",
             alignItems: isMobile ? "stretch" : "center",
             gap: isMobile ? 1 : 3,
-            py: isMobile ? 0 : 2,
+            py: 2,
           }}
         >
           {orderedPlayers.map((player, i) => (

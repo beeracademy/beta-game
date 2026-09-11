@@ -30,14 +30,19 @@ import { useSharedControl } from "../../stores/sharedControl";
 import CardInventory from "./components/CardInventory";
 import Chart from "./components/Chart";
 import ChugDialog from "./components/ChugDialog";
-import ChugsHistoryDialog from "./components/ChugsHistoryDialog";
 import ChugsList from "./components/ChugsList";
 import ExitGameDialog from "./components/ExitGameDialog";
 import GameFinishedDialog from "./components/GameFinishedDialog";
 import Header from "./components/Header";
+import MobileCardInventory from "./components/MobileCardInventory";
+import MobileChugsView from "./components/MobileChugsView";
+import MobileGraphView from "./components/MobileGraphView";
 import { MobileMoreMenu } from "./components/MobileMoreMenu";
 import MobileNowDrawing from "./components/MobileNowDrawing";
 import MobileStandings from "./components/MobileStandings";
+import MobileViewSelector, {
+	type MobileViewType,
+} from "./components/MobileViewSelector";
 import PlayerList from "./components/PlayerList";
 import SharedControlDialog from "./components/SharedControlDialog";
 import GameTable from "./components/Table";
@@ -58,7 +63,7 @@ const GameView: FunctionComponent = () => {
 	const [mobileSharedControlDialogOpen, setMobileSharedControlDialogOpen] =
 		useState(false);
 	const [mobileExitDialogOpen, setMobileExitDialogOpen] = useState(false);
-	const [mobileChugsDialogOpen, setMobileChugsDialogOpen] = useState(false);
+	const [mobileView, setMobileView] = useState<MobileViewType>("players");
 
 	const cardFlasher = useCardFlash();
 	const textFlasher = useTextFlash();
@@ -420,7 +425,10 @@ const GameView: FunctionComponent = () => {
 				>
 					<Header />
 
-					<MobileNowDrawing />
+					<MobileViewSelector
+						activeView={mobileView}
+						onChange={setMobileView}
+					/>
 
 					<Box
 						sx={{
@@ -430,11 +438,35 @@ const GameView: FunctionComponent = () => {
 							minHeight: 0,
 							gap: 1.5,
 							overflowY: "auto",
-							paddingTop: 1,
-							paddingBottom: 1,
+							overflowX: "hidden",
+							WebkitOverflowScrolling: "touch",
+							overscrollBehaviorY: "contain",
+							paddingTop: 0.25,
+							paddingBottom: 0.5,
+							scrollbarWidth: "thin",
+							"&::-webkit-scrollbar": {
+								width: 4,
+							},
+							"&::-webkit-scrollbar-thumb": {
+								backgroundColor: (t) =>
+									t.palette.mode === "dark"
+										? "rgba(255, 255, 255, 0.2)"
+										: "rgba(0, 0, 0, 0.2)",
+								borderRadius: 2,
+							},
 						}}
 					>
-						<MobileStandings />
+						{mobileView === "players" && (
+							<>
+								<MobileNowDrawing />
+								<MobileStandings />
+							</>
+						)}
+						{mobileView === "cards" && (
+							<MobileCardInventory onCardClick={drawCard} />
+						)}
+						{mobileView === "chugs" && <MobileChugsView />}
+						{mobileView === "graph" && <MobileGraphView />}
 					</Box>
 
 					<Button
@@ -442,7 +474,7 @@ const GameView: FunctionComponent = () => {
 						color="primary"
 						fullWidth
 						disabled={isGameDone}
-						sx={{ height: 60, fontSize: 20 }}
+						sx={{ height: 60, fontSize: 20, flexShrink: 0 }}
 						onClick={drawCard}
 					>
 						Draw card
@@ -452,7 +484,7 @@ const GameView: FunctionComponent = () => {
 						variant="text"
 						color="inherit"
 						fullWidth
-						sx={{ height: 40, color: "text.secondary" }}
+						sx={{ height: 40, color: "text.secondary", flexShrink: 0 }}
 						onClick={(e) => setMobileMenuAnchor(e.currentTarget)}
 					>
 						<BsThreeDotsVertical size={18} style={{ marginRight: 8 }} />
@@ -462,10 +494,6 @@ const GameView: FunctionComponent = () => {
 					<MobileMoreMenu
 						anchorEl={mobileMenuAnchor}
 						onClose={() => setMobileMenuAnchor(null)}
-						onOpenChugs={() => {
-							setMobileMenuAnchor(null);
-							setMobileChugsDialogOpen(true);
-						}}
 						onOpenSharedControl={() => {
 							setMobileMenuAnchor(null);
 							setMobileSharedControlDialogOpen(true);
@@ -485,11 +513,6 @@ const GameView: FunctionComponent = () => {
 					<SharedControlDialog
 						open={mobileSharedControlDialogOpen}
 						onClose={() => setMobileSharedControlDialogOpen(false)}
-					/>
-
-					<ChugsHistoryDialog
-						open={mobileChugsDialogOpen}
-						onClose={() => setMobileChugsDialogOpen(false)}
 					/>
 
 					<ExitGameDialog
