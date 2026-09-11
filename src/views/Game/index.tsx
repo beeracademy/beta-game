@@ -303,8 +303,8 @@ const GameView: FunctionComponent = () => {
         sx={{
           display: "flex",
           flexDirection: "row",
-          width: "100vw",
-          minHeight: "100vh",
+          width: "100%",
+          height: "100%",
           backgroundColor: "background.default",
           backgroundImage: (t) =>
             t.palette.mode === "dark"
