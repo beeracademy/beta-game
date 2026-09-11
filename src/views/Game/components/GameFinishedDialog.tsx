@@ -11,7 +11,6 @@ import {
   Stack,
   TextField,
   Typography,
-  useMediaQuery,
   useTheme,
 } from "@mui/material";
 import {
@@ -44,9 +43,6 @@ interface GameFinishedDialogProps extends DialogProps {
 const GameFinishedDialog: FunctionComponent<GameFinishedDialogProps> = (
   props,
 ) => {
-  const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
-
   const sounds = useSounds();
 
   const {
@@ -180,7 +176,6 @@ const GameFinishedDialog: FunctionComponent<GameFinishedDialogProps> = (
         }}
         maxWidth="sm"
         fullWidth
-        fullScreen={isMobile}
         slotProps={{
           paper: {
             sx: {

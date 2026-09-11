@@ -13,6 +13,11 @@ import { useShallow } from "zustand/react/shallow";
 import Base14Sips from "../../../components/Base14Sips";
 import Bubbles from "../../../components/Bubbles";
 import { Crown, Jester } from "../../../components/Hats";
+import {
+  getCardASCIISymbol,
+  getCardSuitColor,
+  getCardValueSymbol,
+} from "../../../models/card";
 import useGame from "../../../stores/game";
 import { useGameMetrics, usePlayerMetrics } from "../../../stores/metrics";
 import MobilePlayerStatsDialog from "./MobilePlayerStatsDialog";
@@ -27,6 +32,7 @@ const MobileStandings: FunctionComponent = () => {
       players: state.players,
       dnf_player_indexes: state.dnf_player_indexes,
       sipsInABeer: state.sipsInABeer,
+      draws: state.draws,
     })),
   );
 
@@ -52,6 +58,17 @@ const MobileStandings: FunctionComponent = () => {
         const color = playerColors[index] ?? playerColors[0];
         const sipsIntoBeer = totalSips % game.sipsInABeer;
         const sipsLeft = game.sipsInABeer - sipsIntoBeer;
+        const numberOfPlayers = game.players.length;
+        // A player's cards live at index, index + n, index + 2n, ... in the
+        // draw order, so the last one drawn is the highest such index present.
+        const playerDrawCount =
+          numberOfPlayers > 0
+            ? Math.floor((game.draws.length - 1 - index) / numberOfPlayers) + 1
+            : 0;
+        const lastCard =
+          playerDrawCount > 0
+            ? game.draws[(playerDrawCount - 1) * numberOfPlayers + index]
+            : undefined;
 
         return (
           <ButtonBase
@@ -226,6 +243,22 @@ const MobileStandings: FunctionComponent = () => {
                   <>
                     {sipsLeft} sip{sipsLeft === 1 ? "" : "s"} left in beer{" "}
                     {(metrics?.numberOfBeers ?? 0) + 1}
+                    {lastCard && (
+                      <>
+                        {", latest draw "}
+                        <Box
+                          component="span"
+                          sx={{
+                            color: isActive
+                              ? "inherit"
+                              : getCardSuitColor(lastCard, theme.palette.mode),
+                          }}
+                        >
+                          {getCardASCIISymbol(lastCard)}
+                        </Box>{" "}
+                        {getCardValueSymbol(lastCard.value)}
+                      </>
+                    )}
                   </>
                 )}
               </Typography>

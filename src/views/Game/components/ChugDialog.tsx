@@ -7,7 +7,6 @@ import {
 	DialogTitle,
 	Stack,
 	Typography,
-	useMediaQuery,
 	useTheme,
 } from "@mui/material";
 import {
@@ -70,7 +69,6 @@ interface ChugDialogProps extends DialogProps {}
 
 const ChugDialog: FunctionComponent<ChugDialogProps> = (props) => {
 	const theme = useTheme();
-	const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 	const sounds = useSounds();
 	const textFlasher = useTextFlash();
 
@@ -324,7 +322,6 @@ const ChugDialog: FunctionComponent<ChugDialogProps> = (props) => {
 		<Dialog
 			{...props}
 			fullWidth
-			fullScreen={isMobile}
 			maxWidth="sm"
 			onClose={() => {
 				buttonRef.current?.focus();

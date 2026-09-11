@@ -49,8 +49,6 @@ const NewGameForm: FunctionComponent<NewGameFormProps> = () => {
   };
 
   const startGame = async (players: Player[]) => {
-    setPreGameOpen(false);
-
     stopAll();
     play("baladada");
 
@@ -60,9 +58,13 @@ const NewGameForm: FunctionComponent<NewGameFormProps> = () => {
         numberOfRounds: NUMBER_OF_ROUNDS,
         sipsInABeer: SIP_IN_A_BEER,
       });
+      // On success we navigate away to the game, so there's no need to
+      // close the pre-game screen here (doing so would briefly flash the
+      // login form before the navigation takes effect).
     } catch (error) {
       console.error("[NewGameForm] Failed to start game:", error);
 
+      setPreGameOpen(false);
       stopAll();
       play("wilhelm_scream");
       setStartError(
