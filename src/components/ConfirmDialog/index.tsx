@@ -14,7 +14,7 @@ import { IoClose } from "react-icons/io5";
 interface ConfirmDialogProps {
   open: boolean;
   title: string;
-  message: string;
+  message: React.ReactNode;
   onConfirm: () => void;
   onCancel: () => void;
   confirmLabel?: string;

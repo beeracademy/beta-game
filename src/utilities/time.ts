@@ -65,10 +65,7 @@ export const formatDurationCompact = (milliseconds: number): string => {
   return `${minutes}m ${secondsStr}s`;
 };
 
-export const formatUnitRate = (
-  milliseconds: number,
-  unit: string,
-): string => {
+export const formatUnitRate = (milliseconds: number, unit: string): string => {
   const safeMs = Math.max(0, Math.floor(milliseconds || 0));
   if (safeMs === 0) {
     return "-";

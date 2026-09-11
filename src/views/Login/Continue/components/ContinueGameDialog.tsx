@@ -1,6 +1,7 @@
 import type { FunctionComponent } from "react";
 import type { Game } from "../../../../api/models/game";
 import ConfirmDialog from "../../../../components/ConfirmDialog";
+import FormattedTime from "../../../../components/FormattedTime";
 import { datetimeToddmmHHMMSS } from "../../../../utilities/time";
 
 interface ContinueGameDialogProps {
@@ -25,11 +26,13 @@ const ContinueGameDialog: FunctionComponent<ContinueGameDialogProps> = ({
     <ConfirmDialog
       open={open}
       title="Resume a game"
-      message={`Are you sure you want to resume game ${
-        game.id
-      } started at ${datetimeToddmmHHMMSS(
-        game.start_datetime,
-      )} with ${playerNames.join(", ")}?`}
+      message={
+        <>
+          Are you sure you want to resume game {game.id} started at{" "}
+          <FormattedTime value={datetimeToddmmHHMMSS(game.start_datetime)} />{" "}
+          with {playerNames.join(", ")}?
+        </>
+      }
       onCancel={onCancel}
       onConfirm={onConfirm}
     />

@@ -33,6 +33,7 @@ import { useSounds } from "../../../hooks/sounds";
 import type { Player } from "../../../models/player";
 import useGame from "../../../stores/game";
 import { mapToLocal } from "../../../stores/game.mapper";
+import FormattedTime from "../../../components/FormattedTime";
 import { datetimeToddmmHHMMSS } from "../../../utilities/time";
 import LoginHeaderActions from "../components/LoginHeaderActions";
 import ContinueGameDialog from "./components/ContinueGameDialog";
@@ -453,9 +454,13 @@ const ContinueGameView: FunctionComponent = () => {
                                   Game #{game.id}
                                 </Typography>
                               }
-                              secondary={datetimeToddmmHHMMSS(
-                                game.start_datetime,
-                              )}
+                              secondary={
+                                <FormattedTime
+                                  value={datetimeToddmmHHMMSS(
+                                    game.start_datetime,
+                                  )}
+                                />
+                              }
                             />
                             <Stack
                               direction="row"

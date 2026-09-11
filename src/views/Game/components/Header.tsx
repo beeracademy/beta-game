@@ -129,25 +129,37 @@ const Header: FunctionComponent = () => {
     }
   };
 
-  const turnTimeRef = useRef<HTMLElement>(null);
-  const gameTimeRef = useRef<HTMLElement>(null);
+  const turnHoursRef = useRef<HTMLElement>(null);
+  const turnMinutesRef = useRef<HTMLElement>(null);
+  const turnSecondsRef = useRef<HTMLElement>(null);
+  const turnMsRef = useRef<HTMLElement>(null);
+  const gameHoursRef = useRef<HTMLElement>(null);
+  const gameMinutesRef = useRef<HTMLElement>(null);
+  const gameSecondsRef = useRef<HTMLElement>(null);
   const avgRoundTimeRef = useRef<HTMLElement>(null);
   const avgCardTimeRef = useRef<HTMLElement>(null);
 
   // The clocks are written straight to the DOM instead of through state: they
   // tick every frame and re-rendering the whole header that often is wasteful.
+  // The ":" separators are static spans (see .time-colon) instead of part of
+  // the ticking text, since AUPassata's colon glyph needs a CSS nudge to look
+  // vertically centered.
   const updateTimes = useCallback(() => {
-    setTextContent(
-      turnTimeRef.current,
-      secondsToHHMMSSsss(
-        gameMetrics.done ? 0 : gameMetrics.GetElapsedTurnTime(),
-      ),
-    );
+    const [turnHours, turnMinutes, turnSecondsAndMs] = secondsToHHMMSSsss(
+      gameMetrics.done ? 0 : gameMetrics.GetElapsedTurnTime(),
+    ).split(":");
+    setTextContent(turnHoursRef.current, turnHours);
+    setTextContent(turnMinutesRef.current, turnMinutes);
+    const [turnSeconds, turnMs] = turnSecondsAndMs.split(".");
+    setTextContent(turnSecondsRef.current, turnSeconds);
+    setTextContent(turnMsRef.current, `.${turnMs}`);
 
-    setTextContent(
-      gameTimeRef.current,
-      secondsToHHMMSS(gameMetrics.GetElapsedGameTime()),
-    );
+    const [gameHours, gameMinutes, gameSeconds] = secondsToHHMMSS(
+      gameMetrics.GetElapsedGameTime(),
+    ).split(":");
+    setTextContent(gameHoursRef.current, gameHours);
+    setTextContent(gameMinutesRef.current, gameMinutes);
+    setTextContent(gameSecondsRef.current, gameSeconds);
 
     const avgRoundMs = gameMetrics.GetAverageRoundTime();
     setTextContent(
@@ -352,21 +364,32 @@ const Header: FunctionComponent = () => {
             }}
           >
             <Typography
-              ref={turnTimeRef}
               sx={{
                 fontSize: { xs: 22, sm: 32 },
                 fontWeight: 600,
                 lineHeight: 1,
               }}
-            />
+            >
+              <span ref={turnHoursRef} />
+              <span className="time-colon">:</span>
+              <span ref={turnMinutesRef} />
+              <span className="time-colon">:</span>
+              <span ref={turnSecondsRef} />
+              <span ref={turnMsRef} />
+            </Typography>
             <Typography
-              ref={gameTimeRef}
               sx={{
                 fontSize: { xs: 11, sm: 13 },
                 opacity: 0.8,
                 mt: 0.25,
               }}
-            />
+            >
+              <span ref={gameHoursRef} />
+              <span className="time-colon">:</span>
+              <span ref={gameMinutesRef} />
+              <span className="time-colon">:</span>
+              <span ref={gameSecondsRef} />
+            </Typography>
           </Stack>
 
           <Stack

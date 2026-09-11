@@ -17,6 +17,7 @@ import { useSounds } from "../../../hooks/sounds";
 import useGame from "../../../stores/game";
 import { useSharedControl } from "../../../stores/sharedControl";
 import { usePlayerMetricsByIndex } from "../../../stores/metrics";
+import FormattedTime from "../../../components/FormattedTime";
 import { secondsToHHMMSS } from "../../../utilities/time";
 
 interface MobilePlayerStatsDialogProps {
@@ -86,7 +87,13 @@ const MobilePlayerStatsDialog: FunctionComponent<
     ["Total sips", <Base14Sips key="total-sips" value={metrics.totalSips} />],
     ["Max sips", <Base14Sips key="max-sips" value={metrics.maxSips} />],
     ["Min sips", <Base14Sips key="min-sips" value={metrics.minSips} />],
-    ["Total time", secondsToHHMMSS(metrics.totalTime)],
+    [
+      "Total time",
+      <FormattedTime
+        key="total-time"
+        value={secondsToHHMMSS(metrics.totalTime)}
+      />,
+    ],
     ["Beers", metrics.numberOfBeers.toString()],
     ["Chugs", metrics.numberOfChugs.toString()],
   ];

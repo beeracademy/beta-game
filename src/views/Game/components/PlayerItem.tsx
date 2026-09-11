@@ -30,6 +30,7 @@ import {
 } from "../../../stores/metrics";
 import useSettings from "../../../stores/settings";
 import Base14Sips from "../../../components/Base14Sips";
+import FormattedTime from "../../../components/FormattedTime";
 import { secondsToHHMMSS } from "../../../utilities/time";
 import { useSounds } from "../../../hooks/sounds";
 
@@ -329,7 +330,11 @@ const PlayerItem: FunctionComponent<PlayerItemProps> = (props) => {
                       textAlign: "right",
                     }}
                   >
-                    {secondsToHHMMSS(playerMetrics.totalTime + elapsedTurnTime)}
+                    <FormattedTime
+                      value={secondsToHHMMSS(
+                        playerMetrics.totalTime + elapsedTurnTime,
+                      )}
+                    />
                   </ListItemText>
                 </ListItem>
               </List>
@@ -346,7 +351,11 @@ const PlayerItem: FunctionComponent<PlayerItemProps> = (props) => {
                 </Typography>
 
                 <Typography align="center" sx={{ fontSize: 18 }}>
-                  {secondsToHHMMSS(playerMetrics.totalTime + elapsedTurnTime)}
+                  <FormattedTime
+                    value={secondsToHHMMSS(
+                      playerMetrics.totalTime + elapsedTurnTime,
+                    )}
+                  />
                 </Typography>
               </Stack>
             )}

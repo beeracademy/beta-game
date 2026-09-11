@@ -31,6 +31,13 @@
   font-weight: bold;
 }
 
+// AUPassata's ":" glyph sits noticeably lower than a digit's vertical
+// center, so timers (00:00:00.000) nudge it up to look centered.
+.time-colon {
+  display: inline-block;
+  transform: translateY(-0.05em);
+}
+
 *,
 *::before,
 *::after {
