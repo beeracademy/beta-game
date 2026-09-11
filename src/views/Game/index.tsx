@@ -176,6 +176,17 @@ const GameView: FunctionComponent = () => {
       }
 
       if (e.code === "Space") {
+        const target = e.target as HTMLElement | null;
+        const tagName = target?.tagName;
+        // Don't hijack Space when typing in an input/textarea/contenteditable (e.g. chat)
+        if (
+          tagName === "INPUT" ||
+          tagName === "TEXTAREA" ||
+          target?.isContentEditable
+        ) {
+          return;
+        }
+
         e.preventDefault();
 
         if (spacePressedRef.current) {
