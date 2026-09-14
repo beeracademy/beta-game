@@ -31,8 +31,12 @@ interface MobileCardInventoryProps {
   onCardClick?: () => void;
 }
 
-export const MobileCardInventory: FunctionComponent<MobileCardInventoryProps> = () => {
-  const [selectedCardValue, setSelectedCardValue] = useState<number | null>(null);
+export const MobileCardInventory: FunctionComponent<
+  MobileCardInventoryProps
+> = () => {
+  const [selectedCardValue, setSelectedCardValue] = useState<number | null>(
+    null,
+  );
 
   const game = useGame(
     useShallow((state) => ({
@@ -225,7 +229,8 @@ export const MobileCardInventory: FunctionComponent<MobileCardInventoryProps> = 
             >
               <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
                 <Typography sx={{ fontWeight: 800, fontSize: 18 }}>
-                  {valueToName(selectedCardValue)} ({valueToSymbol(selectedCardValue)})
+                  {valueToName(selectedCardValue)} (
+                  {valueToSymbol(selectedCardValue)})
                 </Typography>
                 <Chip
                   label={
@@ -337,7 +342,8 @@ export const MobileCardInventory: FunctionComponent<MobileCardInventoryProps> = 
                               left: 0,
                               pointerEvents: "none",
                               zIndex: 2,
-                              filter: "drop-shadow(0px 1px 3px rgba(0, 0, 0, 0.6))",
+                              filter:
+                                "drop-shadow(0px 1px 3px rgba(0, 0, 0, 0.6))",
                               opacity: 0.55,
                             }}
                           />

@@ -1,9 +1,10 @@
 import { useEffect, useRef } from "react";
-import { useTextFlash } from "../../../components/TextFlash";
+import type { useTextFlash } from "../../../components/TextFlash";
 import {
   pickJesterMessage,
   pickKingMessage,
 } from "../../../components/TextFlash/messages";
+import { play } from "../../../hooks/sounds";
 import type { Card } from "../../../models/card";
 import type { Player } from "../../../models/player";
 import type { PlayerMetrics } from "../../../stores/metrics";
@@ -61,11 +62,14 @@ export const useLeaderboardAnnouncer = ({
 
     const prev = leaderboardRef.current;
 
+    let hatSwitched = false;
+
     if (leaderIndex !== -1 && leaderIndex !== prev.leader) {
       const name = players[leaderIndex]?.username;
       if (name) {
         textFlasher.flash(pickKingMessage(name), { variant: "king" });
       }
+      hatSwitched = true;
     }
 
     if (jesterIndex !== -1 && jesterIndex !== prev.jester) {
@@ -73,6 +77,11 @@ export const useLeaderboardAnnouncer = ({
       if (name) {
         textFlasher.flash(pickJesterMessage(name), { variant: "jester" });
       }
+      hatSwitched = true;
+    }
+
+    if (hatSwitched) {
+      play("hat");
     }
 
     leaderboardRef.current = { leader: leaderIndex, jester: jesterIndex };

@@ -4,14 +4,11 @@ import { MobileViewSelector } from "./MobileViewSelector";
 
 describe("MobileViewSelector", () => {
   it("renders all 4 tabs", () => {
-    render(
-      <MobileViewSelector
-        activeView="players"
-        onChange={vi.fn()}
-      />,
-    );
+    render(<MobileViewSelector activeView="players" onChange={vi.fn()} />);
 
-    expect(screen.getByRole("button", { name: /players/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: /players/i }),
+    ).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /cards/i })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /chugs/i })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /graph/i })).toBeInTheDocument();
@@ -19,12 +16,7 @@ describe("MobileViewSelector", () => {
 
   it("calls onChange when a tab is clicked", () => {
     const handleChange = vi.fn();
-    render(
-      <MobileViewSelector
-        activeView="players"
-        onChange={handleChange}
-      />,
-    );
+    render(<MobileViewSelector activeView="players" onChange={handleChange} />);
 
     fireEvent.click(screen.getByRole("button", { name: /cards/i }));
     expect(handleChange).toHaveBeenCalledWith("cards");

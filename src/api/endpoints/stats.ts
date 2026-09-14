@@ -12,9 +12,8 @@ export interface RankedCardResponse {
 export async function getRankedCards(): Promise<
   Record<string, RankedCardResponse>
 > {
-  const response = await client.get<Record<string, RankedCardResponse>>(
-    "/api/ranked_cards/",
-  );
+  const response =
+    await client.get<Record<string, RankedCardResponse>>("/api/ranked_cards/");
   return response.data;
 }
 

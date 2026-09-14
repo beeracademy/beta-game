@@ -41,7 +41,9 @@ export const MobileGraphView: FunctionComponent = () => {
           borderColor: "divider",
         }}
       >
-        <Box sx={{ flex: 1, minHeight: 0, width: "100%", touchAction: "pan-y" }}>
+        <Box
+          sx={{ flex: 1, minHeight: 0, width: "100%", touchAction: "pan-y" }}
+        >
           <Chart />
         </Box>
       </Card>
@@ -51,7 +53,13 @@ export const MobileGraphView: FunctionComponent = () => {
         <Typography
           variant="caption"
           color="text.secondary"
-          sx={{ fontWeight: 700, textTransform: "uppercase", letterSpacing: 0.5, mb: 1, display: "block" }}
+          sx={{
+            fontWeight: 700,
+            textTransform: "uppercase",
+            letterSpacing: 0.5,
+            mb: 1,
+            display: "block",
+          }}
         >
           Players & Cumulative Sips
         </Typography>
@@ -85,13 +93,23 @@ export const MobileGraphView: FunctionComponent = () => {
                   </Avatar>
                 }
                 label={
-                  <Box component="span" sx={{ display: "inline-flex", gap: 0.5 }}>
-                    <Typography component="span" sx={{ fontSize: 12, fontWeight: 600 }}>
+                  <Box
+                    component="span"
+                    sx={{ display: "inline-flex", gap: 0.5 }}
+                  >
+                    <Typography
+                      component="span"
+                      sx={{ fontSize: 12, fontWeight: 600 }}
+                    >
                       {player.username}
                     </Typography>
                     <Typography
                       component="span"
-                      sx={{ fontSize: 12, fontWeight: 700, color: "text.secondary" }}
+                      sx={{
+                        fontSize: 12,
+                        fontWeight: 700,
+                        color: "text.secondary",
+                      }}
                     >
                       ({sips})
                     </Typography>

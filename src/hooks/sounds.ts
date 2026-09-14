@@ -11,10 +11,10 @@ const SoundNames = [
   "bubbi_fuve",
   "cheering",
   "click",
-  "crown",
   "dick",
   "doublekill",
   "downunder",
+  "hat",
   "homosangen_fuve",
   "humiliation",
   "loser",
@@ -147,5 +147,5 @@ const useSounds = () => {
   return SOUNDS;
 };
 
-export { SoundNames, mute, pause, play, stop, stopAll, unmute, useSounds };
+export { mute, pause, play, SoundNames, stop, stopAll, unmute, useSounds };
 export type { SoundName };
