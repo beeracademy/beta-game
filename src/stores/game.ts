@@ -271,10 +271,7 @@ const useGame = create<GameState & GameActions>()(
           update.gameEndTimestamp = Date.now();
         }
 
-        // Don't update turn start timestamp if a chug has been drawn
-        if (card.value !== 14) {
-          update.turnStartTimestamp = Date.now();
-        }
+        update.turnStartTimestamp = Date.now();
 
         set(update);
 

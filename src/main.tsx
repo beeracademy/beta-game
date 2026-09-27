@@ -7,6 +7,7 @@ import { TextFlashProvider } from "./components/TextFlash";
 import "./index.scss";
 import Routes from "./routes";
 import useLocation from "./stores/location";
+import useRankedCards from "./stores/rankedCards";
 import { registerServiceWorker } from "./serviceWorkerRegistration";
 import ThemeProvider from "./theme/provider";
 
@@ -18,6 +19,9 @@ registerServiceWorker();
 
 // Prompt for location access up front so it's available when submitting a game
 useLocation.getState().RequestLocation();
+
+// Preload ranked cards so player photos on face cards are ready immediately
+useRankedCards.getState().fetchRankedCards();
 
 ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
   <BrowserRouter>

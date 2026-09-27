@@ -67,12 +67,11 @@ new-game/
 │   │   ├── Conditional/    # Utility wrapper for conditional rendering
 │   │   ├── ConfirmDialog/  # Accessible confirmation modal
 │   │   ├── Hats/           # Crown and Jester badges
-│   │   ├── MemeDialog/     # Giphy-powered meme modal
 │   │   ├── SettingsDialog/ # Application configuration modal
 │   │   ├── Terminal/       # In-game cheat code & diagnostic CLI
 │   │   └── TextFlash/      # Animated banners for killstreaks and announcements
 │   ├── contexts/           # React Contexts (SharedControl context & provider)
-│   ├── hooks/              # Custom React hooks (sounds, camera, preloader, idleTimer)
+│   ├── hooks/              # Custom React hooks (sounds, camera, preloader)
 │   ├── models/             # Domain models (Card, Player, Game, Location)
 │   ├── routes/             # Route definitions and GameGuard access control
 │   ├── stores/             # Zustand stores (game, metrics, settings, gamesPlayed, location)

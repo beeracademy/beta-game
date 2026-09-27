@@ -12,11 +12,9 @@ import { useNavigate } from "react-router-dom";
 import { useShallow } from "zustand/react/shallow";
 import { useCardFlash } from "../../components/CardFlash";
 import { GameChat } from "../../components/GameChat";
-import MemeDialog from "../../components/MemeDialog";
 import Terminal from "../../components/Terminal";
 import { useTextFlash } from "../../components/TextFlash";
 import { pickHypeMessage } from "../../components/TextFlash/messages";
-import useIdleTimer from "../../hooks/idleTimer";
 import { useSounds } from "../../hooks/sounds";
 import useChat from "../../stores/chat";
 import useGame from "../../stores/game";
@@ -46,6 +44,7 @@ import MobileViewSelector, {
 import PlayerList from "./components/PlayerList";
 import SharedControlDialog from "./components/SharedControlDialog";
 import GameTable from "./components/Table";
+import { useCardInactivityTimer } from "./hooks/useCardInactivityTimer";
 import { useHostRemoteControl } from "./hooks/useHostRemoteControl";
 import { useLeaderboardAnnouncer } from "./hooks/useLeaderboardAnnouncer";
 
@@ -55,7 +54,6 @@ const GameView: FunctionComponent = () => {
   const { isRemote, send: sendRemote } = useSharedControl();
 
   const [showTerminal, setShowTerminal] = useState(false);
-  const [showSleepyMeme, setShowSleepyMeme] = useState(false);
 
   const [mobileMenuAnchor, setMobileMenuAnchor] = useState<HTMLElement | null>(
     null,
@@ -77,6 +75,7 @@ const GameView: FunctionComponent = () => {
       ExitGame: state.Exit,
       players: state.players,
       startTimestamp: state.gameStartTimestamp,
+      turnStartTimestamp: state.turnStartTimestamp,
     })),
   );
 
@@ -125,21 +124,23 @@ const GameView: FunctionComponent = () => {
   const sounds = useSounds();
   const spacePressedRef = useRef(false);
 
-  const resetIdleTimer = useIdleTimer(
-    () => {
-      if (gameMetrics.chugging || gameMetrics.done) {
-        return;
-      }
-      setShowSleepyMeme(true);
-      sounds.play("tryk_paa_den_lange_tast");
-    },
-    1000 * 60 * 15 /* 15 minutes */,
+  const latestCard = game.cards[game.cards.length - 1];
+  const isChugActive = Boolean(
+    latestCard?.value === 14 &&
+    latestCard?.chug_start_start_delta_ms !== undefined &&
+    latestCard?.chug_end_start_delta_ms === undefined,
   );
 
-  const drawCard = useCallback(() => {
-    setShowSleepyMeme(false);
-    resetIdleTimer();
+  useCardInactivityTimer({
+    onInactive: () => {
+      sounds.play("tryk_paa_den_lange_tast");
+    },
+    turnStartTimestamp: game.turnStartTimestamp,
+    isChugActive,
+    isDone: gameMetrics.done,
+  });
 
+  const drawCard = useCallback(() => {
     // On a remote, proxy the draw through WebSocket
     if (isRemote) {
       sendRemote({ event: "DRAW_CARD" });
@@ -162,7 +163,7 @@ const GameView: FunctionComponent = () => {
     }
 
     cardFlasher.flash(card);
-  }, [isRemote, resetIdleTimer, sendRemote, game, cardFlasher, textFlasher]);
+  }, [isRemote, sendRemote, game, cardFlasher, textFlasher]);
 
   // Sync host state with remote clients over WebSocket
   useHostRemoteControl({
@@ -252,9 +253,6 @@ const GameView: FunctionComponent = () => {
       return;
     }
 
-    setShowSleepyMeme(false);
-    resetIdleTimer();
-
     const latestCard = game.cards[game.cards.length - 1];
     if (!latestCard) {
       return;
@@ -286,7 +284,6 @@ const GameView: FunctionComponent = () => {
     gameMetrics.numberOfCards,
     cardFlasher,
     textFlasher,
-    resetIdleTimer,
   ]);
 
   const showMobileExitDialog = () => {
@@ -398,15 +395,6 @@ const GameView: FunctionComponent = () => {
             onClose={() => {
               setShowTerminal(false);
             }}
-          />
-
-          <MemeDialog
-            open={showSleepyMeme}
-            onClose={() => {
-              setShowSleepyMeme(false);
-              resetIdleTimer();
-            }}
-            tag="sleepy boring snoring"
           />
         </Box>
 

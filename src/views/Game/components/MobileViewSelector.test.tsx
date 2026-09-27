@@ -1,6 +1,6 @@
 import { fireEvent, render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
-import { MobileViewSelector } from "./MobileViewSelector";
+import MobileViewSelector from "./MobileViewSelector";
 
 describe("MobileViewSelector", () => {
   it("renders all 4 tabs", () => {

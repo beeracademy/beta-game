@@ -7,11 +7,8 @@ import {
   useRef,
   useState,
 } from "react";
-import {
-  getRankedCards,
-  type RankedCardResponse,
-} from "../../api/endpoints/stats";
 import type { Card } from "../../models/card";
+import useRankedCards from "../../stores/rankedCards";
 import { CardFlashDialog } from "./dialog";
 
 const CardFlashContext = createContext({
@@ -39,35 +36,13 @@ export const CardFlashProvider: FunctionComponent<CardFlashProviderProps> = ({
 }) => {
   const [show, setShow] = useState(false);
   const [card, setCard] = useState<Card>();
-  const [rankedCards, setRankedCards] = useState<
-    Record<string, RankedCardResponse>
-  >({});
+  const rankedCards = useRankedCards((state) => state.rankedCards);
+  const fetchRankedCards = useRankedCards((state) => state.fetchRankedCards);
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
-    let cancelled = false;
-
-    getRankedCards()
-      .then((cards) => {
-        if (cancelled) {
-          return;
-        }
-        setRankedCards(cards);
-
-        // preload the overlay photos so they appear instantly when a card flashes
-        for (const rankedCard of Object.values(cards)) {
-          const image = new Image();
-          image.src = rankedCard.user_image;
-        }
-      })
-      .catch(() => {
-        // ranked cards are a cosmetic bonus; ignore failures
-      });
-
-    return () => {
-      cancelled = true;
-    };
-  }, []);
+    fetchRankedCards();
+  }, [fetchRankedCards]);
 
   useEffect(() => {
     return () => {

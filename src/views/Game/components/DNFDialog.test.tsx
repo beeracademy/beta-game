@@ -73,4 +73,19 @@ describe("DNFDialog", () => {
     });
     expect(setPlayerDNFSpy).not.toHaveBeenCalled();
   });
+
+  it("renders PlayerCross over the avatar for players marked as DNF", () => {
+    useGame.setState({
+      players: [
+        { id: 101, username: "Alice", token: "tok1" },
+        { id: 102, username: "Bob", token: "tok2" },
+      ],
+      dnf_player_indexes: [0],
+    });
+
+    render(<DNFDialog open={true} onClose={vi.fn()} />);
+
+    expect(screen.getByTestId("dnf-cross-0")).toBeInTheDocument();
+    expect(screen.queryByTestId("dnf-cross-1")).not.toBeInTheDocument();
+  });
 });

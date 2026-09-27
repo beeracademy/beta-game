@@ -1,7 +1,7 @@
 import { render, screen } from "@testing-library/react";
 import { beforeEach, describe, expect, it } from "vitest";
 import useGame, { createInitialGameState } from "../../../stores/game";
-import { MobileChugsView } from "./MobileChugsView";
+import MobileChugsView from "./MobileChugsView";
 
 describe("MobileChugsView component", () => {
   beforeEach(() => {

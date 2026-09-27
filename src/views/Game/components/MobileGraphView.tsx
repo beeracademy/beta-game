@@ -13,7 +13,7 @@ import useGame from "../../../stores/game";
 import { usePlayerMetrics } from "../../../stores/metrics";
 import Chart from "./Chart";
 
-export const MobileGraphView: FunctionComponent = () => {
+const MobileGraphView: FunctionComponent = () => {
   const theme = useTheme();
 
   const players = useGame(useShallow((state) => state.players));

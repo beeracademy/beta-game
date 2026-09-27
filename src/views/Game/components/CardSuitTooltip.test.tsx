@@ -88,4 +88,63 @@ describe("CardSuitTooltip component", () => {
     expect(screen.getByTestId("crossout-S")).toBeInTheDocument();
     expect(screen.getByTestId("crossout-C")).toBeInTheDocument();
   });
+
+  it("renders player picture on face card thumbnails when ranked photo exists", () => {
+    const mockRankedCards = {
+      "S-12": {
+        user_id: 1,
+        user_username: "Alice",
+        user_image: "/avatars/alice.png",
+        ranking_name: "Queen of Spades",
+        ranking_value: "100",
+      },
+    };
+
+    render(
+      <CardSuitTooltip
+        cardValue={12}
+        symbol="Q"
+        cardsLeft={2}
+        suits={["S", "C"]}
+        draws={[]}
+        players={players}
+        rankedCards={mockRankedCards}
+      />,
+    );
+
+    const spadePhoto = screen.getByTestId("ranked-photo-S");
+    expect(spadePhoto).toBeInTheDocument();
+    expect(spadePhoto).toHaveAttribute("src", "/avatars/alice.png");
+
+    // Club does not have a ranked photo
+    expect(screen.queryByTestId("ranked-photo-C")).not.toBeInTheDocument();
+  });
+
+  it("renders player picture with grayscale styling when face card is drawn", () => {
+    const mockRankedCards = {
+      "S-12": {
+        user_id: 1,
+        user_username: "Alice",
+        user_image: "/avatars/alice.png",
+        ranking_name: "Queen of Spades",
+        ranking_value: "100",
+      },
+    };
+
+    render(
+      <CardSuitTooltip
+        cardValue={12}
+        symbol="Q"
+        cardsLeft={1}
+        suits={["S", "C"]}
+        draws={[{ value: 12, suit: "S" }]}
+        players={players}
+        rankedCards={mockRankedCards}
+      />,
+    );
+
+    const spadePhoto = screen.getByTestId("ranked-photo-S");
+    expect(spadePhoto).toBeInTheDocument();
+    expect(screen.getByTestId("crossout-S")).toBeInTheDocument();
+  });
 });

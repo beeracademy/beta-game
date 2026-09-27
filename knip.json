@@ -1,11 +1,7 @@
 {
   "$schema": "https://unpkg.com/knip@5/overview/config.json",
   "project": ["src/**/*.{ts,tsx,scss,sass}"],
-  "ignore": [
-    "src/api/endpoints/stats.ts",
-    "src/api/models/player.ts",
-    "src/models/game.ts"
-  ],
+  "ignore": ["src/api/models/player.ts", "src/models/game.ts"],
   "ignoreExportsUsedInFile": true,
   "rules": {
     "exports": "off",

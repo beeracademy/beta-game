@@ -11,10 +11,10 @@ describe("Service Worker (public/sw.js)", () => {
   });
 
   it("registers essential service worker event listeners", () => {
-    expect(swContent).toContain("self.addEventListener('install'");
-    expect(swContent).toContain("self.addEventListener('activate'");
-    expect(swContent).toContain("self.addEventListener('fetch'");
-    expect(swContent).toContain("self.addEventListener('message'");
+    expect(swContent).toMatch(/self\.addEventListener\(["']install["']/);
+    expect(swContent).toMatch(/self\.addEventListener\(["']activate["']/);
+    expect(swContent).toMatch(/self\.addEventListener\(["']fetch["']/);
+    expect(swContent).toMatch(/self\.addEventListener\(["']message["']/);
   });
 
   it("skips waiting immediately on install for non-blocking readiness", () => {
@@ -31,20 +31,24 @@ describe("Service Worker (public/sw.js)", () => {
   });
 
   it("supports preferred audio format optimization (ogg vs mp3)", () => {
-    expect(swContent).toContain("audioFormat === 'mp3' ? 'mp3' : 'ogg'");
+    expect(swContent).toMatch(
+      /audioFormat === ["']mp3["'] \? ["']mp3["'] : ["']ogg["']/,
+    );
     expect(swContent).toContain("`/sounds/${sound}.${format}`");
   });
 
   it("bypasses API, WebSocket, and Vite dev server paths", () => {
-    expect(swContent).toContain("url.pathname.startsWith('/api/')");
-    expect(swContent).toContain("url.pathname.startsWith('/api-token-auth')");
-    expect(swContent).toContain("url.pathname.startsWith('/ws')");
-    expect(swContent).toContain("url.pathname.startsWith('/@vite')");
-    expect(swContent).toContain("url.pathname.startsWith('/src/')");
+    expect(swContent).toMatch(/url\.pathname\.startsWith\(["']\/api\/["']\)/);
+    expect(swContent).toMatch(
+      /url\.pathname\.startsWith\(["']\/api-token-auth["']\)/,
+    );
+    expect(swContent).toMatch(/url\.pathname\.startsWith\(["']\/ws["']\)/);
+    expect(swContent).toMatch(/url\.pathname\.startsWith\(["']\/@vite["']\)/);
+    expect(swContent).toMatch(/url\.pathname\.startsWith\(["']\/src\/["']\)/);
   });
 
   it("provides offline fallback for navigation requests", () => {
-    expect(swContent).toContain("request.mode === 'navigate'");
-    expect(swContent).toContain("caches.match('/index.html'");
+    expect(swContent).toMatch(/request\.mode === ["']navigate["']/);
+    expect(swContent).toMatch(/caches\.match\(["']\/index\.html["']/);
   });
 });

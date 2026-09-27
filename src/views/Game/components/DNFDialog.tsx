@@ -111,13 +111,27 @@ const DNFDialog: FunctionComponent<DNFDialogProps> = (props) => {
                 component={ButtonBase}
                 onClick={() => toggle(index)}
               >
-                <Avatar
-                  src={player.image}
-                  sx={{
-                    width: 94,
-                    height: 94,
-                  }}
-                />
+                <Box sx={{ position: "relative" }}>
+                  <Avatar
+                    src={player.image}
+                    sx={{
+                      width: 94,
+                      height: 94,
+                    }}
+                  />
+
+                  {dnf_player_indexes.includes(index) && (
+                    <PlayerCross
+                      data-testid={`dnf-cross-${index}`}
+                      style={{
+                        position: "absolute",
+                        top: 0,
+                        left: 0,
+                        pointerEvents: "none",
+                      }}
+                    />
+                  )}
+                </Box>
 
                 <Typography
                   key={player.id}
@@ -132,8 +146,6 @@ const DNFDialog: FunctionComponent<DNFDialogProps> = (props) => {
                 >
                   {player.username}
                 </Typography>
-
-                {dnf_player_indexes.includes(index || 0) && <PlayerCross />}
               </Box>
             );
           })}

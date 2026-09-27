@@ -5,7 +5,7 @@ import { getCardASCIISymbol, getCardSuitColor } from "../../../models/card";
 import useGame from "../../../stores/game";
 import { millisecondsToMMSSsss } from "../../../utilities/time";
 
-export const MobileChugsView: FunctionComponent = () => {
+const MobileChugsView: FunctionComponent = () => {
   const theme = useTheme();
 
   const game = useGame(

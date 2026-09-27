@@ -9,7 +9,7 @@ import {
   Stack,
   Typography,
 } from "@mui/material";
-import { type FunctionComponent, useState } from "react";
+import { type FunctionComponent, useEffect, useState } from "react";
 import { IoClose } from "react-icons/io5";
 import { useShallow } from "zustand/react/shallow";
 import {
@@ -25,18 +25,23 @@ import {
 } from "../../../models/card";
 import useGame from "../../../stores/game";
 import { useGameMetrics } from "../../../stores/metrics";
+import useRankedCards from "../../../stores/rankedCards";
 import PlayerCross from "./PlayerCross";
 
 interface MobileCardInventoryProps {
   onCardClick?: () => void;
 }
 
-export const MobileCardInventory: FunctionComponent<
-  MobileCardInventoryProps
-> = () => {
+const MobileCardInventory: FunctionComponent<MobileCardInventoryProps> = () => {
   const [selectedCardValue, setSelectedCardValue] = useState<number | null>(
     null,
   );
+  const rankedCards = useRankedCards((state) => state.rankedCards);
+  const fetchRankedCards = useRankedCards((state) => state.fetchRankedCards);
+
+  useEffect(() => {
+    fetchRankedCards();
+  }, [fetchRankedCards]);
 
   const game = useGame(
     useShallow((state) => ({
@@ -276,6 +281,10 @@ export const MobileCardInventory: FunctionComponent<
 
                   const suitName = getCardSuitName(card);
                   const isRed = suit === "H" || suit === "D";
+                  const rankedPhoto =
+                    selectedCardValue !== null
+                      ? rankedCards[`${suit}-${selectedCardValue}`]?.user_image
+                      : undefined;
 
                   return (
                     <Box
@@ -329,6 +338,32 @@ export const MobileCardInventory: FunctionComponent<
                             }),
                           }}
                         />
+
+                        {rankedPhoto && (
+                          <Box
+                            component="img"
+                            src={rankedPhoto}
+                            alt=""
+                            data-testid={`ranked-photo-${suit}`}
+                            sx={{
+                              position: "absolute",
+                              top: "50%",
+                              left: "50%",
+                              transform: "translate(-50%, -50%)",
+                              width: "60%",
+                              height: "70%",
+                              objectFit: "cover",
+                              border: "1px solid #000",
+                              borderRadius: "2px",
+                              pointerEvents: "none",
+                              zIndex: 1,
+                              ...(isDrawn && {
+                                filter: "grayscale(100%) contrast(0.8)",
+                                opacity: 0.35,
+                              }),
+                            }}
+                          />
+                        )}
 
                         {/* Cartoony cross overlay when drawn */}
                         {isDrawn && (

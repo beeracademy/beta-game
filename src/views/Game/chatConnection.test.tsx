@@ -59,9 +59,6 @@ vi.mock("./components/PlayerList", () => ({
 vi.mock("../../components/Terminal", () => ({
   default: () => <div data-testid="mock-terminal" />,
 }));
-vi.mock("../../components/MemeDialog", () => ({
-  default: () => <div data-testid="mock-meme-dialog" />,
-}));
 vi.mock("./components/MobileNowDrawing", () => ({
   default: () => <div data-testid="mock-mobile-now-drawing" />,
 }));
@@ -76,9 +73,6 @@ vi.mock("./components/GameFinishedDialog", () => ({
 }));
 vi.mock("./components/SharedControlDialog", () => ({
   default: () => <div data-testid="mock-shared-control-dialog" />,
-}));
-vi.mock("./components/ChugsHistoryDialog", () => ({
-  default: () => <div data-testid="mock-chugs-history-dialog" />,
 }));
 
 describe("GameView game chat connection", () => {

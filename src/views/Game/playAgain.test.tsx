@@ -75,9 +75,6 @@ vi.mock("./components/PlayerList", () => ({
 vi.mock("../../components/Terminal", () => ({
   default: () => <div data-testid="mock-terminal" />,
 }));
-vi.mock("../../components/MemeDialog", () => ({
-  default: () => <div data-testid="mock-meme-dialog" />,
-}));
 vi.mock("../../components/GameChat", () => ({
   GameChat: () => <div data-testid="mock-game-chat" />,
 }));

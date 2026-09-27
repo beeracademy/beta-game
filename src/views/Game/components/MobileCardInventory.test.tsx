@@ -2,7 +2,7 @@ import { fireEvent, render, screen } from "@testing-library/react";
 import { beforeEach, describe, expect, it } from "vitest";
 import useGame, { createInitialGameState } from "../../../stores/game";
 import { MetricsStore } from "../../../stores/metrics";
-import { MobileCardInventory } from "./MobileCardInventory";
+import MobileCardInventory from "./MobileCardInventory";
 
 describe("MobileCardInventory component", () => {
   beforeEach(() => {

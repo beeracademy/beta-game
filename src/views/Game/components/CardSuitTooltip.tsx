@@ -1,5 +1,6 @@
 import { Box, Paper, Stack, Typography, useTheme } from "@mui/material";
-import type { FunctionComponent } from "react";
+import { type FunctionComponent, useEffect } from "react";
+import type { RankedCardResponse } from "../../../api/endpoints/stats";
 import {
   type Card,
   type CardSuit,
@@ -11,6 +12,7 @@ import {
   valueToName,
 } from "../../../models/card";
 import type { Player } from "../../../models/player";
+import useRankedCards from "../../../stores/rankedCards";
 import PlayerCross from "./PlayerCross";
 
 interface CardSuitTooltipProps {
@@ -20,6 +22,7 @@ interface CardSuitTooltipProps {
   suits: CardSuit[];
   draws: Card[];
   players: Player[];
+  rankedCards?: Record<string, RankedCardResponse>;
 }
 
 const CardSuitTooltip: FunctionComponent<CardSuitTooltipProps> = ({
@@ -29,8 +32,17 @@ const CardSuitTooltip: FunctionComponent<CardSuitTooltipProps> = ({
   suits,
   draws,
   players,
+  rankedCards: propRankedCards,
 }) => {
   const theme = useTheme();
+  const storeRankedCards = useRankedCards((state) => state.rankedCards);
+  const fetchRankedCards = useRankedCards((state) => state.fetchRankedCards);
+
+  useEffect(() => {
+    fetchRankedCards();
+  }, [fetchRankedCards]);
+
+  const rankedCards = propRankedCards ?? storeRankedCards;
 
   return (
     <Paper
@@ -119,6 +131,7 @@ const CardSuitTooltip: FunctionComponent<CardSuitTooltipProps> = ({
 
           const suitName = getCardSuitName(card);
           const suitColor = getCardSuitColor(card, theme.palette.mode);
+          const rankedPhoto = rankedCards[`${suit}-${cardValue}`]?.user_image;
 
           return (
             <Box
@@ -177,6 +190,32 @@ const CardSuitTooltip: FunctionComponent<CardSuitTooltipProps> = ({
                     }),
                   }}
                 />
+
+                {rankedPhoto && (
+                  <Box
+                    component="img"
+                    src={rankedPhoto}
+                    alt={`${suitName} player avatar`}
+                    data-testid={`ranked-photo-${suit}`}
+                    sx={{
+                      position: "absolute",
+                      top: "50%",
+                      left: "50%",
+                      transform: "translate(-50%, -50%)",
+                      width: "60%",
+                      height: "70%",
+                      objectFit: "cover",
+                      border: "1px solid #000",
+                      borderRadius: "2px",
+                      pointerEvents: "none",
+                      zIndex: 1,
+                      ...(isDrawn && {
+                        filter: "grayscale(100%) contrast(0.8)",
+                        opacity: 0.35,
+                      }),
+                    }}
+                  />
+                )}
 
                 {/* DNF-style cartoony cross overlay when drawn */}
                 {isDrawn && (

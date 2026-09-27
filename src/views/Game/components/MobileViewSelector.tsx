@@ -11,7 +11,7 @@ interface MobileViewSelectorProps {
   onChange: (view: MobileViewType) => void;
 }
 
-export const MobileViewSelector: FunctionComponent<MobileViewSelectorProps> = ({
+const MobileViewSelector: FunctionComponent<MobileViewSelectorProps> = ({
   activeView,
   onChange,
 }) => {
