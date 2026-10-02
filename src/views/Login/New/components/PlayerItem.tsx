@@ -9,7 +9,7 @@ import {
   darken,
   useTheme,
 } from "@mui/material";
-import { FunctionComponent, useState } from "react";
+import { FunctionComponent, useRef, useState } from "react";
 import { ImCross } from "react-icons/im";
 import * as AuthAPI from "../../../../api/endpoints/authentication";
 import Conditional from "../../../../components/Conditional";
@@ -28,11 +28,16 @@ const PlayerItem: FunctionComponent<PlayerItemProps> = (props) => {
   const player = newGame.players[props.index];
 
   const [disabled, setDisabled] = useState(false);
+  const loggingInRef = useRef(false);
 
   const isOffline = newGame.offline;
 
+  if (!player) {
+    return null;
+  }
+
   const login = async () => {
-    if (newGame.offline) {
+    if (newGame.offline || disabled || loggingInRef.current || player?.ready) {
       return;
     }
 
@@ -41,8 +46,10 @@ const PlayerItem: FunctionComponent<PlayerItemProps> = (props) => {
     }
 
     const isPlayerWithSameUsernameLoggedIn = newGame.players.some(
-      (p) =>
-        p.username?.toLowerCase() === player.username?.toLowerCase() && p.ready,
+      (p, i) =>
+        i !== props.index &&
+        p?.username?.toLowerCase() === player.username?.toLowerCase() &&
+        p?.ready,
     );
 
     if (isPlayerWithSameUsernameLoggedIn) {
@@ -53,39 +60,41 @@ const PlayerItem: FunctionComponent<PlayerItemProps> = (props) => {
     }
 
     try {
+      loggingInRef.current = true;
       setDisabled(true);
 
       const resp = await AuthAPI.login(player.username, player.password || "");
 
-      newGame.setPlayer(props.index, {
-        ...player,
+      newGame.setPlayer(props.index, (prev) => ({
+        ...prev,
         id: resp.id,
         token: resp.token,
         image: resp.image,
         ready: true,
-      });
+      }));
     } catch (e) {
       console.error(e);
 
       play("snack");
     } finally {
+      loggingInRef.current = false;
       setDisabled(false);
     }
   };
 
   const updateUsername = (username: string) => {
-    newGame.setPlayer(props.index, {
-      ...player,
+    newGame.setPlayer(props.index, (prev) => ({
+      ...prev,
       username,
       ready: isOffline && username !== "",
-    });
+    }));
   };
 
   const updatePassword = (password: string) => {
-    newGame.setPlayer(props.index, {
-      ...player,
+    newGame.setPlayer(props.index, (prev) => ({
+      ...prev,
       password,
-    });
+    }));
   };
 
   const remove = () => {
@@ -136,9 +145,9 @@ const PlayerItem: FunctionComponent<PlayerItemProps> = (props) => {
                 backgroundColor: theme.palette.background.default,
               },
             }}
-            value={player.username || ""}
+            value={player?.username || ""}
             onChange={(e) => updateUsername(e.target.value)}
-            disabled={(player.ready && !isOffline) || disabled}
+            disabled={(player?.ready && !isOffline) || disabled}
             onKeyDown={(e) => {
               if (e.key === "Enter") {
                 login();
@@ -172,7 +181,7 @@ const PlayerItem: FunctionComponent<PlayerItemProps> = (props) => {
                     backgroundColor: theme.palette.background.default,
                   },
                 }}
-                value={player.password || ""}
+                value={player?.password || ""}
                 onChange={(e) => updatePassword(e.target.value)}
                 onBlur={login}
                 onKeyDown={(e) => {
@@ -180,7 +189,7 @@ const PlayerItem: FunctionComponent<PlayerItemProps> = (props) => {
                     login();
                   }
                 }}
-                disabled={player.ready || disabled}
+                disabled={player?.ready || disabled}
               />
             </>
           )}
@@ -193,7 +202,7 @@ const PlayerItem: FunctionComponent<PlayerItemProps> = (props) => {
                   height: 56,
                   borderRadius: 0,
                 }}
-                src={player.image}
+                src={player?.image}
               >
                 <CircularProgress color="inherit" size={24} />
               </Avatar>
@@ -204,14 +213,14 @@ const PlayerItem: FunctionComponent<PlayerItemProps> = (props) => {
                   height: 56,
                   borderRadius: 0,
                 }}
-                src={player.image}
+                src={player?.image}
               />
             )}
           </Conditional>
         </Stack>
       </Box>
 
-      <Conditional value={player.ready && !isOffline}>
+      <Conditional value={Boolean(player?.ready && !isOffline)}>
         <IconButton
           onClick={remove}
           sx={{

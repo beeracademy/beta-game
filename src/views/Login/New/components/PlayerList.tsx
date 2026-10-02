@@ -8,7 +8,7 @@ const PlayerList: FunctionComponent = () => {
 
   return (
     <Stack spacing={1}>
-      {Array.from(Array(newGame.numberOfPlayers).keys()).map((_, i) => {
+      {newGame.players.map((_, i) => {
         return <PlayerItem key={i} index={i} />;
       })}
     </Stack>

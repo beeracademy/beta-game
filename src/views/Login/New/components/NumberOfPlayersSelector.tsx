@@ -1,5 +1,5 @@
 import { ToggleButton, ToggleButtonGroup } from "@mui/material";
-import { FunctionComponent, useState } from "react";
+import { FunctionComponent, useEffect, useState } from "react";
 
 interface NumberOfPlayersSelectorProps {
   min: number;
@@ -12,6 +12,10 @@ const NumberOfPlayersSelector: FunctionComponent<
   NumberOfPlayersSelectorProps
 > = (props) => {
   const [value, setValue] = useState<number>(props.value);
+
+  useEffect(() => {
+    setValue(props.value);
+  }, [props.value]);
 
   return (
     <ToggleButtonGroup exclusive fullWidth size="small">

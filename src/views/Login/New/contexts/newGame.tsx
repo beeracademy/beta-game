@@ -22,7 +22,10 @@ interface NewGameContextType {
   ready: boolean;
 
   players: Player[];
-  setPlayer: (index: number, player: Player) => void;
+  setPlayer: (
+    index: number,
+    player: Player | ((prev: Player) => Player),
+  ) => void;
 
   numberOfPlayers: number;
   offline: boolean;
@@ -50,62 +53,80 @@ export const NewGameProvider: React.FC<NewGameProviderProps> = ({
 }) => {
   const [ready, setReady] = useState<boolean>(false);
 
-  const [numberOfPlayers, setNumberOfPlayers] = useState<number>(4);
   const [offline, setOffline] = useState<boolean>(false);
   const [title, setTitle] = useState<string>("New Game");
   const [wide, setWide] = useState<boolean>(false);
 
-  const [players, setPlayers] = useState<Player[]>(
-    new Array(numberOfPlayers).fill({}),
+  const [players, setPlayers] = useState<Player[]>(() =>
+    Array.from({ length: 4 }, () => ({
+      username: "",
+      ready: false,
+    })),
   );
 
+  const numberOfPlayers = players.length;
+
   useEffect(() => {
-    setReady(players.every((player) => player.ready));
+    setReady(players.length > 0 && players.every((player) => Boolean(player?.ready)));
   }, [players]);
 
-  const setPlayerHandler = (index: number, player: Player) => {
-    setPlayers([
-      ...players.slice(0, index),
-      player,
-      ...players.slice(index + 1),
-    ]);
+  const setPlayerHandler = (
+    index: number,
+    playerOrUpdater: Player | ((prev: Player) => Player),
+  ) => {
+    setPlayers((prev) => {
+      if (index >= prev.length) {
+        return prev;
+      }
+      const updatedPlayer =
+        typeof playerOrUpdater === "function"
+          ? playerOrUpdater(prev[index])
+          : playerOrUpdater;
+
+      return [
+        ...prev.slice(0, index),
+        updatedPlayer,
+        ...prev.slice(index + 1),
+      ];
+    });
   };
 
   const setNumberOfPlayersHandler = (number: number) => {
-    setNumberOfPlayers(number);
-
-    if (number < players.length) {
-      setPlayers(players.slice(0, number));
-    } else {
-      setPlayers([...players, ...new Array(number - players.length).fill({})]);
-    }
+    setPlayers((prev) => {
+      if (number < prev.length) {
+        return prev.slice(0, number);
+      } else {
+        const added = Array.from(
+          { length: number - prev.length },
+          () => ({
+            username: "",
+            ready: false,
+          }),
+        );
+        return [...prev, ...added];
+      }
+    });
   };
 
   const setOfflineHandler = (offline: boolean) => {
     setOffline(offline);
 
-    if (offline) {
-      setPlayers(
-        players.map((player, i) => {
+    setPlayers((prev) =>
+      prev.map((player, i) => {
+        if (offline) {
           return {
             id: i,
-            username: player.username,
+            username: player.username || "",
             ready: !!player.username,
           };
-        }),
-      );
-    }
-
-    if (!offline) {
-      setPlayers(
-        players.map((player) => {
+        } else {
           return {
-            username: player.username,
+            username: player.username || "",
             ready: false,
           };
-        }),
-      );
-    }
+        }
+      }),
+    );
   };
 
   return (
