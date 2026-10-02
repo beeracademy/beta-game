@@ -12,6 +12,7 @@ import { GiBeerBottle } from "react-icons/gi";
 import { useShallow } from "zustand/react/shallow";
 import Base14Sips from "../../../components/Base14Sips";
 import Bubbles from "../../../components/Bubbles";
+import { useCardFlash } from "../../../components/CardFlash";
 import { Crown, Jester } from "../../../components/Hats";
 import {
   getCardASCIISymbol,
@@ -26,6 +27,7 @@ import MobilePlayerStatsDialog from "./MobilePlayerStatsDialog";
 // combo which doesn't fit small screens.
 const MobileStandings: FunctionComponent = () => {
   const theme = useTheme();
+  const { show: isCardFlashing, wasRecentlyDismissed } = useCardFlash();
 
   const game = useGame(
     useShallow((state) => ({
@@ -43,7 +45,7 @@ const MobileStandings: FunctionComponent = () => {
   // plays out, instead of snapping to a fallback index.
   const [displayedIndex, setDisplayedIndex] = useState(0);
 
-  const playerColors = theme.player as Record<number, string>;
+  const playerColors = (theme.player ?? {}) as Record<number, string>;
 
   const isFirstRound = gameMetrics.currentRound === 1;
 
@@ -55,7 +57,8 @@ const MobileStandings: FunctionComponent = () => {
         const isActive =
           gameMetrics.activePlayerIndex === index && !gameMetrics.done;
         const totalSips = metrics?.totalSips || 0;
-        const color = playerColors[index] ?? playerColors[0];
+        const color =
+          playerColors[index] ?? playerColors[0] ?? theme.palette.primary.main;
         const sipsIntoBeer = totalSips % game.sipsInABeer;
         const sipsLeft = game.sipsInABeer - sipsIntoBeer;
         const numberOfPlayers = game.players.length;
@@ -74,6 +77,9 @@ const MobileStandings: FunctionComponent = () => {
           <ButtonBase
             key={index}
             onClick={() => {
+              if (isCardFlashing || wasRecentlyDismissed?.()) {
+                return;
+              }
               setSelectedIndex(index);
               setDisplayedIndex(index);
             }}

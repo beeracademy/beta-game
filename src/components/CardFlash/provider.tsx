@@ -2,6 +2,7 @@ import {
   createContext,
   type FunctionComponent,
   type ReactNode,
+  useCallback,
   useContext,
   useEffect,
   useRef,
@@ -11,10 +12,18 @@ import type { Card } from "../../models/card";
 import useRankedCards from "../../stores/rankedCards";
 import { CardFlashDialog } from "./dialog";
 
-const CardFlashContext = createContext({
+interface CardFlashContextType {
+  show: boolean;
+  flash: (newCard: Card, options?: flashCardOptions) => void;
+  hide: () => void;
+  wasRecentlyDismissed: () => boolean;
+}
+
+const CardFlashContext = createContext<CardFlashContextType>({
   show: false,
   flash: (_card: Card, _options?: flashCardOptions) => {},
   hide: () => {},
+  wasRecentlyDismissed: () => false,
 });
 
 export const useCardFlash = () => {
@@ -39,6 +48,7 @@ export const CardFlashProvider: FunctionComponent<CardFlashProviderProps> = ({
   const rankedCards = useRankedCards((state) => state.rankedCards);
   const fetchRankedCards = useRankedCards((state) => state.fetchRankedCards);
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const lastDismissedAtRef = useRef(0);
 
   useEffect(() => {
     fetchRankedCards();
@@ -52,28 +62,35 @@ export const CardFlashProvider: FunctionComponent<CardFlashProviderProps> = ({
     };
   }, []);
 
-  const flash = (newCard: Card, options?: flashCardOptions) => {
-    setCard(newCard);
-
+  const hide = useCallback(() => {
     if (timeoutRef.current) {
       clearTimeout(timeoutRef.current);
     }
-
-    timeoutRef.current = setTimeout(() => {
-      setShow(false);
-      setCard(undefined);
-    }, options?.duration || duration);
-
-    setShow(true);
-  };
-
-  const hide = () => {
-    if (timeoutRef.current) {
-      clearTimeout(timeoutRef.current);
-    }
+    lastDismissedAtRef.current = Date.now();
     setShow(false);
     setCard(undefined);
-  };
+  }, []);
+
+  const flash = useCallback(
+    (newCard: Card, options?: flashCardOptions) => {
+      setCard(newCard);
+
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+
+      timeoutRef.current = setTimeout(() => {
+        hide();
+      }, options?.duration || duration);
+
+      setShow(true);
+    },
+    [duration, hide],
+  );
+
+  const wasRecentlyDismissed = useCallback(() => {
+    return Date.now() - lastDismissedAtRef.current < 400;
+  }, []);
 
   return (
     <CardFlashContext.Provider
@@ -81,6 +98,7 @@ export const CardFlashProvider: FunctionComponent<CardFlashProviderProps> = ({
         show,
         flash,
         hide,
+        wasRecentlyDismissed,
       }}
     >
       {card && (
@@ -88,6 +106,7 @@ export const CardFlashProvider: FunctionComponent<CardFlashProviderProps> = ({
           open={show}
           card={card}
           rankedPhoto={rankedCards[`${card.suit}-${card.value}`]?.user_image}
+          onDismiss={hide}
         />
       )}
       {props.children}
