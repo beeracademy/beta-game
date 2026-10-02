@@ -194,6 +194,48 @@ describe("Metrics Store & Derivation", () => {
       expect(MetricsStore.getState().players).toEqual([]);
       expect(MetricsStore.getState().game.numberOfPlayers).toBe(0);
     });
+
+    it("does not advance currentRound while a chug is pending", async () => {
+      const samplePlayers: Player[] = [
+        { id: 1, username: "Alice", token: "tok1" },
+        { id: 2, username: "Bob", token: "tok2" },
+      ];
+      await useGame.getState().Start(samplePlayers, {
+        sipsInABeer: 14,
+        numberOfRounds: 2,
+        offline: true,
+      });
+
+      // 2 players, 13 card values per player deck size (26 total cards in deck).
+      // Round 1: card 0, card 1
+      // Round 2: card 2, card 3
+      // Card 1 is drawn by Bob (last player in round 1) and is an Ace (value 14).
+      useGame.setState({
+        shuffleIndices: Array.from({ length: 2 * 13 - 1 }, () => 0),
+        draws: [
+          { value: 5, suit: "S", start_delta_ms: 1000 },
+          { value: 14, suit: "H", start_delta_ms: 2000 }, // Bob's Ace in round 1
+        ],
+      });
+      MetricsStore.getState().Update();
+
+      // Bob hasn't finished chugging yet:
+      const midChugMetrics = MetricsStore.getState().game;
+      expect(midChugMetrics.chugging).toBe(true);
+      expect(midChugMetrics.currentRound).toBe(1); // STILL round 1!
+      expect(midChugMetrics.activePlayerIndex).toBe(1); // Bob is active
+
+      // Now Bob starts and completes the chug:
+      useGame.getState().StartChug();
+      useGame.getState().StopChug();
+
+      const postChugMetrics = MetricsStore.getState().game;
+      expect(postChugMetrics.chugging).toBe(false);
+      expect(postChugMetrics.currentRound).toBe(2); // Now round 2!
+      expect(postChugMetrics.activePlayerIndex).toBe(0); // Alice's turn in round 2
+
+      useGame.getState().Exit();
+    });
   });
 
   describe("Cards per minute & Average round time derivation", () => {

@@ -141,4 +141,51 @@ describe("Header", () => {
     // 2 players, 4 cards = 2 rounds in 60 seconds -> 30 s / round
     expect(screen.getByText(/30 s \/ round/)).toBeInTheDocument();
   });
+
+  it("does not advance round in Header when the last player of a round draws an Ace until chug completes", () => {
+    const now = Date.now();
+    const shuffle = Array.from({ length: 2 * 13 - 1 }, () => 0);
+    // 2 players, 13 rounds.
+    // Round 1 = cards 0, 1
+    // Round 2 = cards 2, 3
+    // Card 3 is an Ace drawn by the last player in round 2 (Bob).
+    useGame.setState({
+      gameStartTimestamp: now - 60000,
+      numberOfRounds: 13,
+      shuffleIndices: shuffle,
+      players: [
+        { id: 1, username: "Alice", token: "tok1" },
+        { id: 2, username: "Bob", token: "tok2" },
+      ],
+      draws: [
+        { value: 5, suit: "S", start_delta_ms: 10000 },
+        { value: 8, suit: "H", start_delta_ms: 25000 },
+        { value: 9, suit: "D", start_delta_ms: 45000 },
+        { value: 14, suit: "C", start_delta_ms: 55000 }, // Ace drawn, chug not ended!
+      ],
+    });
+
+    const { rerender } = render(
+      <MemoryRouter>
+        <Header />
+      </MemoryRouter>,
+    );
+
+    // Header must show Round 2/13, NOT Round 3/13!
+    expect(screen.getByText(/Round 2\/13/i)).toBeInTheDocument();
+    expect(screen.queryByText(/Round 3\/13/i)).not.toBeInTheDocument();
+
+    // Now start and complete the chug
+    useGame.getState().StartChug();
+    useGame.getState().StopChug();
+
+    rerender(
+      <MemoryRouter>
+        <Header />
+      </MemoryRouter>,
+    );
+
+    // Now that chug is complete, game has proceeded to Round 3
+    expect(screen.getByText(/Round 3\/13/i)).toBeInTheDocument();
+  });
 });

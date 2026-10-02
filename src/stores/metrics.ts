@@ -394,16 +394,18 @@ const MetricsStore = create<MetricsState & MetricsActions>()((set, get) => ({
     const numberOfCards = deck.length;
     const numberOfCardsDrawn = cardsDrawn.length;
 
+    const effectiveCardsDrawn = chugging
+      ? numberOfCardsDrawn - 1
+      : numberOfCardsDrawn;
+
     const done = numberOfCardsDrawn === numberOfCards;
 
     const currentRound = Math.min(
-      Math.floor(numberOfCardsDrawn / numberOfPlayers) + 1,
+      Math.floor(effectiveCardsDrawn / numberOfPlayers) + 1,
       numberOfRounds,
     );
 
-    const rawActiveIndex = chugging
-      ? numberOfCardsDrawn - 1
-      : numberOfCardsDrawn;
+    const rawActiveIndex = effectiveCardsDrawn;
     const activePlayerIndex =
       numberOfPlayers > 0
         ? ((rawActiveIndex % numberOfPlayers) + numberOfPlayers) %
@@ -440,7 +442,7 @@ const MetricsStore = create<MetricsState & MetricsActions>()((set, get) => ({
     const currentPlayerMetrics = get().players;
     const isNewRoundOrFirstCalculation =
       currentPlayerMetrics.length === 0 ||
-      cardsDrawn.length % numberOfPlayers === 0;
+      (effectiveCardsDrawn % numberOfPlayers === 0 && !chugging);
 
     const { isLeading: newLeading, isLast: newLast } =
       calculateLeaderboard(totalSips);
