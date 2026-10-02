@@ -1,4 +1,5 @@
 import {
+  CssBaseline,
   ThemeProvider as MuiThemeProvider,
   useMediaQuery,
 } from "@mui/material";
@@ -24,7 +25,10 @@ const ThemeProvider: FunctionComponent<ThemeProviderProps> = (props) => {
   }, [themeMode, prefersDarkMode]);
 
   return (
-    <MuiThemeProvider theme={resolvedTheme}>{props.children}</MuiThemeProvider>
+    <MuiThemeProvider theme={resolvedTheme}>
+      <CssBaseline />
+      {props.children}
+    </MuiThemeProvider>
   );
 };
 

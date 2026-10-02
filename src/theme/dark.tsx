@@ -172,6 +172,10 @@ dark.components = {
     styleOverrides: {
       root: {
         "& input": {
+          "&::placeholder": {
+            color: dark.palette.text.secondary,
+            opacity: 1,
+          },
           "&:-webkit-autofill": {
             // Hack to prevent autofill from changing the text color
             transitionDelay: "9999999999999999s",
@@ -179,6 +183,22 @@ dark.components = {
         },
       },
     },
+  },
+  MuiTypography: {
+    variants: [
+      {
+        props: { color: "text.secondary" },
+        style: {
+          color: dark.palette.text.secondary,
+        },
+      },
+      {
+        props: { color: "text.primary" },
+        style: {
+          color: dark.palette.text.primary,
+        },
+      },
+    ],
   },
 };
 

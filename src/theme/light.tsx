@@ -18,7 +18,7 @@ const light = createTheme({
     },
     text: {
       primary: "#121826",
-      secondary: "#a4a4a4",
+      secondary: "#556070",
     },
     info: {
       main: "#3498db",
@@ -171,6 +171,10 @@ light.components = {
     styleOverrides: {
       root: {
         "& input": {
+          "&::placeholder": {
+            color: light.palette.text.secondary,
+            opacity: 1,
+          },
           "&:-webkit-autofill": {
             // Hack to prevent autofill from changing the text color
             transitionDelay: "9999999999999999s",
@@ -178,6 +182,22 @@ light.components = {
         },
       },
     },
+  },
+  MuiTypography: {
+    variants: [
+      {
+        props: { color: "text.secondary" },
+        style: {
+          color: light.palette.text.secondary,
+        },
+      },
+      {
+        props: { color: "text.primary" },
+        style: {
+          color: light.palette.text.primary,
+        },
+      },
+    ],
   },
 };
 

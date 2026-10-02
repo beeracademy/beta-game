@@ -322,7 +322,7 @@ const GameView: FunctionComponent = () => {
           backgroundImage: (t) =>
             t.palette.mode === "dark"
               ? "linear-gradient(180deg, rgba(0, 0, 0, 0.18) 0%, transparent 12%, transparent 88%, rgba(0, 0, 0, 0.22) 100%), radial-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px)"
-              : "linear-gradient(180deg, rgba(0, 0, 0, 0.03) 0%, transparent 12%, transparent 88%, rgba(0, 0, 0, 0.04) 100%), radial-gradient(rgba(0, 0, 0, 0.05) 1px, transparent 1px)",
+              : "linear-gradient(180deg, rgba(0, 0, 0, 0.03) 0%, transparent 12%, transparent 88%, rgba(0, 0, 0, 0.04) 100%), radial-gradient(rgba(0, 0, 0, 0.08) 1px, transparent 1px)",
           backgroundSize: "100% 100%, 24px 24px",
           backgroundRepeat: "no-repeat, repeat",
           backgroundAttachment: "fixed",
@@ -470,9 +470,16 @@ const GameView: FunctionComponent = () => {
 
           <Button
             variant="text"
-            color="inherit"
             fullWidth
-            sx={{ height: 40, color: "text.secondary", flexShrink: 0 }}
+            sx={{
+              height: 40,
+              color: "text.secondary",
+              flexShrink: 0,
+              fontWeight: 600,
+              "&:hover": {
+                color: "text.primary",
+              },
+            }}
             onClick={(e) => setMobileMenuAnchor(e.currentTarget)}
           >
             <BsThreeDotsVertical size={18} style={{ marginRight: 8 }} />

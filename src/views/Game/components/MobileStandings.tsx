@@ -93,6 +93,7 @@ const MobileStandings: FunctionComponent = () => {
               borderRadius: 2,
               border: (t) => `1px solid ${t.palette.divider}`,
               backgroundColor: isActive ? color : "transparent",
+              color: "text.primary",
               opacity: isDNF ? 0.5 : 1,
               textAlign: "left",
               justifyContent: "flex-start",
@@ -240,10 +241,12 @@ const MobileStandings: FunctionComponent = () => {
               </Stack>
 
               <Typography
-                sx={{ fontSize: 11 }}
-                color={
-                  isActive ? "rgba(255, 255, 255, 0.85)" : "text.secondary"
-                }
+                sx={{
+                  fontSize: 11,
+                  color: isActive
+                    ? "rgba(255, 255, 255, 0.85)"
+                    : "text.secondary",
+                }}
               >
                 {isDNF ? (
                   "DNF"
