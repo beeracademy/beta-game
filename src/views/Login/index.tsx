@@ -48,15 +48,23 @@ const Wallpaper = memo(() => {
         left: 0,
         width: "100%",
         height: "100%",
-        opacity: 0.2,
         zIndex: -1,
         pointerEvents: "none",
-        backgroundImage: "url(/wallpaper/" + wallpaper + ".png)",
-        backgroundSize: "cover",
-        backgroundPosition: "center",
-        backgroundRepeat: "no-repeat",
+        backgroundColor: "#242424",
       }}
-    />
+    >
+      <Box
+        sx={{
+          width: "100%",
+          height: "100%",
+          opacity: 0.2,
+          backgroundImage: "url(/wallpaper/" + wallpaper + ".png)",
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+          backgroundRepeat: "no-repeat",
+        }}
+      />
+    </Box>
   );
 });
 
