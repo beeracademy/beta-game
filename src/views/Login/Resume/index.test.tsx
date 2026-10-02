@@ -6,7 +6,7 @@ import * as AuthAPI from "../../../api/endpoints/authentication";
 import * as GameAPI from "../../../api/endpoints/game";
 import type { Game } from "../../../api/models/game";
 import useGame, { createInitialGameState } from "../../../stores/game";
-import ContinueGameView from "./index";
+import ResumeGameView from "./index";
 
 const playMock = vi.fn();
 const navigateMock = vi.fn();
@@ -39,7 +39,7 @@ vi.mock("../../../api/endpoints/game", () => ({
   postResumeGame: vi.fn(),
 }));
 
-describe("ContinueGameView", () => {
+describe("ResumeGameView", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     localStorage.clear();
@@ -50,7 +50,7 @@ describe("ContinueGameView", () => {
     render(
       <HelmetProvider>
         <MemoryRouter>
-          <ContinueGameView />
+          <ResumeGameView />
         </MemoryRouter>
       </HelmetProvider>,
     );

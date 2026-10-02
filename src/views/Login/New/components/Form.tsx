@@ -172,7 +172,7 @@ const NewGameForm: FunctionComponent<NewGameFormProps> = () => {
         variant="outlined"
         color="inherit"
         size="large"
-        to="/login/continue"
+        to="/login/resume"
       >
         Resume a game
       </Button>

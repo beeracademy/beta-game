@@ -16,8 +16,8 @@ const NewGameCard: FunctionComponent = () => {
             ? { xs: "100%", sm: "min(92vw, 720px)", md: "min(90vw, 760px)" }
             : { xs: "100%", sm: 580, md: 600 },
           maxWidth: "100%",
-          height: { xs: "100%", md: "auto" },
-          maxHeight: { xs: "100%", md: "calc(100vh - 48px)" },
+          height: { xs: "100%", sm: "auto" },
+          maxHeight: { xs: "100%", sm: "calc(100vh - 48px)" },
           display: "flex",
           flexDirection: "column",
           borderRadius: { xs: 0, sm: 2 },

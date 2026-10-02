@@ -36,9 +36,9 @@ import { mapToLocal } from "../../../stores/game.mapper";
 import FormattedTime from "../../../components/FormattedTime";
 import { datetimeToddmmHHMMSS } from "../../../utilities/time";
 import LoginHeaderActions from "../components/LoginHeaderActions";
-import ContinueGameDialog from "./components/ContinueGameDialog";
+import ResumeGameDialog from "./components/ResumeGameDialog";
 
-const ContinueGameView: FunctionComponent = () => {
+const ResumeGameView: FunctionComponent = () => {
   const navigate = useNavigate();
   const { play } = useSounds();
   const Resume = useGame((state) => state.Resume);
@@ -165,8 +165,8 @@ const ContinueGameView: FunctionComponent = () => {
           sx={{
             width: { xs: "100%", sm: 580, md: 600 },
             maxWidth: "100%",
-            height: { xs: "100%", md: "auto" },
-            maxHeight: { xs: "100%", md: "calc(100vh - 48px)" },
+            height: { xs: "100%", sm: "auto" },
+            maxHeight: { xs: "100%", sm: "calc(100vh - 48px)" },
             display: "flex",
             flexDirection: "column",
             borderRadius: { xs: 0, sm: 2 },
@@ -199,13 +199,16 @@ const ContinueGameView: FunctionComponent = () => {
 
           <Box
             sx={{
+              display: "flex",
+              flexDirection: "column",
               overflowY: "auto",
               overflowX: "hidden",
               flex: 1,
+              minHeight: 0,
               p: { xs: 1, sm: 2 },
             }}
           >
-            <CardContent>
+            <CardContent sx={{ flexShrink: 0 }}>
               <Typography variant="body2" color="text.secondary">
                 You can resume a game started from another device by signing in
                 with one of the players participating and selecting the game you
@@ -214,7 +217,7 @@ const ContinueGameView: FunctionComponent = () => {
             </CardContent>
 
             {player === null ? (
-              <CardContent sx={{ pt: 0 }}>
+              <CardContent sx={{ pt: 0, flexShrink: 0 }}>
                 <Box
                   component="form"
                   onSubmit={(e) => {
@@ -306,7 +309,7 @@ const ContinueGameView: FunctionComponent = () => {
                 </Box>
               </CardContent>
             ) : (
-              <CardContent sx={{ pt: 0 }}>
+              <CardContent sx={{ pt: 0, flexShrink: 0 }}>
                 <Box
                   sx={{
                     display: "flex",
@@ -355,7 +358,7 @@ const ContinueGameView: FunctionComponent = () => {
             )}
 
             <Conditional value={player !== null}>
-              <Divider sx={{ my: 1 }} />
+              <Divider sx={{ my: 1, flexShrink: 0 }} />
             </Conditional>
 
             {player !== null && (
@@ -420,7 +423,8 @@ const ContinueGameView: FunctionComponent = () => {
                   resumableGames.length > 0 && (
                     <CardContent
                       sx={{
-                        maxHeight: 400,
+                        flex: 1,
+                        minHeight: 0,
                         overflowY: "auto",
                         overflowX: "hidden",
                         p: 1,
@@ -485,9 +489,9 @@ const ContinueGameView: FunctionComponent = () => {
               </>
             )}
 
-            <Divider sx={{ my: 1 }} />
+            <Divider sx={{ my: 1, flexShrink: 0 }} />
 
-            <CardContent>
+            <CardContent sx={{ flexShrink: 0 }}>
               <Button
                 variant="outlined"
                 color="inherit"
@@ -504,7 +508,7 @@ const ContinueGameView: FunctionComponent = () => {
       </Fade>
 
       {selectedGame && (
-        <ContinueGameDialog
+        <ResumeGameDialog
           open={!!selectedGame}
           game={selectedGame}
           onConfirm={confirmResume}
@@ -515,4 +519,4 @@ const ContinueGameView: FunctionComponent = () => {
   );
 };
 
-export default ContinueGameView;
+export default ResumeGameView;

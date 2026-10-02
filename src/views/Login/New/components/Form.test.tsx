@@ -26,7 +26,7 @@ vi.mock("../../../../api/endpoints/authentication", () => ({
 }));
 
 describe("NewGameForm", () => {
-  it("renders 'Resume a game' button pointing to /login/continue", () => {
+  it("renders 'Resume a game' button pointing to /login/resume", () => {
     render(
       <MemoryRouter>
         <NewGameProvider>
@@ -39,7 +39,7 @@ describe("NewGameForm", () => {
       name: "Resume a game",
     });
     expect(continueLink).toBeInTheDocument();
-    expect(continueLink).toHaveAttribute("href", "/login/continue");
+    expect(continueLink).toHaveAttribute("href", "/login/resume");
   });
 
   it("does not crash when increasing player count while typing password for player 2", async () => {

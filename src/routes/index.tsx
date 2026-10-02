@@ -8,8 +8,8 @@ import {
 import { useAssetsPreloader } from "../hooks/preloader";
 import GameView from "../views/Game";
 import LoginView from "../views/Login";
-import ContinueGameView from "../views/Login/Continue";
 import NewGameView from "../views/Login/New";
+import ResumeGameView from "../views/Login/Resume";
 import SharedControlView from "../views/SharedControl";
 import { GameGuard } from "./guard";
 
@@ -40,7 +40,11 @@ const Routes: FunctionComponent = () => {
         >
           <Route path="login" element={<LoginView />}>
             <Route path="" element={<NewGameView />} />
-            <Route path="continue" element={<ContinueGameView />} />
+            <Route path="resume" element={<ResumeGameView />} />
+            <Route
+              path="continue"
+              element={<Navigate to="/login/resume" replace />}
+            />
           </Route>
 
           <Route path="*" element={<Navigate to="/login" />} />

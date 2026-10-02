@@ -20,7 +20,7 @@ const LoginView: FunctionComponent = () => {
           minHeight: "100%",
           height: "100%",
           px: { xs: 0, sm: 2, md: 3 },
-          py: { xs: 0, md: 3 },
+          py: { xs: 0, sm: 2, md: 3 },
           overflowY: "auto",
         }}
       >
